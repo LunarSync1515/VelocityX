@@ -2485,11 +2485,15 @@ do
                 NewKey.Instance.Text = Name .. " [".. Key .."]"
             end
 
-            function NewKey:SetStatus(Bool)
+function NewKey:SetStatus(Bool)
     if NewKey.Instance.Text:find("Menu Keybind") then
         NewKey.Instance.Visible = false
         return
     end
+
+    -- show bind if a key exists
+    NewKey.Instance.Visible = Bool
+end
 
     -- Always show assigned keybinds
     NewKey.Instance.Visible = true
@@ -5351,4 +5355,5 @@ end
 
 
 return Library
+
 
