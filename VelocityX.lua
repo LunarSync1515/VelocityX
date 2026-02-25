@@ -1912,7 +1912,7 @@ do
         local Update = function()
             if KeyListItem then
                 KeyListItem:SetText(Data.Name, Keybind.Value)
-                KeyListItem:SetStatus(Keybind.Toggled)
+                KeyListItem:SetStatus(Keybind.Value ~= "None")
             end
         end
 
@@ -5351,3 +5351,4 @@ end
 
 
 return Library
+
