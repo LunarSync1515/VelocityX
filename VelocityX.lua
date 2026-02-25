@@ -1655,22 +1655,20 @@ do
     Library.CreateKeybind = function(self, Data)
         local Keybind = {
             IsOpen = false,
-
             Key = "",
             Toggled = false,
             Mode = "",
-
             Flag = Data.Flag,
-
             Picking = false,
             Value = ""
         }
 
-        local KeyListItem 
-        if Library.KeyList then 
-            KeyListItem = Library.KeyList:Add("", "")
-        end
+        -- REGISTER FIX: Global tracker so the list can find this keybind later
+        Library.AllKeybinds = Library.AllKeybinds or {}
+        Library.AllKeybinds[Keybind.Flag] = Keybind
 
+        local KeyListItem 
+        
         local Items = { } do 
             Items["KeyButton"] = Instances:Create("TextButton", {
                 Parent = Data.Parent.Instance,
@@ -1903,6 +1901,312 @@ do
             Items["KeyButton"]:OnHover(function()
                 Items["KeyButton"]:Tween(nil, {BackgroundColor3 = Library:GetLighterColor(Library.Theme.Element, 1.35)})
             end)
+
+            Items["KeyButton"]:OnHoverLeave(function()
+                Items["KeyButton"]:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
+            end)
+        end
+
+        local Update = function()
+            -- SYNC FIX: Re-check if KeyList exists every time a bind updates
+            if Library.KeyList then
+                if not KeyListItem then
+                    KeyListItem = Library.KeyList:Add(Data.Name, Keybind.Value)
+                end
+                KeyListItem:SetText(Data.Name, Keybind.Value)
+                KeyListItem:SetStatus(Keybind.Toggled)
+            end
+        end
+
+        local Modes = {
+            ["Toggle"] = {Items["Toggle"], Items["ToggleText"], Items["ToggleStroke"], Items["ToggleLiner"]},
+            ["Hold"] = {Items["Hold"], Items["HoldText"], Items["HoldStroke"], Items["HoldLiner"]},
+            ["Always On"] = {Items["AlwaysOn"], Items["AlwaysOnText"], Items["AlwaysOnStroke"], Items["AlwaysOnLiner"]}
+        }
+
+        function Keybind:Get()
+            return Keybind.Mode, Keybind.Key, Keybind.Toggled
+        end
+
+        local Debounce = false
+        local RenderStepped  
+
+        function Keybind:SetOpen(Bool)
+            if Debounce then 
+                return
+            end
+
+            Keybind.IsOpen = Bool
+
+            Debounce = true 
+
+            if Keybind.IsOpen then 
+                Items["KeybindWindow"].Instance.Visible = true
+                Items["KeybindWindow"].Instance.Parent = Library.Holder.Instance
+                
+                RenderStepped = RunService.RenderStepped:Connect(function()
+                    Items["KeybindWindow"].Instance.Position = UDim2New(0, Items["KeyButton"].Instance.AbsolutePosition.X, 0, Items["KeyButton"].Instance.AbsolutePosition.Y + Items["KeyButton"].Instance.AbsoluteSize.Y + 65)
+                end)
+
+                if not Debounce then 
+                    for Index, Value in Library.OpenFrames do 
+                        if Value ~= Keybind then 
+                            Value:SetOpen(false)
+                        end
+                    end
+
+                    Library.OpenFrames[Keybind] = Keybind 
+                end
+            else
+                if not Debounce then 
+                    if Library.OpenFrames[Keybind] then 
+                        Library.OpenFrames[Keybind] = nil
+                    end
+                end
+
+                if RenderStepped then 
+                    RenderStepped:Disconnect()
+                    RenderStepped = nil
+                end
+            end
+
+            local Descendants = Items["KeybindWindow"].Instance:GetDescendants()
+            TableInsert(Descendants, Items["KeybindWindow"].Instance)
+
+            local NewTween
+
+            for Index, Value in Descendants do 
+                local TransparencyProperty = Tween:GetProperty(Value)
+
+                if not TransparencyProperty then
+                    continue 
+                end
+
+                if type(TransparencyProperty) == "table" then 
+                    for _, Property in TransparencyProperty do 
+                        NewTween = Tween:FadeItem(Value, Property, Bool, Library.FadeSpeed)
+                    end
+                else
+                    NewTween = Tween:FadeItem(Value, TransparencyProperty, Bool, Library.FadeSpeed)
+                end
+            end
+            
+            if NewTween then
+                NewTween.Tween.Completed:Connect(function()
+                    Debounce = false 
+                    Items["KeybindWindow"].Instance.Visible = Keybind.IsOpen
+                    task.wait(0.2)
+                    Items["KeybindWindow"].Instance.Parent = not Keybind.IsOpen and Library.UnusedHolder.Instance or Library.Holder.Instance
+                end)
+            else
+                Debounce = false
+            end
+        end
+
+        function Keybind:Set(Key)
+            if StringFind(tostring(Key), "Enum") then 
+                Keybind.Key = tostring(Key)
+
+                Key = Key.Name == "Backspace" and "None" or Key.Name
+
+                local KeyString = Keys[Keybind.Key] or StringGSub(Key, "Enum.", "") or "None"
+                local TextToDisplay = StringGSub(StringGSub(KeyString, "KeyCode.", ""), "UserInputType.", "") or "None"
+
+                Keybind.Value = TextToDisplay
+                Items["KeyButton"].Instance.Text = TextToDisplay
+
+                Library.Flags[Keybind.Flag] = {
+                    Mode = Keybind.Mode,
+                    Key = Keybind.Key,
+                    Toggled = Keybind.Toggled,
+                    active = Keybind.Toggled
+                }
+
+                if Data.Callback then 
+                    Library:SafeCall(Data.Callback, Keybind.Toggled)
+                end
+
+                Update()
+            elseif type(Key) == "table" then
+                local RealKey = Key.Key == "Backspace" and "None" or Key.Key
+                Keybind.Key = tostring(Key.Key)
+
+                if Key.Mode then
+                    Keybind.Mode = Key.Mode
+                    Keybind:SetMode(Key.Mode)
+                else
+                    Keybind.Mode = "Toggle"
+                    Keybind:SetMode("Toggle")
+                end
+
+                local KeyString = Keys[Keybind.Key] or StringGSub(tostring(RealKey), "Enum.", "") or RealKey
+                local TextToDisplay = KeyString and StringGSub(StringGSub(KeyString, "KeyCode.", ""), "UserInputType.", "") or "None"
+
+                TextToDisplay = StringGSub(StringGSub(KeyString, "KeyCode.", ""), "UserInputType.", "")
+
+                Keybind.Value = TextToDisplay
+                Items["KeyButton"].Instance.Text = TextToDisplay
+
+                if Key.Toggled then 
+                    Keybind:Press(Key.Toggled)
+                end
+
+                if Data.Callback then 
+                    Library:SafeCall(Data.Callback, Keybind.Toggled)
+                end
+
+                Update()
+            elseif TableFind({"Toggle", "Hold", "Always", "Always On"}, Key) then
+                local RealMode = Key == "Always" and "Always On" or Key
+                Keybind.Mode = RealMode
+                Keybind:SetMode(RealMode)
+
+                if Data.Callback then 
+                    Library:SafeCall(Data.Callback, Keybind.Toggled)
+                end
+
+                Update()
+            elseif type(Key) == "boolean" then  
+                Keybind:Press(Key)
+            end
+
+            Keybind.Picking = false
+        end
+
+        function Keybind:Press(Bool)
+            if Keybind.Mode == "Toggle" then 
+                Keybind.Toggled = not Keybind.Toggled
+            elseif Keybind.Mode == "Hold" then 
+                Keybind.Toggled = Bool
+            elseif Keybind.Mode == "Always On" or Keybind.Mode == "Always" then 
+                Keybind.Toggled = true
+            end
+
+            Library.Flags[Keybind.Flag] = {
+                Mode = Keybind.Mode,
+                Key = Keybind.Key,
+                Toggled = Keybind.Toggled,
+                active = Keybind.Toggled
+            }
+
+            if Data.Callback then 
+                Library:SafeCall(Data.Callback, Keybind.Toggled)
+            end
+
+            Update()
+        end
+
+        function Keybind:SetMode(Mode)
+            for Index, Value in Modes do 
+                if Index == Mode then
+                    Value[1]:Tween(nil, {BackgroundTransparency = 0})
+                    Value[4]:Tween(nil, {BackgroundTransparency = 0})
+                    Value[2]:Tween(nil, {TextTransparency = 0})
+                    Value[3]:Tween(nil, {Transparency = 0})
+                else
+                    Value[1]:Tween(nil, {BackgroundTransparency = 1})
+                    Value[4]:Tween(nil, {BackgroundTransparency = 1})
+                    Value[2]:Tween(nil, {TextTransparency = 0.4})
+                    Value[3]:Tween(nil, {Transparency = 1})
+                end
+            end
+
+            Keybind.Mode = Mode
+            Library.Flags[Keybind.Flag] = {
+                Mode = Keybind.Mode,
+                Key = Keybind.Key,
+                Toggled = Keybind.Toggled,
+                active = Keybind.Toggled
+            }
+
+            Update()
+        end
+
+        Items["KeyButton"]:Connect("MouseButton1Click", function()
+            Keybind.Picking = true 
+
+            Items["KeyButton"].Instance.Text = "."
+            Library:Thread(function()
+                local Count = 1
+
+                while true do 
+                    if not Keybind.Picking then 
+                        break
+                    end
+
+                    if Count == 4 then
+                        Count = 1
+                    end
+
+                    Items["KeyButton"].Instance.Text = Count == 1 and "." or Count == 2 and ".." or Count == 3 and "..."
+                    Count += 1
+                    task.wait(0.4)
+                end
+            end)
+
+            local InputBegan
+            InputBegan = UserInputService.InputBegan:Connect(function(Input)
+                if Input.UserInputType == Enum.UserInputType.Keyboard then 
+                    Keybind:Set(Input.KeyCode)
+                else
+                    Keybind:Set(Input.UserInputType)
+                end
+
+                InputBegan:Disconnect()
+                InputBegan = nil
+            end)
+        end)
+
+        Items["KeyButton"]:Connect("MouseButton2Down", function()
+            Keybind:SetOpen(not Keybind.IsOpen)
+        end)
+
+        Library:Connect(UserInputService.InputBegan, function(Input)
+            if Keybind.Value == "None" then return end
+
+            if tostring(Input.KeyCode) == Keybind.Key or tostring(Input.UserInputType) == Keybind.Key then
+                if Keybind.Mode == "Toggle" then 
+                    Keybind:Press()
+                elseif Keybind.Mode == "Hold" then 
+                    Keybind:Press(true)
+                elseif Keybind.Mode == "Always On" then 
+                    Keybind:Press(true)
+                end
+            end
+        end)
+
+        Library:Connect(UserInputService.InputEnded, function(Input)
+            if Keybind.Value == "None" then return end
+
+            if tostring(Input.KeyCode) == Keybind.Key or tostring(Input.UserInputType) == Keybind.Key then
+                if Keybind.Mode == "Hold" then 
+                    Keybind:Press(false)
+                end
+            end
+        end)
+
+        Items["Toggle"]:Connect("MouseButton1Down", function()
+            Keybind:SetMode("Toggle")
+        end)
+
+        Items["Hold"]:Connect("MouseButton1Down", function()
+            Keybind:SetMode("Hold")
+        end)
+
+        Items["AlwaysOn"]:Connect("MouseButton1Down", function()
+            Keybind:SetMode("Always On")
+        end)
+
+        if Data.Default then
+            Keybind:Set({Key = Data.Default, Mode = Data.Mode or "Toggle", Toggled = Data.Toggled})
+        end
+
+        Library.SetFlags[Keybind.Flag] = function(Value)
+            Keybind:Set(Value)
+        end
+
+        return Keybind, Items 
+    end
 
             Items["KeyButton"]:OnHoverLeave(function()
                 Items["KeyButton"]:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
@@ -2348,7 +2652,7 @@ do
         return Watermark
     end
 
-    Library.KeybindList = function(self)
+   Library.KeybindList = function(self)
         local KeybindList = { }
         self.KeyList = KeybindList
 
@@ -2478,11 +2782,12 @@ do
                 BorderColor3 = FromRGB(0, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.X,
                 TextSize = 14,
-                BackgroundColor3 = FromRGB(255, 255, 255)
+                BackgroundColor3 = FromRGB(255, 255, 255),
+                Visible = false -- Hidden by default fix
             })  NewKey:AddToTheme({TextColor3 = "Text"})
 
             function NewKey:SetText(Name, Key)
-                NewKey.Instance.Text = Name .. " [".. Key .."]"
+                NewKey.Instance.Text = Name .. " [".. Key .. "]"
             end
 
             function NewKey:SetStatus(Bool)
@@ -2491,6 +2796,13 @@ do
             end
 
             return NewKey
+        end
+
+        -- SYNC FIX: Reaches out to add every existing keybind that was made BEFORE the list was opened
+        if Library.AllKeybinds then
+            for _, bind in pairs(Library.AllKeybinds) do
+                bind:Press(bind.Toggled) -- Triggers the update logic for the list
+            end
         end
 
         return KeybindList
@@ -5343,3 +5655,4 @@ do
 end
 
 return Library
+
