@@ -22,10 +22,10 @@ local Library do
         FadeSpeed = 0.2,
 
         Folders = {
-            Directory = "VelocityX",
-            Configs = "VelocityX/Configs",
-            Assets = "VelocityX/Assets",
-			Sounds = "VelocityX/Sounds",
+            Directory = "luna",
+            Configs = "luna/Configs",
+            Assets = "luna/Assets",
+			Sounds = "luna/Sounds",
         },
 
         -- Ignore below
@@ -771,7 +771,7 @@ Library.SafeCall = function(self, Function, ...)
     local Success, Result = pcall(Function, TableUnpack(Arguements))
 
     if not Success then
-        LocalPlayer:Kick("VelocityX Callback Error: " .. tostring(Result))
+        LocalPlayer:Kick("Luna Callback Error: " .. tostring(Result))
         return false
     end
 
@@ -1666,13 +1666,10 @@ do
             Value = ""
         }
 
-       local KeyListItem
-
--- wait until KeybindList exists
-task.spawn(function()
-    repeat task.wait() until Library.KeyList
-    KeyListItem = Library.KeyList:Add("", "")
-end)
+        local KeyListItem 
+        if Library.KeyList then 
+            KeyListItem = Library.KeyList:Add("", "")
+        end
 
         local Items = { } do 
             Items["KeyButton"] = Instances:Create("TextButton", {
@@ -1915,7 +1912,7 @@ end)
         local Update = function()
             if KeyListItem then
                 KeyListItem:SetText(Data.Name, Keybind.Value)
-                KeyListItem:SetStatus(Keybind.Value ~= "None")
+                KeyListItem:SetStatus(Keybind.Toggled)
             end
         end
 
@@ -2488,22 +2485,11 @@ end)
                 NewKey.Instance.Text = Name .. " [".. Key .."]"
             end
 
-function NewKey:SetStatus(Bool)
-    if NewKey.Instance.Text:find("Menu Keybind") then
-        NewKey.Instance.Visible = false
-        return
-    end
+            function NewKey:SetStatus(Bool)
+                if NewKey.Instance.Text:find("Menu Keybind") then NewKey.Instance.Visible = false return end
+                NewKey.Instance.Visible = Bool 
+            end
 
-    -- show bind if a key exists
-    NewKey.Instance.Visible = Bool
-end
-
-    -- Always show assigned keybinds
-    NewKey.Instance.Visible = true
-
-    -- Active = bright, inactive = faded
-    NewKey.Instance.TextTransparency = Bool and 0 or 0.4
-end
             return NewKey
         end
 
@@ -5356,8 +5342,4 @@ end
     end
 end
 
-
 return Library
-
-
-
