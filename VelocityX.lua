@@ -1666,10 +1666,13 @@ do
             Value = ""
         }
 
-        local KeyListItem 
-        if Library.KeyList then 
-            KeyListItem = Library.KeyList:Add("", "")
-        end
+       local KeyListItem
+
+-- wait until KeybindList exists
+task.spawn(function()
+    repeat task.wait() until Library.KeyList
+    KeyListItem = Library.KeyList:Add("", "")
+end)
 
         local Items = { } do 
             Items["KeyButton"] = Instances:Create("TextButton", {
@@ -5355,5 +5358,6 @@ end
 
 
 return Library
+
 
 
