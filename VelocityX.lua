@@ -2502,18 +2502,21 @@ do
 
         local Items = { } do
             Items["ModList"] = Instances:Create("Frame", {
-                Parent = Library.Holder.Instance,
-                Name = "\0",
+                Parent = Library.Holder.Instance, -- Ensure Library.Holder is the ScreenGui for a floating list
+                Name = "ModList", -- Changed from "\0" for easier debugging
                 AnchorPoint = Vector2New(0, 0.5),
                 Position = UDim2New(1, -220, 0.5, 0),
                 BorderColor3 = FromRGB(0, 0, 0),
                 BorderSizePixel = 0,
                 Size = UDim2New(0, 200, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = FromRGB(24, 28, 36)
+                BackgroundColor3 = FromRGB(24, 28, 36),
+                Visible = true, -- FORCE VISIBILITY
+                ZIndex = 5      -- ENSURE IT IS ABOVE OTHER ELEMENTS
             })  Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
 
             Items["ModList"]:MakeDraggable()
+
 
             Instances:Create("UIPadding", {
                 Parent = Items["ModList"].Instance,
@@ -5343,3 +5346,4 @@ do
 end
 
 return Library
+
