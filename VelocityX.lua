@@ -183,14 +183,14 @@ local Keys = {
 local Themes = {
     ["Preset"] = {
         ["Window Outline"] = FromRGB(0, 0, 0),
-        ["Accent"] = FromRGB(155, 11, 227),
+        ["Accent"] = FromRGB(0, 203, 255),
         ["Background 1"] = FromRGB(20,20,20),
         ["Text"] = FromRGB(255, 255, 255),
         ["Inline"] = FromHex('#161616'),
         ["Element"] = FromHex('#1c1c1c'),
         ["Inactive Text"] = FromRGB(185, 185, 185),
         ["Border"] =  FromHex('#323232'),
-        ["Background 2"] = FromRGB(24,24,24)
+        ["Background 2"] = FromRGB(0,0,0)
     }
 }
 
@@ -5343,3 +5343,4 @@ do
 end
 
 return Library
+
