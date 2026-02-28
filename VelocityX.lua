@@ -2512,7 +2512,7 @@ do
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundColor3 = FromRGB(24, 28, 36),
                 Visible = true, -- FORCE VISIBILITY
-                ZIndex = 5      -- ENSURE IT IS ABOVE OTHER ELEMENTS
+                ZIndex = 9999      -- ENSURE IT IS ABOVE OTHER ELEMENTS
             })  Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
 
             Items["ModList"]:MakeDraggable()
@@ -5375,6 +5375,7 @@ task.spawn(function()
 end)
 
 return Library
+
 
 
 
