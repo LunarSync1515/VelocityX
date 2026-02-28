@@ -680,7 +680,7 @@ Library.Holder = Instances:Create("ScreenGui", {
     Parent = gethui(),
     Name = "\0",
     ZIndexBehavior = Enum.ZIndexBehavior.Global,
-    DisplayOrder = 2,
+    DisplayOrder = 9999,
     IgnoreGuiInset = true,
     ResetOnSpawn = false
 })
@@ -5375,6 +5375,7 @@ task.spawn(function()
 end)
 
 return Library
+
 
 
 
