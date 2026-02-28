@@ -22,10 +22,10 @@ local Library do
         FadeSpeed = 0.2,
 
         Folders = {
-            Directory = "VelocityX",
-            Configs = "VelocityX/Configs",
-            Assets = "VelocityX/Assets",
-			Sounds = "VelocityX/Sounds",
+            Directory = "luna",
+            Configs = "luna/Configs",
+            Assets = "luna/Assets",
+			Sounds = "luna/Sounds",
         },
 
         -- Ignore below
@@ -183,14 +183,14 @@ local Keys = {
 local Themes = {
     ["Preset"] = {
         ["Window Outline"] = FromRGB(0, 0, 0),
-        ["Accent"] = FromRGB(0, 158, 255),
+        ["Accent"] = FromRGB(155, 11, 227),
         ["Background 1"] = FromRGB(20,20,20),
         ["Text"] = FromRGB(255, 255, 255),
         ["Inline"] = FromHex('#161616'),
         ["Element"] = FromHex('#1c1c1c'),
         ["Inactive Text"] = FromRGB(185, 185, 185),
         ["Border"] =  FromHex('#323232'),
-        ["Background 2"] = FromRGB(0,0,0)
+        ["Background 2"] = FromRGB(24,24,24)
     }
 }
 
@@ -680,7 +680,7 @@ Library.Holder = Instances:Create("ScreenGui", {
     Parent = gethui(),
     Name = "\0",
     ZIndexBehavior = Enum.ZIndexBehavior.Global,
-    DisplayOrder = 9999,
+    DisplayOrder = 2,
     IgnoreGuiInset = true,
     ResetOnSpawn = false
 })
@@ -2502,19 +2502,18 @@ do
 
         local Items = { } do
             Items["ModList"] = Instances:Create("Frame", {
-                Parent = Library.Holder.Instance, -- Ensure Library.Holder is the ScreenGui for a floating list
-                Name = "ModList", -- Changed from "\0" for easier debugging
-                AnchorPoint = Vector2New(0.5, 0.5),
-                Position = UDim2New(0.5, 0, 0.5, 0),
+                Parent = Library.Holder.Instance,
+                Name = "\0",
+                AnchorPoint = Vector2New(0, 0.5),
+                Position = UDim2New(1, -220, 0.5, 0),
                 BorderColor3 = FromRGB(0, 0, 0),
                 BorderSizePixel = 0,
-                Size = UDim2New(0, 250, 0, 200),
-                BackgroundColor3 = FromRGB(250, 0, 0),
-                Visible = true, -- FORCE VISIBILITY
-                ZIndex = 999999
+                Size = UDim2New(0, 200, 0, 0),
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = FromRGB(24, 28, 36)
             })  Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
-            Items["ModList"]:MakeDraggable()
 
+            Items["ModList"]:MakeDraggable()
 
             Instances:Create("UIPadding", {
                 Parent = Items["ModList"].Instance,
@@ -5342,41 +5341,5 @@ do
         end
     end
 end
---////////////////////////////////////////////////////
--- VELOCITYX MODLIST FORCE CREATE
---////////////////////////////////////////////////////
-
-task.spawn(function()
-
-    repeat task.wait()
-    until Library
-        and Library.Holder
-        and Library.Holder.Instance
-        and Library.ModeratorList
-
-    local ok, ModList = pcall(function()
-        return Library:ModeratorList()
-    end)
-
-    if ok and ModList then
-        Library.ModListObject = ModList
-        Library.ModListObject:SetVisibility(true)
-        Library.ModListObject:add_mod("VelocityX", "Owner")
-
-        -- Test entry (so you SEE it)
-        Library.ModListObject:add_mod("VelocityX", "Owner")
-
-        print("[VelocityX] Modlist Loaded")
-    else
-        warn("[VelocityX] Modlist failed")
-    end
-
-end)
 
 return Library
-
-
-
-
-
-
