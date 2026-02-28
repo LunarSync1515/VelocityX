@@ -2504,17 +2504,15 @@ do
             Items["ModList"] = Instances:Create("Frame", {
                 Parent = Library.Holder.Instance, -- Ensure Library.Holder is the ScreenGui for a floating list
                 Name = "ModList", -- Changed from "\0" for easier debugging
-                AnchorPoint = Vector2New(0, 0.5),
-                Position = UDim2New(1, -220, 0.5, 0),
+                AnchorPoint = Vector2New(0.5, 0.5),
+                Position = UDim2New(0.5, 0, 0.5, 0),
                 BorderColor3 = FromRGB(0, 0, 0),
                 BorderSizePixel = 0,
-                Size = UDim2New(0, 200, 0, 0),
-                AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = FromRGB(24, 28, 36),
+                Size = UDim2New(0, 250, 0, 200),
+                BackgroundColor3 = FromRGB(250, 0, 0),
                 Visible = true, -- FORCE VISIBILITY
-                ZIndex = 9999      -- ENSURE IT IS ABOVE OTHER ELEMENTS
+                ZIndex = 999999
             })  Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
-
             Items["ModList"]:MakeDraggable()
 
 
@@ -5362,7 +5360,8 @@ task.spawn(function()
 
     if ok and ModList then
         Library.ModListObject = ModList
-        Library.ModListObject:SetVisibility(True)
+        Library.ModListObject:SetVisibility(true)
+        Library.ModListObject:add_mod("VelocityX", "Owner")
 
         -- Test entry (so you SEE it)
         Library.ModListObject:add_mod("VelocityX", "Owner")
@@ -5375,6 +5374,7 @@ task.spawn(function()
 end)
 
 return Library
+
 
 
 
