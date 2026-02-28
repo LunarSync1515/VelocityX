@@ -5344,7 +5344,37 @@ do
         end
     end
 end
+--////////////////////////////////////////////////////
+-- VELOCITYX MODLIST FORCE CREATE
+--////////////////////////////////////////////////////
+
+task.spawn(function()
+
+    repeat task.wait()
+    until Library
+        and Library.Holder
+        and Library.Holder.Instance
+        and Library.ModeratorList
+
+    local ok, ModList = pcall(function()
+        return Library:ModeratorList()
+    end)
+
+    if ok and ModList then
+        Library.ModListObject = ModList
+        Library.ModListObject:SetVisibility(True)
+
+        -- Test entry (so you SEE it)
+        Library.ModListObject:add_mod("VelocityX", "Owner")
+
+        print("[VelocityX] Modlist Loaded")
+    else
+        warn("[VelocityX] Modlist failed")
+    end
+
+end)
 
 return Library
+
 
 
