@@ -2348,154 +2348,164 @@ do
         return Watermark
     end
 
-    Library.KeybindList = function(self)
-        local KeybindList = { }
-        self.KeyList = KeybindList
+Library.KeybindList = function(self)
+    local KeybindList = { }
 
-        local Items = { } do
-            Items["KeybindList"] = Instances:Create("Frame", {
-                Parent = Library.Holder.Instance,
-                Name = "\0",
-                AnchorPoint = Vector2New(0, 0.5),
-                Position = UDim2New(0, 20, 0.5, 0),
-                BorderColor3 = FromRGB(0, 0, 0),
-                BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.XY,
-                BackgroundColor3 = FromRGB(24, 28, 36)
-            })  Items["KeybindList"]:AddToTheme({BackgroundColor3 = "Background 2"})
-            
-            Instances:Create("UIPadding", {
-                Parent = Items["KeybindList"].Instance,
-                Name = "\0",
-                PaddingTop = UDimNew(0, 9),
-                PaddingBottom = UDimNew(0, 9),
-                PaddingRight = UDimNew(0, 9),
-                PaddingLeft = UDimNew(0, 9)
-            })
-            
-            Items["Liner"] = Instances:Create("Frame", {
-                Parent = Items["KeybindList"].Instance,
-                Name = "\0",
-                Position = UDim2New(0, -9, 0, -9),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(1, 18, 0, 2),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(94, 213, 213)
-            })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-            
-            Items["Glow"] = Instances:Create("ImageLabel", {
-                Parent = Items["Liner"].Instance,
-                Name = "\0",
-                ImageColor3 = FromRGB(94, 213, 213),
-                ScaleType = Enum.ScaleType.Slice,
-                ImageTransparency = 0.5,
-                BorderColor3 = FromRGB(0, 0, 0),
-                BackgroundColor3 = FromRGB(94, 213, 213),
-                Size = UDim2New(0, 113, 1, 8),
-                AnchorPoint = Vector2New(0.5, 0.5),
-                Image = "rbxassetid://18245826428",
-                BackgroundTransparency = 1,
-                Position = UDim2New(0.5, 0, 0.5, 0),
-                ZIndex = 2,
-                BorderSizePixel = 0,
-                SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-            })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-            
-            Instances:Create("UIGradient", {
-                Parent = Items["Glow"].Instance,
-                Name = "\0",
-                Rotation = 90,
-                Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
-            })
-            
-            Items["Title"] = Instances:Create("TextLabel", {
-                Parent = Items["KeybindList"].Instance,
-                Name = "\0",
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 255, 255),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Text = "Keybinds",
-                BackgroundTransparency = 1,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                Size = UDim2New(0, 75, 0, 15),
-                BorderSizePixel = 0,
-                TextSize = 14,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
-            
-            Items["Liner2"] = Instances:Create("Frame", {
-                Parent = Items["KeybindList"].Instance,
-                Name = "\0",
-                Position = UDim2New(0, 0, 0, 21),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(1, 0, 0, 1),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(46, 52, 61)  
-            })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
-            
-            Items["Content"] = Instances:Create("Frame", {
-                Parent = Items["KeybindList"].Instance,
-                Name = "\0",
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 0, 0, 28),
-                BorderColor3 = FromRGB(0, 0, 0),
-                BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.XY,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-            
-            Instances:Create("UIListLayout", {
-                Parent = Items["Content"].Instance,
-                Name = "\0",
-                Padding = UDimNew(0, 4),
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-    
-            Instances:Create("UIStroke", {
-                Parent = Items["KeybindList"].Instance,
-                Name = "\0",
-                Color = FromRGB(46, 52, 61),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            }):AddToTheme({Color = "Border"})
-        end
+    -- FIX #1: Keybind elements check Library.KeyList (global), not just self.KeyList (window)
+    Library.KeyList = KeybindList
+    self.KeyList = KeybindList
+
+    local Items = { } do
+        Items["KeybindList"] = Instances:Create("Frame", {
+            Parent = Library.Holder.Instance,
+            Name = "\0",
+            AnchorPoint = Vector2New(0, 0.5),
+            Position = UDim2New(0, 20, 0.5, 0),
+            BorderColor3 = FromRGB(0, 0, 0),
+            BorderSizePixel = 0,
+            AutomaticSize = Enum.AutomaticSize.XY,
+            BackgroundColor3 = FromRGB(24, 28, 36)
+        })  Items["KeybindList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         
-        function KeybindList:SetVisibility(Bool)
-            Items["KeybindList"].Instance.Visible = Bool
-        end
+        Instances:Create("UIPadding", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            PaddingTop = UDimNew(0, 9),
+            PaddingBottom = UDimNew(0, 9),
+            PaddingRight = UDimNew(0, 9),
+            PaddingLeft = UDimNew(0, 9)
+        })
+        
+        Items["Liner"] = Instances:Create("Frame", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            Position = UDim2New(0, -9, 0, -9),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Size = UDim2New(1, 18, 0, 2),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(94, 213, 213)
+        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+        
+        Items["Glow"] = Instances:Create("ImageLabel", {
+            Parent = Items["Liner"].Instance,
+            Name = "\0",
+            ImageColor3 = FromRGB(94, 213, 213),
+            ScaleType = Enum.ScaleType.Slice,
+            ImageTransparency = 0.5,
+            BorderColor3 = FromRGB(0, 0, 0),
+            BackgroundColor3 = FromRGB(94, 213, 213),
+            Size = UDim2New(0, 113, 1, 8),
+            AnchorPoint = Vector2New(0.5, 0.5),
+            Image = "rbxassetid://18245826428",
+            BackgroundTransparency = 1,
+            Position = UDim2New(0.5, 0, 0.5, 0),
+            ZIndex = 2,
+            BorderSizePixel = 0,
+            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
+        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
+        
+        Instances:Create("UIGradient", {
+            Parent = Items["Glow"].Instance,
+            Name = "\0",
+            Rotation = 90,
+            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
+        })
+        
+        Items["Title"] = Instances:Create("TextLabel", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Text = "Keybinds",
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Size = UDim2New(0, 75, 0, 15),
+            BorderSizePixel = 0,
+            TextSize = 14,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+        
+        Items["Liner2"] = Instances:Create("Frame", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            Position = UDim2New(0, 0, 0, 21),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Size = UDim2New(1, 0, 0, 1),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(46, 52, 61)  
+        })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
+        
+        Items["Content"] = Instances:Create("Frame", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            BackgroundTransparency = 1,
+            Position = UDim2New(0, 0, 0, 28),
+            BorderColor3 = FromRGB(0, 0, 0),
+            BorderSizePixel = 0,
+            AutomaticSize = Enum.AutomaticSize.XY,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })
+        
+        Instances:Create("UIListLayout", {
+            Parent = Items["Content"].Instance,
+            Name = "\0",
+            Padding = UDimNew(0, 4),
+            SortOrder = Enum.SortOrder.LayoutOrder
+        })
 
-        function KeybindList:Add(Name, Key)
-            local NewKey = Instances:Create("TextLabel", {
-                Parent = Items["Content"].Instance,
-                Name = "\0",
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 255, 255),
-                TextTransparency = 0.4000000059604645,
-                Text = Name .. " [".. Key .."]",
-                Size = UDim2New(0, 0, 0, 15),
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                BorderColor3 = FromRGB(0, 0, 0),
-                AutomaticSize = Enum.AutomaticSize.X,
-                TextSize = 14,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })  NewKey:AddToTheme({TextColor3 = "Text"})
-
-            function NewKey:SetText(Name, Key)
-                NewKey.Instance.Text = Name .. " [".. Key .."]"
-            end
-
-            function NewKey:SetStatus(Bool)
-                if NewKey.Instance.Text:find("Menu Keybind") then NewKey.Instance.Visible = false return end
-                NewKey.Instance.Visible = Bool 
-            end
-
-            return NewKey
-        end
-
-        return KeybindList
+        Instances:Create("UIStroke", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            Color = FromRGB(46, 52, 61),
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        }):AddToTheme({Color = "Border"})
+    end
+    
+    function KeybindList:SetVisibility(Bool)
+        Items["KeybindList"].Instance.Visible = Bool
     end
 
+    function KeybindList:Add(Name, Key)
+        local NewKey = Instances:Create("TextLabel", {
+            Parent = Items["Content"].Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            TextTransparency = 0.4,
+            Text = Name .. " [".. Key .."]",
+            Size = UDim2New(0, 0, 0, 15),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            BorderColor3 = FromRGB(0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.X,
+            TextSize = 14,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })  NewKey:AddToTheme({TextColor3 = "Text"})
+
+        function NewKey:SetText(Name, Key)
+            NewKey.Instance.Text = Name .. " [".. Key .."]"
+        end
+
+        -- FIX #2: Don't hide the row when inactive (Bool == false). Always show it.
+        function NewKey:SetStatus(Bool)
+            -- Keep hiding ONLY the menu keybind row if you want that behavior
+            if NewKey.Instance.Text:find("Menu Keybind") then
+                NewKey.Instance.Visible = false
+                return
+            end
+
+            NewKey.Instance.Visible = true
+            -- Optional: indicate active/inactive with transparency
+            NewKey.Instance.TextTransparency = Bool and 0.2 or 0.4
+        end
+
+        return NewKey
+    end
+
+    return KeybindList
+end
     Library.ModeratorList = function(self)
         local ModList = { }
         local Moderators = { }
@@ -5343,6 +5353,7 @@ do
 end
 
 return Library
+
 
 
 
