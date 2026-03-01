@@ -2503,13 +2503,13 @@ Library.KeybindList = function(self)
     -- Global glow when ANY keybind is active
     local ActiveCount = 0
     local DefaultAccent = FromRGB(94, 213, 213)
-    local ActiveBlue = FromRGB(0, 170, 255)
+    local ActiveBlue = FromRGB(60, 150, 255)
 
     local function UpdateActiveGlow()
         local on = ActiveCount > 0
         Items["Liner"].Instance.BackgroundColor3 = on and ActiveBlue or DefaultAccent
         Items["Glow"].Instance.ImageColor3 = on and ActiveBlue or DefaultAccent
-        Items["Glow"].Instance.ImageTransparency = on and 0.12 or 0.5
+        Items["Glow"].Instance.ImageTransparency = on and 0.35 or 0.5
     end
 
     UpdateActiveGlow()
@@ -5430,6 +5430,7 @@ end
 end
 
 return Library
+
 
 
 
