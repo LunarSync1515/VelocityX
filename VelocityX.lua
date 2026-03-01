@@ -2351,156 +2351,117 @@ do
 Library.KeybindList = function(self)
     local KeybindList = { }
 
-    -- Keybind elements check Library.KeyList (global), not just self.KeyList (window)
     Library.KeyList = KeybindList
     self.KeyList = KeybindList
 
-    local Items = { } do
-        Items["KeybindList"] = Instances:Create("Frame", {
-            Parent = Library.Holder.Instance,
-            Name = "\0",
-            AnchorPoint = Vector2New(0, 0.5),
-            Position = UDim2New(0, 20, 0.5, 0),
-            BorderColor3 = FromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(24, 28, 36)
-        })  Items["KeybindList"]:AddToTheme({BackgroundColor3 = "Background 2"})
+    local Items = {}
 
-        -- DRAGGABLE
-        do
-            local frame = Items["KeybindList"].Instance
-            local UIS = game:GetService("UserInputService")
+    -- MAIN FRAME
+    Items["KeybindList"] = Instances:Create("Frame", {
+        Parent = Library.Holder.Instance,
+        Name = "\0",
+        AnchorPoint = Vector2New(0, 0.5),
+        Position = UDim2New(0, 20, 0.5, 0),
+        BorderSizePixel = 0,
+        AutomaticSize = Enum.AutomaticSize.XY,
+        BackgroundColor3 = FromRGB(24, 28, 36)
+    })
 
-            local dragging = false
-            local dragStart, startPos
+    -- DRAGGING
+    do
+        local frame = Items["KeybindList"].Instance
+        local UIS = game:GetService("UserInputService")
 
-            local function update(input)
-                local delta = input.Position - dragStart
-                frame.Position = UDim2New(
-                    startPos.X.Scale, startPos.X.Offset + delta.X,
-                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
-                )
-            end
+        local dragging = false
+        local dragStart, startPos
 
-            frame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                    dragStart = input.Position
-                    startPos = frame.Position
-
-                    input.Changed:Connect(function()
-                        if input.UserInputState == Enum.UserInputState.End then
-                            dragging = false
-                        end
-                    end)
-                end
-            end)
-
-            UIS.InputChanged:Connect(function(input)
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    update(input)
-                end
-            end)
+        local function update(input)
+            local delta = input.Position - dragStart
+            frame.Position = UDim2New(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
         end
 
-        Instances:Create("UIPadding", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            PaddingTop = UDimNew(0, 9),
-            PaddingBottom = UDimNew(0, 9),
-            PaddingRight = UDimNew(0, 9),
-            PaddingLeft = UDimNew(0, 9)
-        })
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = frame.Position
 
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, -9, 0, -9),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 18, 0, 2),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(94, 213, 213)
-        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
 
-        Items["Glow"] = Instances:Create("ImageLabel", {
-            Parent = Items["Liner"].Instance,
-            Name = "\0",
-            ImageColor3 = FromRGB(94, 213, 213),
-            ScaleType = Enum.ScaleType.Slice,
-            ImageTransparency = 0.5,
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundColor3 = FromRGB(94, 213, 213),
-            Size = UDim2New(0, 113, 1, 8),
-            AnchorPoint = Vector2New(0.5, 0.5),
-            Image = "rbxassetid://18245826428",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0.5, 0, 0.5, 0),
-            ZIndex = 2,
-            BorderSizePixel = 0,
-            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-
-        Instances:Create("UIGradient", {
-            Parent = Items["Glow"].Instance,
-            Name = "\0",
-            Rotation = 90,
-            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
-        })
-
-        Items["Title"] = Instances:Create("TextLabel", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Text = "Keybinds",
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2New(0, 75, 0, 15),
-            BorderSizePixel = 0,
-            TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
-
-        Items["Liner2"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, 0, 0, 21),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 0, 0, 1),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(46, 52, 61)
-        })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
-
-        Items["Content"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 28),
-            BorderColor3 = FromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
-
-        Instances:Create("UIListLayout", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            Padding = UDimNew(0, 4),
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-
-        Instances:Create("UIStroke", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
+        UIS.InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                update(input)
+            end
+        end)
     end
 
-    -- BRIGHT BLUE GLOW WHEN ANY KEYBIND IS ACTIVE
+    -- PADDING
+    Instances:Create("UIPadding", {
+        Parent = Items["KeybindList"].Instance,
+        PaddingTop = UDim.new(0, 9),
+        PaddingBottom = UDim.new(0, 9),
+        PaddingRight = UDim.new(0, 9),
+        PaddingLeft = UDim.new(0, 9)
+    })
+
+    -- TOP BLUE BAR
+    Items["Liner"] = Instances:Create("Frame", {
+        Parent = Items["KeybindList"].Instance,
+        Position = UDim2New(0, -9, 0, -9),
+        Size = UDim2New(1, 18, 0, 2),
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(94, 213, 213)
+    })
+
+    Items["Glow"] = Instances:Create("ImageLabel", {
+        Parent = Items["Liner"].Instance,
+        ImageColor3 = FromRGB(94, 213, 213),
+        ImageTransparency = 0.5,
+        BackgroundTransparency = 1,
+        Size = UDim2New(0, 113, 1, 8),
+        AnchorPoint = Vector2New(0.5, 0.5),
+        Position = UDim2New(0.5, 0, 0.5, 0),
+        Image = "rbxassetid://18245826428",
+        ScaleType = Enum.ScaleType.Slice,
+        SliceCenter = Rect.new(21,21,79,79)
+    })
+
+    -- TITLE
+    Instances:Create("TextLabel", {
+        Parent = Items["KeybindList"].Instance,
+        Text = "Keybinds",
+        BackgroundTransparency = 1,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Size = UDim2New(0, 75, 0, 15),
+        TextSize = 14,
+        FontFace = Library.Font,
+        TextColor3 = Color3.new(1,1,1)
+    })
+
+    -- CONTENT
+    Items["Content"] = Instances:Create("Frame", {
+        Parent = Items["KeybindList"].Instance,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 0, 0, 28),
+        AutomaticSize = Enum.AutomaticSize.XY
+    })
+
+    Instances:Create("UIListLayout", {
+        Parent = Items["Content"].Instance,
+        Padding = UDim.new(0, 4),
+        SortOrder = Enum.SortOrder.LayoutOrder
+    })
+
+    -- ACTIVE TRACKING
     local ActiveCount = 0
     local DefaultAccent = FromRGB(94, 213, 213)
     local ActiveBlue = FromRGB(0, 170, 255)
@@ -2509,31 +2470,29 @@ Library.KeybindList = function(self)
         local on = ActiveCount > 0
         Items["Liner"].Instance.BackgroundColor3 = on and ActiveBlue or DefaultAccent
         Items["Glow"].Instance.ImageColor3 = on and ActiveBlue or DefaultAccent
-        Items["Glow"].Instance.ImageTransparency = on and 0.12 or 0.5
+        Items["Glow"].Instance.ImageTransparency = on and 0.1 or 0.5
     end
 
     UpdateActiveGlow()
 
-    function KeybindList:SetVisibility(Bool)
-        Items["KeybindList"].Instance.Visible = Bool
-    end
-
     function KeybindList:Add(Name, Key)
         local NewKey = Instances:Create("TextLabel", {
             Parent = Items["Content"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            TextTransparency = 0.4,
             Text = Name .. " [".. Key .."]",
-            Size = UDim2New(0, 0, 0, 15),
             BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            BorderColor3 = FromRGB(0, 0, 0),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  NewKey:AddToTheme({TextColor3 = "Text"})
+            FontFace = Library.Font,
+            TextColor3 = Color3.new(1,1,1),
+            TextTransparency = 0.4
+        })
+
+        -- GLOW OUTLINE (for active bind)
+        local Stroke = Instance.new("UIStroke")
+        Stroke.Parent = NewKey.Instance
+        Stroke.Thickness = 1.5
+        Stroke.Transparency = 1
+        Stroke.Color = ActiveBlue
 
         NewKey._Active = false
 
@@ -2542,19 +2501,24 @@ Library.KeybindList = function(self)
         end
 
         function NewKey:SetStatus(Bool)
-            -- Hide ONLY the menu keybind row (keep if you want)
             if NewKey.Instance.Text:find("Menu Keybind") then
                 NewKey.Instance.Visible = false
                 return
             end
 
-            -- Always show
             NewKey.Instance.Visible = true
 
-            -- Row bright when active
-            NewKey.Instance.TextTransparency = Bool and 0 or 0.4
+            -- 🔵 BLUE TEXT + GLOW
+            if Bool then
+                NewKey.Instance.TextColor3 = ActiveBlue
+                NewKey.Instance.TextTransparency = 0
+                Stroke.Transparency = 0.2
+            else
+                NewKey.Instance.TextColor3 = Color3.new(1,1,1)
+                NewKey.Instance.TextTransparency = 0.4
+                Stroke.Transparency = 1
+            end
 
-            -- Update global glow
             if Bool ~= NewKey._Active then
                 NewKey._Active = Bool
                 ActiveCount += Bool and 1 or -1
@@ -5415,6 +5379,7 @@ end
 end
 
 return Library
+
 
 
 
