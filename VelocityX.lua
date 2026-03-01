@@ -2351,7 +2351,7 @@ do
 Library.KeybindList = function(self)
     local KeybindList = { }
 
-    -- Fix: keybind elements check Library.KeyList (global), not only self.KeyList (window)
+    -- Keybind elements check Library.KeyList (global), not just self.KeyList (window)
     Library.KeyList = KeybindList
     self.KeyList = KeybindList
 
@@ -2367,7 +2367,7 @@ Library.KeybindList = function(self)
             BackgroundColor3 = FromRGB(24, 28, 36)
         })  Items["KeybindList"]:AddToTheme({BackgroundColor3 = "Background 2"})
 
-        -- Make draggable
+        -- Draggable
         do
             local frame = Items["KeybindList"].Instance
             local UIS = game:GetService("UserInputService")
@@ -2413,6 +2413,7 @@ Library.KeybindList = function(self)
             PaddingLeft = UDimNew(0, 9)
         })
 
+        -- Top bar (static, no glow changes)
         Items["Liner"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
@@ -2423,6 +2424,8 @@ Library.KeybindList = function(self)
             BackgroundColor3 = FromRGB(94, 213, 213)
         })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
 
+        -- Keep the decorative glow asset if you want the same look,
+        -- but we DO NOT animate it or brighten it.
         Items["Glow"] = Instances:Create("ImageLabel", {
             Parent = Items["Liner"].Instance,
             Name = "\0",
@@ -2500,21 +2503,7 @@ Library.KeybindList = function(self)
         }):AddToTheme({Color = "Border"})
     end
 
-    -- Global glow when ANY keybind is active
-    local ActiveCount = 0
-    local DefaultAccent = FromRGB(94, 213, 213)
-    local ActiveBlue = FromRGB(60, 150, 255)
-
-    local function UpdateActiveGlow()
-        local on = ActiveCount > 0
-        Items["Liner"].Instance.BackgroundColor3 = on and ActiveBlue or DefaultAccent
-        Items["Glow"].Instance.ImageColor3 = on and ActiveBlue or DefaultAccent
-        Items["Glow"].Instance.ImageTransparency = on and 0.35 or 0.5
-    end
-
-    UpdateActiveGlow()
-
-    -- IMPORTANT: main source expects this method (prevents your kick)
+    -- Main source expects this method
     function KeybindList:SetVisibility(Bool)
         Items["KeybindList"].Instance.Visible = Bool
     end
@@ -2536,22 +2525,14 @@ Library.KeybindList = function(self)
             BackgroundColor3 = FromRGB(255, 255, 255)
         })
 
-        -- NOTE: Do NOT theme TextColor3 here or it can override active blue
+        -- Important: don't theme TextColor3 here or it can override the active blue
         -- NewKey:AddToTheme({TextColor3 = "Text"})
-
-        -- Add glow outline for active items
-        local Stroke = Instance.new("UIStroke")
-        Stroke.Parent = NewKey.Instance
-        Stroke.Thickness = 1.5
-        Stroke.Color = ActiveBlue
-        Stroke.Transparency = 1
-
-        NewKey._Active = false
 
         function NewKey:SetText(Name, Key)
             NewKey.Instance.Text = Name .. " [".. Key .."]"
         end
 
+        -- Blue text when active, no glow
         function NewKey:SetStatus(Bool)
             if NewKey.Instance.Text:find("Menu Keybind") then
                 NewKey.Instance.Visible = false
@@ -2560,22 +2541,11 @@ Library.KeybindList = function(self)
 
             NewKey.Instance.Visible = true
 
-            if Bool then
-                NewKey.Instance.TextColor3 = ActiveBlue
-                NewKey.Instance.TextTransparency = 0
-                Stroke.Transparency = 0.2
-            else
-                NewKey.Instance.TextColor3 = FromRGB(255, 255, 255)
-                NewKey.Instance.TextTransparency = 0.4
-                Stroke.Transparency = 1
-            end
+            local ActiveBlue = FromRGB(60, 150, 255) -- softer blue
+            local NormalText = FromRGB(255, 255, 255)
 
-            if Bool ~= NewKey._Active then
-                NewKey._Active = Bool
-                ActiveCount += Bool and 1 or -1
-                if ActiveCount < 0 then ActiveCount = 0 end
-                UpdateActiveGlow()
-            end
+            NewKey.Instance.TextColor3 = Bool and ActiveBlue or NormalText
+            NewKey.Instance.TextTransparency = Bool and 0 or 0.4
         end
 
         return NewKey
@@ -5430,6 +5400,7 @@ end
 end
 
 return Library
+
 
 
 
