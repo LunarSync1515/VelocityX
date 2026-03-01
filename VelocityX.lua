@@ -2553,244 +2553,206 @@ Library.KeybindList = function(self)
 
     return KeybindList
 end
-									
-Library.ModeratorList = function(self)
-    local ModList = { }
-    local Moderators = { }
+    Library.ModeratorList = function(self)
+        local ModList = { }
+        local Moderators = { }
 
-    local Items = { } do
-        Items["ModList"] = Instances:Create("Frame", {
-            Parent = Library.Holder.Instance,
-            Name = "\0",
-            AnchorPoint = Vector2New(0, 0.5),
-            Position = UDim2New(1, -220, 0.5, 0),
-            BorderColor3 = FromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            Size = UDim2New(0, 200, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundColor3 = FromRGB(24, 28, 36)
-        })  Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
+        local Items = { } do
+            Items["ModList"] = Instances:Create("Frame", {
+                Parent = Library.Holder.Instance,
+                Name = "\0",
+                AnchorPoint = Vector2New(0, 0.5),
+                Position = UDim2New(1, -220, 0.5, 0),
+                BorderColor3 = FromRGB(0, 0, 0),
+                BorderSizePixel = 0,
+                Size = UDim2New(0, 200, 0, 0),
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = FromRGB(24, 28, 36)
+            })  Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
 
-        -- Draggable (replaces Items["ModList"]:MakeDraggable())
-        do
-            local frame = Items["ModList"].Instance
-            local UIS = game:GetService("UserInputService")
+            Items["ModList"]:MakeDraggable()
 
-            local dragging = false
-            local dragStart, startPos
+            Instances:Create("UIPadding", {
+                Parent = Items["ModList"].Instance,
+                Name = "\0",
+                PaddingTop = UDimNew(0, 9),
+                PaddingBottom = UDimNew(0, 9),
+                PaddingRight = UDimNew(0, 9),
+                PaddingLeft = UDimNew(0, 9)
+            })
 
-            local function update(input)
-                local delta = input.Position - dragStart
-                frame.Position = UDim2New(
-                    startPos.X.Scale, startPos.X.Offset + delta.X,
-                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
-                )
+            Items["Liner"] = Instances:Create("Frame", {
+                Parent = Items["ModList"].Instance,
+                Name = "\0",
+                Position = UDim2New(0, -9, 0, -9),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(1, 18, 0, 2),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(94, 213, 213)
+            })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+
+            Items["Glow"] = Instances:Create("ImageLabel", {
+                Parent = Items["Liner"].Instance,
+                Name = "\0",
+                ImageColor3 = FromRGB(94, 213, 213),
+                ScaleType = Enum.ScaleType.Slice,
+                ImageTransparency = 0.5,
+                BorderColor3 = FromRGB(0, 0, 0),
+                BackgroundColor3 = FromRGB(94, 213, 213),
+                Size = UDim2New(0, 113, 1, 8),
+                AnchorPoint = Vector2New(0.5, 0.5),
+                Image = "rbxassetid://18245826428",
+                BackgroundTransparency = 1,
+                Position = UDim2New(0.5, 0, 0.5, 0),
+                ZIndex = 2,
+                BorderSizePixel = 0,
+                SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
+            })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
+
+            Instances:Create("UIGradient", {
+                Parent = Items["Glow"].Instance,
+                Name = "\0",
+                Rotation = 90,
+                Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
+            })
+
+            Items["Title"] = Instances:Create("TextLabel", {
+                Parent = Items["ModList"].Instance,
+                Name = "\0",
+                FontFace = Library.Font,
+                TextColor3 = FromRGB(255, 255, 255),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Text = "Moderators",
+                BackgroundTransparency = 1,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Size = UDim2New(0, 150, 0, 15),
+                BorderSizePixel = 0,
+                TextSize = 14,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+
+            Items["Liner2"] = Instances:Create("Frame", {
+                Parent = Items["ModList"].Instance,
+                Name = "\0",
+                Position = UDim2New(0, 0, 0, 21),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(1, 0, 0, 1),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(46, 52, 61)
+            })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
+
+            Items["Content"] = Instances:Create("Frame", {
+                Parent = Items["ModList"].Instance,
+                Name = "\0",
+                BackgroundTransparency = 1,
+                Position = UDim2New(0, 0, 0, 28),
+                BorderColor3 = FromRGB(0, 0, 0),
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.XY,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })
+
+            Instances:Create("UIListLayout", {
+                Parent = Items["Content"].Instance,
+                Name = "\0",
+                Padding = UDimNew(0, 4),
+                SortOrder = Enum.SortOrder.LayoutOrder
+            })
+
+            Instances:Create("UIStroke", {
+                Parent = Items["ModList"].Instance,
+                Name = "\0",
+                Color = FromRGB(46, 52, 61),
+                LineJoinMode = Enum.LineJoinMode.Miter,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            }):AddToTheme({Color = "Border"})
+        end
+
+        function ModList:SetVisibility(Bool)
+            Items["ModList"].Instance.Visible = Bool
+        end
+
+        function ModList:add_mod(Username, Role)
+            if Moderators[Username] then
+                ModList:remove_mod(Username)
             end
 
-            frame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                    dragStart = input.Position
-                    startPos = frame.Position
+            Role = Role or 'Moderator'
 
-                    input.Changed:Connect(function()
-                        if input.UserInputState == Enum.UserInputState.End then
-                            dragging = false
-                        end
-                    end)
-                end
-            end)
+            local ModFrame = Instances:Create('Frame', {
+                Parent = Items['Content'].Instance,
+                Name = '\0',
+                BackgroundTransparency = 1,
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(1, 0, 0, 15),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })
 
-            UIS.InputChanged:Connect(function(input)
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    update(input)
-                end
-            end)
-        end
+            local Line = Instances:Create('TextLabel', {
+                Parent = ModFrame.Instance,
+                Name = '\0',
+                FontFace = Library.Font,
+                RichText = true,
+                TextColor3 = FromRGB(255, 255, 255),
+                BorderColor3 = FromRGB(0, 0, 0),
+                BackgroundTransparency = 1,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                BorderSizePixel = 0,
+                TextSize = 14,
+                Size = UDim2New(1, 0, 0, 15),
+                Text = ''
+            })  Line:AddToTheme({TextColor3 = 'Text'})
 
-        Instances:Create("UIPadding", {
-            Parent = Items["ModList"].Instance,
-            Name = "\0",
-            PaddingTop = UDimNew(0, 9),
-            PaddingBottom = UDimNew(0, 9),
-            PaddingRight = UDimNew(0, 9),
-            PaddingLeft = UDimNew(0, 9)
-        })
-
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["ModList"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, -9, 0, -9),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 18, 0, 2),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(94, 213, 213)
-        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-
-        Items["Glow"] = Instances:Create("ImageLabel", {
-            Parent = Items["Liner"].Instance,
-            Name = "\0",
-            ImageColor3 = FromRGB(94, 213, 213),
-            ScaleType = Enum.ScaleType.Slice,
-            ImageTransparency = 0.5,
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundColor3 = FromRGB(94, 213, 213),
-            Size = UDim2New(0, 113, 1, 8),
-            AnchorPoint = Vector2New(0.5, 0.5),
-            Image = "rbxassetid://18245826428",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0.5, 0, 0.5, 0),
-            ZIndex = 2,
-            BorderSizePixel = 0,
-            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-
-        Instances:Create("UIGradient", {
-            Parent = Items["Glow"].Instance,
-            Name = "\0",
-            Rotation = 90,
-            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
-        })
-
-        Items["Title"] = Instances:Create("TextLabel", {
-            Parent = Items["ModList"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Text = "Moderators",
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2New(0, 150, 0, 15),
-            BorderSizePixel = 0,
-            TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
-
-        Items["Liner2"] = Instances:Create("Frame", {
-            Parent = Items["ModList"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, 0, 0, 21),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 0, 0, 1),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(46, 52, 61)
-        })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
-
-        Items["Content"] = Instances:Create("Frame", {
-            Parent = Items["ModList"].Instance,
-            Name = "\0",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 28),
-            BorderColor3 = FromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
-
-        Instances:Create("UIListLayout", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            Padding = UDimNew(0, 4),
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-
-        Instances:Create("UIStroke", {
-            Parent = Items["ModList"].Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
-    end
-
-    function ModList:SetVisibility(Bool)
-        Items["ModList"].Instance.Visible = Bool
-    end
-
-    function ModList:add_mod(Username, Role)
-        if Moderators[Username] then
-            ModList:remove_mod(Username)
-        end
-
-        Role = Role or 'Moderator'
-
-        local ModFrame = Instances:Create('Frame', {
-            Parent = Items['Content'].Instance,
-            Name = '\0',
-            BackgroundTransparency = 1,
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 0, 0, 15),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
-
-        local Line = Instances:Create('TextLabel', {
-            Parent = ModFrame.Instance,
-            Name = '\0',
-            FontFace = Library.Font,
-            RichText = true,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            BorderSizePixel = 0,
-            TextSize = 14,
-            Size = UDim2New(1, 0, 0, 15),
-            Text = ''
-        })  Line:AddToTheme({TextColor3 = 'Text'})
-
-        local function esc(s)
-            s = tostring(s or '')
-            s = s:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;'):gsub('"', '&quot;'):gsub("'", '&#39;')
-            return s
-        end
-
-        local function rebuild()
-            local u = esc(Username)
-            local r = esc(Role)
-            Line.Text = string.format('%s  <font color="#B9B9B9">%s</font>', u, r)
-        end
-
-        rebuild()
-
-        local ModData = {
-            Frame = ModFrame,
-            Username = Username,
-            Role = Role,
-            Label = Line,
-            SetRole = function(self, NewRole)
-                self.Role = NewRole or self.Role
-                Role = self.Role
-                rebuild()
+            local function esc(s)
+                s = tostring(s or '')
+                s = s:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;'):gsub('"', '&quot;'):gsub("'", '&#39;')
+                return s
             end
-        }
 
-        Moderators[Username] = ModData
-        return ModData
-    end
+            local function rebuild()
+                local u = esc(Username)
+                local r = esc(Role)
+                Line.Text = string.format('%s  <font color="#B9B9B9">%s</font>', u, r)
+            end
 
-    function ModList:remove_mod(Username)
-        local ModData = Moderators[Username]
-        if ModData then
-            ModData.Frame:Clean()
-            Moderators[Username] = nil
+            rebuild()
+
+            local ModData = {
+                Frame = ModFrame,
+                Username = Username,
+                Role = Role,
+                Label = Line,
+                SetRole = function(self, NewRole)
+                    self.Role = NewRole or self.Role
+                    Role = self.Role
+                    rebuild()
+                end
+            }
+
+            Moderators[Username] = ModData
+            return ModData
         end
-    end
 
-    function ModList:Get()
-        local ModTable = { }
-        for Username, Data in Moderators do
-            TableInsert(ModTable, {username = Username, role = Data.Role})
+        function ModList:remove_mod(Username)
+            local ModData = Moderators[Username]
+            if ModData then
+                ModData.Frame:Clean()
+                Moderators[Username] = nil
+            end
         end
-        return ModTable
+
+        function ModList:Get()
+            local ModTable = { }
+            for Username, Data in Moderators do
+                TableInsert(ModTable, {username = Username, role = Data.Role})
+            end
+            return ModTable
+        end
+
+        return ModList
     end
 
-    -- show by default (optional)
-    ModList:SetVisibility(true)
-
-    return ModList
-end
     Library.ArmorViewer = function(self)
         local Viewer = {
             Items = { }
@@ -5438,13 +5400,3 @@ end
 end
 
 return Library
-
-
-
-
-
-
-
-
-
-
