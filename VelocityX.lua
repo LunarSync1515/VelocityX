@@ -2485,18 +2485,16 @@ do
                 NewKey.Instance.Text = Name .. " [".. Key .."]"
             end
 
-function NewKey:SetStatus(Bool)
-    if NewKey.Instance.Text:find("Menu Keybind") then 
-        NewKey.Instance.Visible = false 
-        return 
+            function NewKey:SetStatus(Bool)
+                if NewKey.Instance.Text:find("Menu Keybind") then NewKey.Instance.Visible = false return end
+                NewKey.Instance.Visible = Bool 
+            end
+
+            return NewKey
+        end
+
+        return KeybindList
     end
-
-    -- Always keep keybind visible
-    NewKey.Instance.Visible = true
-
-    -- Optional: slight visual difference when active
-    NewKey.Instance.TextTransparency = Bool and 0.2 or 0.4
-end
 
     Library.ModeratorList = function(self)
         local ModList = { }
@@ -5345,5 +5343,6 @@ end
 end
 
 return Library
+
 
 
