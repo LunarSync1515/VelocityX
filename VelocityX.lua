@@ -22,10 +22,10 @@ local Library do
         FadeSpeed = 0.2,
 
         Folders = {
-            Directory = "luna",
-            Configs = "luna/Configs",
-            Assets = "luna/Assets",
-			Sounds = "luna/Sounds",
+            Directory = "VelocityX",
+            Configs = "VelocityX/Configs",
+            Assets = "VelocityX/Assets",
+			Sounds = "VelocityX/Sounds",
         },
 
         -- Ignore below
@@ -2485,16 +2485,18 @@ do
                 NewKey.Instance.Text = Name .. " [".. Key .."]"
             end
 
-            function NewKey:SetStatus(Bool)
-                if NewKey.Instance.Text:find("Menu Keybind") then NewKey.Instance.Visible = false return end
-                NewKey.Instance.Visible = Bool 
-            end
-
-            return NewKey
-        end
-
-        return KeybindList
+function NewKey:SetStatus(Bool)
+    if NewKey.Instance.Text:find("Menu Keybind") then 
+        NewKey.Instance.Visible = false 
+        return 
     end
+
+    -- Always keep keybind visible
+    NewKey.Instance.Visible = true
+
+    -- Optional: slight visual difference when active
+    NewKey.Instance.TextTransparency = Bool and 0.2 or 0.4
+end
 
     Library.ModeratorList = function(self)
         local ModList = { }
@@ -5343,4 +5345,5 @@ do
 end
 
 return Library
+
 
