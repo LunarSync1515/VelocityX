@@ -2351,7 +2351,7 @@ do
 Library.KeybindList = function(self)
     local KeybindList = { }
 
-    -- FIX #1: Keybind elements check Library.KeyList (global), not just self.KeyList (window)
+    -- Keybind elements check Library.KeyList (global), not just self.KeyList (window)
     Library.KeyList = KeybindList
     self.KeyList = KeybindList
 
@@ -2366,7 +2366,44 @@ Library.KeybindList = function(self)
             AutomaticSize = Enum.AutomaticSize.XY,
             BackgroundColor3 = FromRGB(24, 28, 36)
         })  Items["KeybindList"]:AddToTheme({BackgroundColor3 = "Background 2"})
-        
+
+        -- DRAGGABLE
+        do
+            local frame = Items["KeybindList"].Instance
+            local UIS = game:GetService("UserInputService")
+
+            local dragging = false
+            local dragStart, startPos
+
+            local function update(input)
+                local delta = input.Position - dragStart
+                frame.Position = UDim2New(
+                    startPos.X.Scale, startPos.X.Offset + delta.X,
+                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
+                )
+            end
+
+            frame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    dragStart = input.Position
+                    startPos = frame.Position
+
+                    input.Changed:Connect(function()
+                        if input.UserInputState == Enum.UserInputState.End then
+                            dragging = false
+                        end
+                    end)
+                end
+            end)
+
+            UIS.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    update(input)
+                end
+            end)
+        end
+
         Instances:Create("UIPadding", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
@@ -2375,7 +2412,7 @@ Library.KeybindList = function(self)
             PaddingRight = UDimNew(0, 9),
             PaddingLeft = UDimNew(0, 9)
         })
-        
+
         Items["Liner"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
@@ -2385,7 +2422,7 @@ Library.KeybindList = function(self)
             BorderSizePixel = 0,
             BackgroundColor3 = FromRGB(94, 213, 213)
         })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-        
+
         Items["Glow"] = Instances:Create("ImageLabel", {
             Parent = Items["Liner"].Instance,
             Name = "\0",
@@ -2403,14 +2440,14 @@ Library.KeybindList = function(self)
             BorderSizePixel = 0,
             SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
         })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-        
+
         Instances:Create("UIGradient", {
             Parent = Items["Glow"].Instance,
             Name = "\0",
             Rotation = 90,
             Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
         })
-        
+
         Items["Title"] = Instances:Create("TextLabel", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
@@ -2425,7 +2462,7 @@ Library.KeybindList = function(self)
             TextSize = 14,
             BackgroundColor3 = FromRGB(255, 255, 255)
         })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
-        
+
         Items["Liner2"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
@@ -2433,9 +2470,9 @@ Library.KeybindList = function(self)
             BorderColor3 = FromRGB(0, 0, 0),
             Size = UDim2New(1, 0, 0, 1),
             BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(46, 52, 61)  
+            BackgroundColor3 = FromRGB(46, 52, 61)
         })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
-        
+
         Items["Content"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
@@ -2446,7 +2483,7 @@ Library.KeybindList = function(self)
             AutomaticSize = Enum.AutomaticSize.XY,
             BackgroundColor3 = FromRGB(255, 255, 255)
         })
-        
+
         Instances:Create("UIListLayout", {
             Parent = Items["Content"].Instance,
             Name = "\0",
@@ -2462,7 +2499,21 @@ Library.KeybindList = function(self)
             ApplyStrokeMode = Enum.ApplyStrokeMode.Border
         }):AddToTheme({Color = "Border"})
     end
-    
+
+    -- BRIGHT BLUE GLOW WHEN ANY KEYBIND IS ACTIVE
+    local ActiveCount = 0
+    local DefaultAccent = FromRGB(94, 213, 213)
+    local ActiveBlue = FromRGB(0, 170, 255)
+
+    local function UpdateActiveGlow()
+        local on = ActiveCount > 0
+        Items["Liner"].Instance.BackgroundColor3 = on and ActiveBlue or DefaultAccent
+        Items["Glow"].Instance.ImageColor3 = on and ActiveBlue or DefaultAccent
+        Items["Glow"].Instance.ImageTransparency = on and 0.12 or 0.5
+    end
+
+    UpdateActiveGlow()
+
     function KeybindList:SetVisibility(Bool)
         Items["KeybindList"].Instance.Visible = Bool
     end
@@ -2484,21 +2535,32 @@ Library.KeybindList = function(self)
             BackgroundColor3 = FromRGB(255, 255, 255)
         })  NewKey:AddToTheme({TextColor3 = "Text"})
 
+        NewKey._Active = false
+
         function NewKey:SetText(Name, Key)
             NewKey.Instance.Text = Name .. " [".. Key .."]"
         end
 
-        -- FIX #2: Don't hide the row when inactive (Bool == false). Always show it.
         function NewKey:SetStatus(Bool)
-            -- Keep hiding ONLY the menu keybind row if you want that behavior
+            -- Hide ONLY the menu keybind row (keep if you want)
             if NewKey.Instance.Text:find("Menu Keybind") then
                 NewKey.Instance.Visible = false
                 return
             end
 
+            -- Always show
             NewKey.Instance.Visible = true
-            -- Optional: indicate active/inactive with transparency
-            NewKey.Instance.TextTransparency = Bool and 0.2 or 0.4
+
+            -- Row bright when active
+            NewKey.Instance.TextTransparency = Bool and 0 or 0.4
+
+            -- Update global glow
+            if Bool ~= NewKey._Active then
+                NewKey._Active = Bool
+                ActiveCount += Bool and 1 or -1
+                if ActiveCount < 0 then ActiveCount = 0 end
+                UpdateActiveGlow()
+            end
         end
 
         return NewKey
@@ -5353,6 +5415,7 @@ end
 end
 
 return Library
+
 
 
 
