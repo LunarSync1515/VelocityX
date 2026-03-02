@@ -5515,8 +5515,10 @@ task.defer(function()
     if lp then
         local pg = lp:WaitForChild("PlayerGui")
         HitNotifier:Init(pg)
+		HitNotifier:Notify("TestPlayer", "Head", 75, 100)
     end
 end)
 
 return Library
+
 
