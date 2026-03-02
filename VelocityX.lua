@@ -5580,11 +5580,11 @@ task.defer(function()
     local lp = Players.LocalPlayer
     if lp then
         HitBar:Init(lp:WaitForChild("PlayerGui"))
-Library.HitBar:Show("Hit Yuuio9995 in their Head with Wooden Bow from 319 studs away", 3.5)
     end
 end)
 
 return Library
+
 
 
 
