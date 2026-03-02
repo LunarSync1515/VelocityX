@@ -5399,7 +5399,7 @@ end
     end
 end
 
---// Slim Hit Notifier (top-left bar)
+--// Slim Hit Notifier (stacking, top-left)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 
@@ -5407,7 +5407,13 @@ Library.HitBar = Library.HitBar or {}
 local HitBar = Library.HitBar
 
 HitBar.Enabled = true
-HitBar.Duration = 3.0 -- seconds
+HitBar.Duration = 3.0
+HitBar.Max = 6 -- max bars on screen
+HitBar.Width = 560
+HitBar.Height = 28
+HitBar.Gap = 6
+HitBar.X = 14
+HitBar.Y = 14
 
 function HitBar:Init(parentGui)
     if self.Gui then return end
@@ -5418,13 +5424,26 @@ function HitBar:Init(parentGui)
     gui.IgnoreGuiInset = true
     gui.Parent = parentGui
 
+    local holder = Instance.new("Frame")
+    holder.Name = "Holder"
+    holder.AnchorPoint = Vector2.new(0, 0)
+    holder.Position = UDim2.new(0, self.X, 0, self.Y)
+    holder.Size = UDim2.new(0, self.Width, 0, 1) -- height grows visually via children
+    holder.BackgroundTransparency = 1
+    holder.Parent = gui
+
+    self.Gui = gui
+    self.Holder = holder
+    self.Items = {} -- newest first
+end
+
+local function makeBar(parent, width, height)
     local container = Instance.new("Frame")
-    container.Name = "Container"
-    container.AnchorPoint = Vector2.new(0, 0)
-    container.Position = UDim2.new(0, 14, 0, 14)     -- top-left
-    container.Size = UDim2.new(0, 560, 0, 28)        -- long thin bar
+    container.Name = "HitItem"
+    container.Size = UDim2.new(0, width, 0, height)
     container.BackgroundTransparency = 1
-    container.Parent = gui
+    container.BorderSizePixel = 0
+    container.Parent = parent
 
     local bg = Instance.new("Frame")
     bg.Name = "BG"
@@ -5454,6 +5473,7 @@ function HitBar:Init(parentGui)
     text.TextXAlignment = Enum.TextXAlignment.Left
     text.TextColor3 = Color3.fromRGB(235, 235, 235)
     text.TextStrokeTransparency = 1
+    text.TextTransparency = 0
     text.Text = ""
     text.Parent = bg
 
@@ -5470,53 +5490,88 @@ function HitBar:Init(parentGui)
     local bar = Instance.new("Frame")
     bar.Name = "Bar"
     bar.Size = UDim2.new(0, 0, 1, 0)
-    bar.BackgroundColor3 = Color3.fromRGB(120, 190, 255) -- subtle blue
+    bar.BackgroundColor3 = Color3.fromRGB(120, 190, 255)
     bar.BorderSizePixel = 0
     bar.Parent = barBack
 
-    -- start hidden
-    container.Visible = false
+    return {
+        Container = container,
+        BG = bg,
+        Text = text,
+        Bar = bar
+    }
+end
 
-    self.Gui = gui
-    self.Container = container
-    self.BG = bg
-    self.Text = text
-    self.Bar = bar
+function HitBar:_reflow(animated)
+    for i, item in ipairs(self.Items) do
+        local y = (i - 1) * (self.Height + self.Gap)
+        local goal = UDim2.new(0, 0, 0, y)
+        if animated then
+            TweenService:Create(item.Container, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = goal}):Play()
+        else
+            item.Container.Position = goal
+        end
+    end
 end
 
 function HitBar:Show(message, duration)
-    if not self.Enabled or not self.Container then return end
+    if not self.Enabled or not self.Holder then return end
     duration = duration or self.Duration
 
-    self.Text.Text = message
-    self.Container.Visible = true
+    -- Create new bar
+    local item = makeBar(self.Holder, self.Width, self.Height)
+    item.Text.Text = message
 
-    -- reset visuals
-    self.Container.BackgroundTransparency = 1
-    self.BG.BackgroundTransparency = 1
-    self.Text.TextTransparency = 1
-    self.Bar.Size = UDim2.new(0, 0, 1, 0)
+    -- Spawn at top, slightly offset for a pop-in
+    item.Container.Position = UDim2.new(0, 0, 0, -6)
+    item.BG.BackgroundTransparency = 1
+    item.Text.TextTransparency = 1
+    item.Bar.Size = UDim2.new(0, 0, 1, 0)
 
-    -- fade in
-    TweenService:Create(self.BG, TweenInfo.new(0.12), {BackgroundTransparency = 0.15}):Play()
-    TweenService:Create(self.Text, TweenInfo.new(0.12), {TextTransparency = 0}):Play()
+    -- Insert newest at top
+    table.insert(self.Items, 1, item)
 
-    -- timeline fill
-    TweenService:Create(self.Bar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+    -- Trim excess
+    while #self.Items > self.Max do
+        local last = table.remove(self.Items)
+        if last and last.Container then
+            last.Container:Destroy()
+        end
+    end
 
-    -- replace-spam protection: cancel previous hide
-    self._token = (self._token or 0) + 1
-    local myToken = self._token
+    -- Push others down
+    self:_reflow(true)
 
+    -- Fade in this new one
+    TweenService:Create(item.BG, TweenInfo.new(0.12), {BackgroundTransparency = 0.15}):Play()
+    TweenService:Create(item.Text, TweenInfo.new(0.12), {TextTransparency = 0}):Play()
+    TweenService:Create(item.Container, TweenInfo.new(0.12), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+
+    -- Timeline fill
+    TweenService:Create(item.Bar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+
+    -- Remove after duration (and reflow)
     task.delay(duration, function()
-        if myToken ~= self._token then return end
-        local t1 = TweenService:Create(self.BG, TweenInfo.new(0.15), {BackgroundTransparency = 1})
-        local t2 = TweenService:Create(self.Text, TweenInfo.new(0.15), {TextTransparency = 1})
+        if not item or not item.Container or not item.Container.Parent then return end
+
+        local t1 = TweenService:Create(item.BG, TweenInfo.new(0.15), {BackgroundTransparency = 1})
+        local t2 = TweenService:Create(item.Text, TweenInfo.new(0.15), {TextTransparency = 1})
         t1:Play(); t2:Play()
         t2.Completed:Wait()
-        if myToken == self._token then
-            self.Container.Visible = false
+
+        -- Remove from list
+        for idx, v in ipairs(self.Items) do
+            if v == item then
+                table.remove(self.Items, idx)
+                break
+            end
         end
+
+        if item.Container then
+            item.Container:Destroy()
+        end
+
+        self:_reflow(true)
     end)
 end
 
@@ -5530,6 +5585,7 @@ Library.HitBar:Show("Hit Yuuio9995 in their Head with Wooden Bow from 319 studs 
 end)
 
 return Library
+
 
 
 
