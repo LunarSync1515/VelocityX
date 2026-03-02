@@ -5399,4 +5399,124 @@ end
     end
 end
 
+--// Hit Notifier (client)
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+Library.HitNotifier = Library.HitNotifier or {}
+local HitNotifier = Library.HitNotifier
+HitNotifier.Enabled = true
+
+function HitNotifier:Init(parentGui)
+    if self.Gui then return end -- prevent double init
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "HitNotifier"
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    gui.Parent = parentGui
+
+    local holder = Instance.new("Frame")
+    holder.Name = "Holder"
+    holder.AnchorPoint = Vector2.new(1, 1)
+    holder.Position = UDim2.new(1, -16, 1, -16)
+    holder.Size = UDim2.new(0, 260, 0, 200)
+    holder.BackgroundTransparency = 1
+    holder.Parent = gui
+
+    local layout = Instance.new("UIListLayout")
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 6)
+    layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    layout.Parent = holder
+
+    self.Gui = gui
+    self.Holder = holder
+end
+
+function HitNotifier:Notify(victimName, hitPart, hpLeft, hpMax)
+    if not self.Enabled or not self.Holder then return end
+
+    local card = Instance.new("Frame")
+    card.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+    card.BackgroundTransparency = 0.1
+    card.BorderSizePixel = 0
+    card.Size = UDim2.new(1, 0, 0, 44)
+    card.Parent = self.Holder
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = card
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 1
+    stroke.Transparency = 0.4
+    stroke.Color = Color3.fromRGB(70, 90, 120)
+    stroke.Parent = card
+
+    local title = Instance.new("TextLabel")
+    title.BackgroundTransparency = 1
+    title.Position = UDim2.new(0, 10, 0, 6)
+    title.Size = UDim2.new(1, -20, 0, 16)
+    title.Font = Enum.Font.GothamSemibold
+    title.TextSize = 13
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Text = ("Hit: %s (%s)"):format(victimName, hitPart or "Body")
+    title.Parent = card
+
+    local hp = math.max(0, math.floor(tonumber(hpLeft) or 0))
+    local hpM = math.max(1, math.floor(tonumber(hpMax) or 100))
+
+    local subtitle = Instance.new("TextLabel")
+    subtitle.BackgroundTransparency = 1
+    subtitle.Position = UDim2.new(0, 10, 0, 22)
+    subtitle.Size = UDim2.new(1, -20, 0, 16)
+    subtitle.Font = Enum.Font.Gotham
+    subtitle.TextSize = 12
+    subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    subtitle.TextColor3 = Color3.fromRGB(200, 200, 210)
+    subtitle.Text = ("%d HP left"):format(hp)
+    subtitle.Parent = card
+
+    local barBack = Instance.new("Frame")
+    barBack.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    barBack.BorderSizePixel = 0
+    barBack.Position = UDim2.new(0, 10, 1, -8)
+    barBack.Size = UDim2.new(1, -20, 0, 3)
+    barBack.Parent = card
+
+    local bar = Instance.new("Frame")
+    bar.BackgroundColor3 = Color3.fromRGB(90, 170, 255)
+    bar.BorderSizePixel = 0
+    bar.Size = UDim2.new(math.clamp(hp / hpM, 0, 1), 0, 1, 0)
+    bar.Parent = barBack
+
+    card.BackgroundTransparency = 1
+    card.Position = UDim2.new(0, 0, 0, 10)
+    TweenService:Create(card, TweenInfo.new(0.12), {
+        BackgroundTransparency = 0.1,
+        Position = UDim2.new(0, 0, 0, 0)
+    }):Play()
+
+    task.delay(1.6, function()
+        if card and card.Parent then
+            local t = TweenService:Create(card, TweenInfo.new(0.15), {BackgroundTransparency = 1})
+            t:Play()
+            t.Completed:Wait()
+            if card then card:Destroy() end
+        end
+    end)
+end
+
+-- init once
+task.defer(function()
+    local lp = Players.LocalPlayer
+    if lp then
+        local pg = lp:WaitForChild("PlayerGui")
+        HitNotifier:Init(pg)
+    end
+end)
+
 return Library
+
