@@ -2648,8 +2648,11 @@ end
                 Position = UDim2New(0, 0, 0, 28),
                 BorderColor3 = FromRGB(0, 0, 0),
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.XY,
-                BackgroundColor3 = FromRGB(255, 255, 255)
+													
+                Size = UDim2New(1, 0, 0, 0),          -- give it width
+                AutomaticSize = Enum.AutomaticSize.Y, -- only grow vertically
+
+				BackgroundColor3 = FromRGB(255, 255, 255)
             })
 
             Instances:Create("UIListLayout", {
@@ -2744,7 +2747,7 @@ end
 
         function ModList:Get()
             local ModTable = { }
-            for Username, Data in Moderators do
+            for Username, Data in pairs(Moderators) do
                 TableInsert(ModTable, {username = Username, role = Data.Role})
             end
             return ModTable
@@ -5400,6 +5403,7 @@ end
 end
 
 return Library
+
 
 
 
