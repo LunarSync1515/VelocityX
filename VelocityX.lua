@@ -2555,6 +2555,7 @@ Library.KeybindList = function(self)
 end
 									
 Library.ModeratorList = function(self)
+
     local ModList = {}
     local Moderators = {}
 
@@ -2572,6 +2573,16 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
+        do
+    local sg = Items["ModList"].Instance:FindFirstAncestorOfClass("ScreenGui")
+    if sg then
+        sg.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    end
+end
+
+Items["ModList"].Instance.ZIndex = 50
+
+
         Instances:Create("UIPadding", {
             Parent = Items["ModList"].Instance,
             PaddingTop = UDimNew(0, 9),
@@ -2579,6 +2590,7 @@ Library.ModeratorList = function(self)
             PaddingRight = UDimNew(0, 9),
             PaddingLeft = UDimNew(0, 9)
         })
+
 
         Items["Title"] = Instances:Create("TextLabel", {
             Parent = Items["ModList"].Instance,
@@ -2592,6 +2604,7 @@ Library.ModeratorList = function(self)
         })
         Items["Title"]:AddToTheme({TextColor3 = "Text"})
 
+
         Items["Liner2"] = Instances:Create("Frame", {
             Parent = Items["ModList"].Instance,
             Position = UDim2New(0,0,0,21),
@@ -2601,7 +2614,7 @@ Library.ModeratorList = function(self)
         })
         Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
 
-        -- ✅ FIXED CONTENT FRAME
+
         Items["Content"] = Instances:Create("Frame", {
             Parent = Items["ModList"].Instance,
             BackgroundTransparency = 1,
@@ -2610,6 +2623,11 @@ Library.ModeratorList = function(self)
             Size = UDim2New(1,0,0,0),
             AutomaticSize = Enum.AutomaticSize.Y
         })
+
+            Items["Title"].Instance.ZIndex = 51
+            Items["Liner2"].Instance.ZIndex = 51
+            Items["Content"].Instance.ZIndex = 51
+
 
         Instances:Create("UIListLayout", {
             Parent = Items["Content"].Instance,
@@ -2625,11 +2643,14 @@ Library.ModeratorList = function(self)
         }):AddToTheme({Color = "Border"})
     end
 
+
     function ModList:SetVisibility(Bool)
         Items["ModList"].Instance.Visible = Bool
     end
 
+
     function ModList:add_mod(Username, Role)
+
         if Moderators[Username] then
             ModList:remove_mod(Username)
         end
@@ -2654,16 +2675,16 @@ Library.ModeratorList = function(self)
             Size = UDim2New(1,0,0,15),
             Text = ""
         })
-        Line:AddToTheme({TextColor3 = "Text"})
 
-        -- 🔥 FORCE TEXT VISIBLE
-        Line.Instance.Visible = true
-        Line.Instance.TextTransparency = 0
-        Line.Instance.TextStrokeTransparency = 1
-        Line.Instance.ZIndex = 10
+       Line.Instance.TextColor3 = FromRGB(255,255,255)
 
-        ModFrame.Instance.Visible = true
-        ModFrame.Instance.ZIndex = 9
+       ModFrame.Instance.ZIndex = 52
+       Line.Instance.ZIndex = 53
+
+       Line.Instance.Visible = true
+       Line.Instance.TextTransparency = 0
+       Line.Instance.TextStrokeTransparency = 1
+
 
         Line.Instance.Text = string.format(
             '%s  <font color="#B9B9B9">%s</font>',
@@ -2681,6 +2702,7 @@ Library.ModeratorList = function(self)
         return Moderators[Username]
     end
 
+
     function ModList:remove_mod(Username)
         local ModData = Moderators[Username]
         if ModData then
@@ -2689,6 +2711,7 @@ Library.ModeratorList = function(self)
         end
     end
 
+
     function ModList:Get()
         local ModTable = {}
         for Username, Data in pairs(Moderators) do
@@ -2696,6 +2719,7 @@ Library.ModeratorList = function(self)
         end
         return ModTable
     end
+
 
     return ModList
 end
@@ -5347,6 +5371,7 @@ end
 end
 
 return Library
+
 
 
 
