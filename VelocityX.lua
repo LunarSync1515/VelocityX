@@ -5399,112 +5399,123 @@ end
     end
 end
 
---// Hit Notifier (client)
+--// Slim Hit Notifier (top-left bar)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 
-Library.HitNotifier = Library.HitNotifier or {}
-local HitNotifier = Library.HitNotifier
-HitNotifier.Enabled = true
+Library.HitBar = Library.HitBar or {}
+local HitBar = Library.HitBar
 
-function HitNotifier:Init(parentGui)
-    if self.Gui then return end -- prevent double init
+HitBar.Enabled = true
+HitBar.Duration = 3.0 -- seconds
+
+function HitBar:Init(parentGui)
+    if self.Gui then return end
 
     local gui = Instance.new("ScreenGui")
-    gui.Name = "HitNotifier"
+    gui.Name = "HitBarNotifier"
     gui.ResetOnSpawn = false
     gui.IgnoreGuiInset = true
     gui.Parent = parentGui
 
-    local holder = Instance.new("Frame")
-    holder.Name = "Holder"
-    holder.AnchorPoint = Vector2.new(1, 1)
-    holder.Position = UDim2.new(1, -16, 1, -16)
-    holder.Size = UDim2.new(0, 260, 0, 200)
-    holder.BackgroundTransparency = 1
-    holder.Parent = gui
+    local container = Instance.new("Frame")
+    container.Name = "Container"
+    container.AnchorPoint = Vector2.new(0, 0)
+    container.Position = UDim2.new(0, 14, 0, 14)     -- top-left
+    container.Size = UDim2.new(0, 560, 0, 28)        -- long thin bar
+    container.BackgroundTransparency = 1
+    container.Parent = gui
 
-    local layout = Instance.new("UIListLayout")
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 6)
-    layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-    layout.Parent = holder
-
-    self.Gui = gui
-    self.Holder = holder
-end
-
-function HitNotifier:Notify(victimName, hitPart, hpLeft, hpMax)
-    if not self.Enabled or not self.Holder then return end
-
-    local card = Instance.new("Frame")
-    card.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
-    card.BackgroundTransparency = 0.1
-    card.BorderSizePixel = 0
-    card.Size = UDim2.new(1, 0, 0, 44)
-    card.Parent = self.Holder
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = card
+    local bg = Instance.new("Frame")
+    bg.Name = "BG"
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+    bg.BackgroundTransparency = 0.15
+    bg.BorderSizePixel = 0
+    bg.Parent = container
 
     local stroke = Instance.new("UIStroke")
     stroke.Thickness = 1
-    stroke.Transparency = 0.4
-    stroke.Color = Color3.fromRGB(70, 90, 120)
-    stroke.Parent = card
+    stroke.Transparency = 0.25
+    stroke.Color = Color3.fromRGB(0, 0, 0)
+    stroke.Parent = bg
 
-    local title = Instance.new("TextLabel")
-    title.BackgroundTransparency = 1
-    title.Position = UDim2.new(0, 10, 0, 6)
-    title.Size = UDim2.new(1, -20, 0, 16)
-    title.Font = Enum.Font.GothamSemibold
-    title.TextSize = 13
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.Text = ("Hit: %s (%s)"):format(victimName, hitPart or "Body")
-    title.Parent = card
+    local padding = Instance.new("UIPadding")
+    padding.PaddingLeft = UDim.new(0, 10)
+    padding.PaddingRight = UDim.new(0, 10)
+    padding.Parent = bg
 
-    local hp = math.max(0, math.floor(tonumber(hpLeft) or 0))
-    local hpM = math.max(1, math.floor(tonumber(hpMax) or 100))
-
-    local subtitle = Instance.new("TextLabel")
-    subtitle.BackgroundTransparency = 1
-    subtitle.Position = UDim2.new(0, 10, 0, 22)
-    subtitle.Size = UDim2.new(1, -20, 0, 16)
-    subtitle.Font = Enum.Font.Gotham
-    subtitle.TextSize = 12
-    subtitle.TextXAlignment = Enum.TextXAlignment.Left
-    subtitle.TextColor3 = Color3.fromRGB(200, 200, 210)
-    subtitle.Text = ("%d HP left"):format(hp)
-    subtitle.Parent = card
+    local text = Instance.new("TextLabel")
+    text.Name = "Text"
+    text.BackgroundTransparency = 1
+    text.Size = UDim2.new(1, 0, 1, 0)
+    text.Font = Enum.Font.GothamSemibold
+    text.TextSize = 13
+    text.TextXAlignment = Enum.TextXAlignment.Left
+    text.TextColor3 = Color3.fromRGB(235, 235, 235)
+    text.TextStrokeTransparency = 1
+    text.Text = ""
+    text.Parent = bg
 
     local barBack = Instance.new("Frame")
-    barBack.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    barBack.Name = "BarBack"
+    barBack.AnchorPoint = Vector2.new(0, 1)
+    barBack.Position = UDim2.new(0, 0, 1, 0)
+    barBack.Size = UDim2.new(1, 0, 0, 2)
+    barBack.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    barBack.BackgroundTransparency = 0.55
     barBack.BorderSizePixel = 0
-    barBack.Position = UDim2.new(0, 10, 1, -8)
-    barBack.Size = UDim2.new(1, -20, 0, 3)
-    barBack.Parent = card
+    barBack.Parent = bg
 
     local bar = Instance.new("Frame")
-    bar.BackgroundColor3 = Color3.fromRGB(90, 170, 255)
+    bar.Name = "Bar"
+    bar.Size = UDim2.new(0, 0, 1, 0)
+    bar.BackgroundColor3 = Color3.fromRGB(120, 190, 255) -- subtle blue
     bar.BorderSizePixel = 0
-    bar.Size = UDim2.new(math.clamp(hp / hpM, 0, 1), 0, 1, 0)
     bar.Parent = barBack
 
-    card.BackgroundTransparency = 1
-    card.Position = UDim2.new(0, 0, 0, 10)
-    TweenService:Create(card, TweenInfo.new(0.12), {
-        BackgroundTransparency = 0.1,
-        Position = UDim2.new(0, 0, 0, 0)
-    }):Play()
+    -- start hidden
+    container.Visible = false
 
-    task.delay(1.6, function()
-        if card and card.Parent then
-            local t = TweenService:Create(card, TweenInfo.new(0.15), {BackgroundTransparency = 1})
-            t:Play()
-            t.Completed:Wait()
-            if card then card:Destroy() end
+    self.Gui = gui
+    self.Container = container
+    self.BG = bg
+    self.Text = text
+    self.Bar = bar
+end
+
+function HitBar:Show(message, duration)
+    if not self.Enabled or not self.Container then return end
+    duration = duration or self.Duration
+
+    self.Text.Text = message
+    self.Container.Visible = true
+
+    -- reset visuals
+    self.Container.BackgroundTransparency = 1
+    self.BG.BackgroundTransparency = 1
+    self.Text.TextTransparency = 1
+    self.Bar.Size = UDim2.new(0, 0, 1, 0)
+
+    -- fade in
+    TweenService:Create(self.BG, TweenInfo.new(0.12), {BackgroundTransparency = 0.15}):Play()
+    TweenService:Create(self.Text, TweenInfo.new(0.12), {TextTransparency = 0}):Play()
+
+    -- timeline fill
+    TweenService:Create(self.Bar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+
+    -- replace-spam protection: cancel previous hide
+    self._token = (self._token or 0) + 1
+    local myToken = self._token
+
+    task.delay(duration, function()
+        if myToken ~= self._token then return end
+        local t1 = TweenService:Create(self.BG, TweenInfo.new(0.15), {BackgroundTransparency = 1})
+        local t2 = TweenService:Create(self.Text, TweenInfo.new(0.15), {TextTransparency = 1})
+        t1:Play(); t2:Play()
+        t2.Completed:Wait()
+        if myToken == self._token then
+            self.Container.Visible = false
         end
     end)
 end
@@ -5513,12 +5524,12 @@ end
 task.defer(function()
     local lp = Players.LocalPlayer
     if lp then
-        local pg = lp:WaitForChild("PlayerGui")
-        HitNotifier:Init(pg)
-		HitNotifier:Notify("TestPlayer", "Head", 75, 100)
+        HitBar:Init(lp:WaitForChild("PlayerGui"))
+Library.HitBar:Show("Hit Yuuio9995 in their Head with Wooden Bow from 319 studs away", 3.5)
     end
 end)
 
 return Library
+
 
 
