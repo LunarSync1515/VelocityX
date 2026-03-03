@@ -57,7 +57,7 @@ if (not LPH_OBFUSCATED) then
   
   local flags = Library.Flags
   local Window = Library:Window({Name = 'VelocityX', Logo = '126922117281354'})
-  local Watermark = Window:Watermark("VelocityX Made By Constructorr")
+  local Watermark = Window:Watermark("Made By Constructorr (VelocityX)")
   local KeybindList = Window:KeybindList()
   local ArmorViewer = Window:ArmorViewer()
   
