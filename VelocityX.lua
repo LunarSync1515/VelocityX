@@ -2697,10 +2697,10 @@ Items["ModList"].Instance.ZIndex = 50
 
 
         Line.Instance.Text = string.format(
-            '<font color="#4DA6FF">%s</font> <font color="#808080">(%d)</font>  <font color="#B9B9B9">%s</font>',
+            '<font color="#4DA6FF">%s</font> <font color="#808080">(%s)</font>  <font color="#B9B9B9">%s</font>',
             tostring(Username),
-            tostring(Role),
-			tonumber(UserId) or 0
+            tostring(UserId),
+			tostring(Role)
         )
 
         Moderators[Username] = {
@@ -5382,6 +5382,7 @@ end
 end
 
 return Library
+
 
 
 
