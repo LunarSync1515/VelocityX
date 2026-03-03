@@ -2576,9 +2576,10 @@ Library.ModeratorList = function(self)
 		-- Top blue accent bar
 Items["TopBar"] = Instances:Create("Frame", {
     Parent = Items["ModList"].Instance,
-    Size = UDim2New(1, 0, 0, 2),
+    Position = UDim2New(0, 0, 0, 0),
+    Size = UDim2New(1, 0, 0, 3), -- thicker (was 2)
     BorderSizePixel = 0,
-    BackgroundColor3 = FromRGB(77, 166, 255) -- Blue
+    BackgroundColor3 = FromRGB(0, 170, 255) -- brighter blue
 })
 
 Items["TopBar"].Instance.ZIndex = 60
@@ -2697,9 +2698,8 @@ Items["ModList"].Instance.ZIndex = 50
 
 
         Line.Instance.Text = string.format(
-            '<font color="#4DA6FF">%s</font> <font color="#808080">(%s)</font>  <font color="#B9B9B9">%s</font>',
+            '<font color="#4DA6FF">%s</font>  <font color="#B9B9B9">%s</font>',
             tostring(Username),
-            tostring(UserId),
 			tostring(Role)
         )
 
@@ -5382,6 +5382,7 @@ end
 end
 
 return Library
+
 
 
 
