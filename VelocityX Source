@@ -61,6 +61,45 @@ if (not LPH_OBFUSCATED) then
   local KeybindList = Window:KeybindList()
   local ArmorViewer = Window:ArmorViewer()
   
+local Players = game:GetService("Players")
+
+-- create the UI first
+local MyModList = Library:ModeratorList()
+MyModList:SetVisibility(true)
+
+-- OPTIONAL test row (remove when done testing)
+-- MyModList:add_mod(0, "TEST_USER", "TEST_ROLE")
+
+-- WatchList (UserId -> Role)
+local WatchList = {
+    [9659461089] = "Moderator",
+    [87654321] = "Moderator",
+    [1] = "Moderator"
+}
+
+local function checkPlayer(player)
+    local tag = WatchList[player.UserId]
+    if tag then
+        MyModList:add_mod(player.UserId, player.Name, tag)
+        warn(("⚠️ WARNING: %s (%s) detected!"):format(player.Name, tag))
+        -- optional:
+        -- Library:Notification(("⚠️ %s (%s) detected!"):format(player.Name, tag), 5)
+    end
+end
+
+-- Detect players already in the server
+for _, player in ipairs(Players:GetPlayers()) do
+    checkPlayer(player)
+end
+
+-- Detect new joins
+Players.PlayerAdded:Connect(checkPlayer)
+
+-- Auto-remove when they leave
+Players.PlayerRemoving:Connect(function(player)
+    MyModList:remove_mod(player.UserId)
+end)
+
   local CombatPage = Window:Page({Name = 'Combat'})
   local VisualsPage = Window:Page({Name = 'Visuals'})
   local MiscPage = Window:Page({Name = 'Misc'})
@@ -734,15 +773,50 @@ do
   local Camera = Workspace.CurrentCamera
   local Client = Players.LocalPlayer
   
-  local wsVFXFolder = Workspace:WaitForChild("VFX")
-  local VMs = wsVFXFolder and wsVFXFolder:FindFirstChild('VMs')
-  local Drops = workspace:FindFirstChild('Drops')
-  local Plants = workspace:FindFirstChild('Plants')
-  local Animals = workspace:FindFirstChild('Animals')
+local wsVFXFolder = Workspace:WaitForChild("VFX", 5)
+if not wsVFXFolder then
+    warn("[VelocityX] Workspace.VFX not found, creating it.")
+    wsVFXFolder = Instance.new("Folder")
+    wsVFXFolder.Name = "VFX"
+    wsVFXFolder.Parent = Workspace
+end
+
+local VMs = wsVFXFolder:FindFirstChild("VMs")
+if not VMs then
+    VMs = Instance.new("Folder")
+    VMs.Name = "VMs"
+    VMs.Parent = wsVFXFolder
+end
+
+local Drops = Workspace:FindFirstChild("Drops")
+local Plants = Workspace:FindFirstChild("Plants")
+local Animals = Workspace:FindFirstChild("Animals")
   
-  local Modules = ReplicatedStorage:WaitForChild("Modules")
-  local rsVFXFolder = ReplicatedStorage:WaitForChild("VFX")
-  local Values = ReplicatedStorage:WaitForChild("Values")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Modules = ReplicatedStorage:WaitForChild("Modules", 5)
+local rsVFXFolder = ReplicatedStorage:WaitForChild("VFX", 5)
+local Values = ReplicatedStorage:WaitForChild("Values", 5)
+
+if not Modules then
+    warn("[VelocityX] ReplicatedStorage.Modules not found.")
+    -- debug: show what *is* in ReplicatedStorage
+    for _, c in ipairs(ReplicatedStorage:GetChildren()) do
+        warn("[RS]", c.Name, c.ClassName)
+    end
+    return
+end
+
+if not rsVFXFolder then
+    warn("[VelocityX] ReplicatedStorage.VFX not found.")
+    -- you can return here too if you require it:
+    -- return
+end
+
+if not Values then
+    warn("[VelocityX] ReplicatedStorage.Values not found.")
+    -- return if required
+end
   
   local ItemClass = Modules and require(Modules:WaitForChild("ItemClass"))
   local VFXModule = Modules and require(Modules.VFXModule)
@@ -1591,7 +1665,7 @@ do
           end))
       end
   
---// Armor Bar
+--// Armor Bar (Flicker-Free + Grace Period + Correct Names)
 do
     local GunTable = {}
     local armorImageCache = {}
