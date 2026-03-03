@@ -104,7 +104,6 @@ local WatchList = {
     [51281722] = "Moderator",
     [174212818] = "Moderator",
     [1378169111] = "Moderator"
-    [372528624] = "Moderator"
 }
 
 local function checkPlayer(player)
