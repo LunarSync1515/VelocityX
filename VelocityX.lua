@@ -2573,15 +2573,14 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
-		-- Top blue accent bar
+-- Top blue accent bar (full-bleed)
 Items["TopBar"] = Instances:Create("Frame", {
     Parent = Items["ModList"].Instance,
-    Position = UDim2New(0, 0, 0, 0),
-    Size = UDim2New(1, 0, 0, 3), -- thicker (was 2)
+    Position = UDim2New(0, -9, 0, -9),
+    Size = UDim2New(1, 18, 0, 3),
     BorderSizePixel = 0,
-    BackgroundColor3 = FromRGB(0, 170, 255) -- brighter blue
+    BackgroundColor3 = FromRGB(0, 170, 255)
 })
-
 Items["TopBar"].Instance.ZIndex = 60
 											
         do
@@ -5382,6 +5381,7 @@ end
 end
 
 return Library
+
 
 
 
