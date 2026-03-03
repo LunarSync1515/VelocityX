@@ -72,9 +72,38 @@ MyModList:SetVisibility(true)
 
 -- WatchList (UserId -> Role)
 local WatchList = {
-    [9659461089] = "Moderator",
-    [87654321] = "Moderator",
-    [1] = "Moderator"
+    [584370127] = "Moderator",
+    [165053216] = "Moderator",
+    [1528346843] = "Moderator",
+    [2364950171] = "Moderator",
+    [3544497889] = "Moderator",
+    [3739152618] = "Moderator",
+    [4252853044] = "Moderator",
+    [1500535353] = "Moderator",
+    [1116486172] = "Moderator",
+    [1304140224] = "Moderator",
+    [542183759] = "Moderator",
+    [2620215562] = "Moderator",
+    [1622256215] = "Moderator",
+    [3034930770] = "Moderator",
+    [2792072212] = "Moderator",
+    [3994092139] = "Moderator",
+    [914847610] = "Moderator",
+    [1004214871] = "Moderator",
+    [122915793] = "Moderator",
+    [81993536] = "Moderator",
+    [114812725] = "Moderator",
+    [3968854760] = "Moderator",
+    [991290934] = "Moderator",
+    [1072151937] = "Moderator",
+    [3122439095] = "Moderator",
+    [113179883] = "Moderator",
+    [1771300283] = "Moderator",
+    [7178750309] = "Moderator",
+    [1249478607] = "Moderator",
+    [51281722] = "Moderator",
+    [174212818] = "Moderator",
+    [1378169111] = "Moderator"
 }
 
 local function checkPlayer(player)
@@ -2964,4 +2993,3 @@ end
       UpdateChar();
       Client.CharacterAdded:Connect(UpdateChar);
   end
-  
