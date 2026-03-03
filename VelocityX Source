@@ -53,7 +53,7 @@ if (not LPH_OBFUSCATED) then
   local RunService = game:GetService("RunService")
   local TweenService = game:GetService("TweenService")
   
-  local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/constructorr12/VelocityX/main/VelocityX.lua"))()
+  local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/LunarSync1515/VelocityX/refs/heads/main/VelocityX.lua"))()
   
   local flags = Library.Flags
   local Window = Library:Window({Name = 'VelocityX', Logo = '117147967081502'})
