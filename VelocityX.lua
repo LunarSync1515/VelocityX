@@ -3417,102 +3417,93 @@ Library.TargetHud = function(self)
         })
     end
 
-    function TargetHud:AddBar(Color)
-        local NewBar = {}
+function TargetHud:AddBar(Color)
+    local NewBar = {}
 
-        -- whole row
-        local Row = Instances:Create("Frame", {
-            Parent = Items["Bars"].Instance,
-            Name = "\0",
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2New(1, 0, 0, 12),
-            ZIndex = 6,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
+    -- bar background fills full width
+    local NewBarBackground = Instances:Create("Frame", {
+        Parent = Items["Bars"].Instance,
+        Name = "\0",
+        BorderColor3 = FromRGB(0, 0, 0),
+        BackgroundTransparency = 1,
+        Size = UDim2New(1, 0, 0, 12),
+        BorderSizePixel = 0,
+        ZIndex = 6,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+    })
 
-        -- HP number on the LEFT
-        local LeftValue = Instances:Create("TextLabel", {
-            Parent = Row.Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Text = "90",
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Right,
-            Position = UDim2New(0, 0, 0, 0),
-            Size = UDim2New(0, 36, 0, 12),
-            BorderSizePixel = 0,
-            ZIndex = 7,
-            TextSize = 12,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  LeftValue:AddToTheme({TextColor3 = "Text"})
+    Instances:Create("UIStroke", {
+        Parent = NewBarBackground.Instance,
+        Name = "\0",
+        Color = FromRGB(46, 52, 61),
+        LineJoinMode = Enum.LineJoinMode.Miter,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    }):AddToTheme({Color = "Border"})
 
-        Instances:Create("UIStroke", {
-            Parent = LeftValue.Instance,
-            Name = "\0"
-        })
+    -- actual health fill, shifted right to leave room for number
+    local BarAccent = Instances:Create("Frame", {
+        Parent = NewBarBackground.Instance,
+        Name = "\0",
+        BorderColor3 = FromRGB(0, 0, 0),
+        Position = UDim2New(0, 40, 0, 0),
+        Size = UDim2New(0.9, -40, 1, 0),
+        ZIndex = 6,
+        BorderSizePixel = 0,
+        BackgroundColor3 = Color
+    })
 
-        -- actual bar on the RIGHT
-        local NewBarBackground = Instances:Create("Frame", {
-            Parent = Row.Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundTransparency = 1,
-            Position = UDim2New(0, 40, 0, 0),
-            Size = UDim2New(1, -40, 0, 12),
-            BorderSizePixel = 0,
-            ZIndex = 6,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
+    Instances:Create("UIGradient", {
+        Parent = BarAccent.Instance,
+        Name = "\0",
+        Rotation = 90,
+        Color = RGBSequence{
+            RGBSequenceKeypoint(0, FromRGB(255, 255, 255)),
+            RGBSequenceKeypoint(1, FromRGB(153, 153, 153))
+        }
+    })
 
-        Instances:Create("UIStroke", {
-            Parent = NewBarBackground.Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
+    -- HP number on the LEFT, inside the same bar frame
+    local LeftValue = Instances:Create("TextLabel", {
+        Parent = NewBarBackground.Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        TextColor3 = FromRGB(255, 255, 255),
+        BorderColor3 = FromRGB(0, 0, 0),
+        Text = "90",
+        BackgroundTransparency = 1,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Position = UDim2New(0, 4, 0, 0),
+        Size = UDim2New(0, 32, 1, 0),
+        BorderSizePixel = 0,
+        ZIndex = 7,
+        TextSize = 12,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+    })  LeftValue:AddToTheme({TextColor3 = "Text"})
 
-        local BarAccent = Instances:Create("Frame", {
-            Parent = NewBarBackground.Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(0.9, 0, 1, 0),
-            ZIndex = 6,
-            BorderSizePixel = 0,
-            BackgroundColor3 = Color
-        })
+    Instances:Create("UIStroke", {
+        Parent = LeftValue.Instance,
+        Name = "\0"
+    })
 
-        Instances:Create("UIGradient", {
-            Parent = BarAccent.Instance,
-            Name = "\0",
-            Rotation = 90,
-            Color = RGBSequence{
-                RGBSequenceKeypoint(0, FromRGB(255, 255, 255)),
-                RGBSequenceKeypoint(1, FromRGB(153, 153, 153))
-            }
-        })
+    function NewBar:SetPercentage(Percentage)
+        local hp = math.floor(Percentage or 0)
+        local RealPercentage = math.clamp((Percentage or 0) / 100, 0, 1)
 
-        function NewBar:SetPercentage(Percentage)
-            local RealPercentage = math.clamp((Percentage or 0) / 100, 0, 1)
+        BarAccent:Tween(
+            TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2New(RealPercentage, -40, 1, 0)}
+        )
 
-            BarAccent:Tween(
-                TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                {Size = UDim2New(RealPercentage, 0, 1, 0)}
-            )
-
-            LeftValue.Instance.Text = tostring(math.floor(Percentage or 0))
-        end
-
-        function NewBar:Remove()
-            Row:Clean()
-            NewBar = nil
-        end
-
-        return NewBar
+        LeftValue.Instance.Text = tostring(hp)
     end
+
+    function NewBar:Remove()
+        NewBarBackground:Clean()
+        NewBar = nil
+    end
+
+    return NewBar
+end
 
     function TargetHud:SetPlayer(Player)
         local AvatarContent = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
@@ -5549,6 +5540,7 @@ end
 end
 
 return Library
+
 
 
 
