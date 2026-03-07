@@ -47,25 +47,72 @@ if (not LPH_OBFUSCATED) then
       end
   end)
   
-  local Players = game:GetService("Players")
-  local HttpService = game:GetService("HttpService")
-  local UserInputService = game:GetService("UserInputService")
-  local RunService = game:GetService("RunService")
-  local TweenService = game:GetService("TweenService")
-  
-  local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/constructorr12/VelocityX/main/VelocityX.lua"))()
-  
-  local flags = Library.Flags
-  local Window = Library:Window({Name = 'VelocityX', Logo = '117147967081502'})
-  local Watermark = Window:Watermark("Made By Constructorr (VelocityX)")
-  local KeybindList = Window:KeybindList()
-  local ArmorViewer = Window:ArmorViewer()
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/constructorr12/VelocityX/main/VelocityX.lua"))()
+
+Library:Notification("                    Loading Bypass                    ", 4, 5)
+task.wait(4.6)
+Library:Notification("✓ Bypass Loaded Successfully", 4.5)
+
+local flags = Library.Flags
+local Window = Library:Window({Name = 'VelocityX', Logo = '117147967081502'})
+local Watermark = Window:Watermark("Made By Constructorr (VelocityX)")
+local KeybindList = Window:KeybindList()
+local ArmorViewer = Window:ArmorViewer()
+local MyModList = Library:ModeratorList()
+
+Library.KeybindListInstance = KeybindList
+Library.ArmorViewerInstance = ArmorViewer
+Library.ModeratorListInstance = MyModList
+
+MyModList:SetVisibility(false)
   
 local Players = game:GetService("Players")
 
 -- create the UI first
 local MyModList = Library:ModeratorList()
 MyModList:SetVisibility(true)
+
+-- CENTER ALERT FUNCTION
+local function CenterAlert(text, duration)
+    duration = duration or 6
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ModeratorAlert"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 420, 0, 90)
+    Frame.Position = UDim2.new(0.5, -210, 0.4, 0)
+    Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(255,60,60)
+    Stroke.Thickness = 2
+    Stroke.Parent = Frame
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1,0,1,0)
+    Label.BackgroundTransparency = 1
+    Label.Text = text
+    Label.TextColor3 = Color3.fromRGB(255,60,60)
+    Label.TextScaled = true
+    Label.Font = Enum.Font.GothamBold
+    Label.Parent = Frame
+
+    task.delay(duration, function()
+        ScreenGui:Destroy()
+    end)
+end
+
 
 -- Chunk Studios group
 local GROUP_ID = 1154360
@@ -81,21 +128,27 @@ local function checkPlayer(player)
     if rank == MODERATOR_RANK then
         local tag = "Moderator"
 
+        -- add to moderator UI
         MyModList:add_mod(player.UserId, player.Name, tag)
 
+        -- console warning
         warn(("⚠️ GROUP MODERATOR: %s detected!"):format(player.Name))
-        -- optional:
-        -- Library:Notification(("⚠️ %s (Moderator) detected!"):format(player.Name), 5)
+
+        -- BIG CENTER WARNING
+        CenterAlert("⚠ MODERATOR DETECTED ⚠\n"..player.Name, 10)
     end
 end
+
 
 -- Detect players already in the server
 for _, player in ipairs(Players:GetPlayers()) do
     checkPlayer(player)
 end
 
+
 -- Detect new joins
 Players.PlayerAdded:Connect(checkPlayer)
+
 
 -- Auto-remove when they leave
 Players.PlayerRemoving:Connect(function(player)
