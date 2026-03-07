@@ -2576,14 +2576,15 @@ Library.ModeratorList = function(self)
         -- allow bar outside padding
         Items["ModList"].Instance.ClipsDescendants = false
 
-        -- BLUE TOP BAR
-        Items["TopBar"] = Instances:Create("Frame", {
-            Parent = Items["ModList"].Instance,
-            Position = UDim2New(0, 0, 0, 0),
-            Size = UDim2New(1, 0, 0, 3),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(0,170,255)
-        })
+ Items["TopBar"] = Instances:Create("Frame", {
+    Parent = Items["ModList"].Instance,
+    Position = UDim2New(0, -9, 0, -9), -- move outside padding
+    Size = UDim2New(1, 18, 0, 3),      -- extend across full width
+    BorderSizePixel = 0,
+    BackgroundColor3 = FromRGB(0,170,255)
+})
+
+Items["TopBar"].Instance.ZIndex = 60
 
         Items["TopBar"].Instance.ZIndex = 60
         Items["TopBar"].Instance.BackgroundColor3 = FromRGB(0,170,255)
@@ -5376,6 +5377,7 @@ end
 end
 
 return Library
+
 
 
 
