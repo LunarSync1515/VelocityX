@@ -5531,4 +5531,185 @@ end
     end
 end
 
+Library.PlayerList = function(self)
+    local PlayerList = {}
+    local Entries = {}
+    local Players = game:GetService("Players")
+
+    local Items = {} do
+        Items["PlayerList"] = Instances:Create("Frame", {
+            Parent = Library.Holder.Instance,
+            Name = "__PlayerList",
+            AnchorPoint = Vector2New(0, 0.5),
+            Position = UDim2New(0, 20, 0.5, 0),
+            BorderSizePixel = 0,
+            Size = UDim2New(0, 260, 0, 260),
+            BackgroundColor3 = FromRGB(24, 28, 36)
+        })  Items["PlayerList"]:AddToTheme({BackgroundColor3 = "Background 2"})
+
+        Items["PlayerList"]:MakeDraggable()
+
+        Instances:Create("UIStroke", {
+            Parent = Items["PlayerList"].Instance,
+            Color = FromRGB(46, 52, 61),
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        }):AddToTheme({Color = "Border"})
+
+        -- top bar
+        Items["TopBar"] = Instances:Create("Frame", {
+            Parent = Items["PlayerList"].Instance,
+            Position = UDim2New(0, 0, 0, 0),
+            Size = UDim2New(1, 0, 0, 3),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(0, 170, 255)
+        })
+
+        Items["Title"] = Instances:Create("TextLabel", {
+            Parent = Items["PlayerList"].Instance,
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            Text = "Players",
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Position = UDim2New(0, 8, 0, 8),
+            Size = UDim2New(0, 120, 0, 15),
+            TextSize = 14
+        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+
+        Items["Count"] = Instances:Create("TextLabel", {
+            Parent = Items["PlayerList"].Instance,
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(185, 185, 185),
+            Text = "0 in server",
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Right,
+            Position = UDim2New(1, -128, 0, 8),
+            Size = UDim2New(0, 120, 0, 15),
+            TextSize = 14
+        })
+
+        Items["Liner2"] = Instances:Create("Frame", {
+            Parent = Items["PlayerList"].Instance,
+            Position = UDim2New(0, 8, 0, 28),
+            Size = UDim2New(1, -16, 0, 1),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(46, 52, 61)
+        })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
+
+        Items["List"] = Instances:Create("ScrollingFrame", {
+            Parent = Items["PlayerList"].Instance,
+            Active = true,
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            BorderSizePixel = 0,
+            CanvasSize = UDim2New(0, 0, 0, 0),
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = FromRGB(46, 52, 61),
+            BackgroundTransparency = 1,
+            Position = UDim2New(0, 8, 0, 36),
+            Size = UDim2New(1, -16, 1, -44),
+            ScrollingDirection = Enum.ScrollingDirection.Y
+        })  Items["List"]:AddToTheme({ScrollBarImageColor3 = "Border"})
+
+        Instances:Create("UIListLayout", {
+            Parent = Items["List"].Instance,
+            Padding = UDimNew(0, 4),
+            SortOrder = Enum.SortOrder.LayoutOrder
+        })
+    end
+
+    local function updateCount()
+        Items["Count"].Instance.Text = tostring(#Players:GetPlayers()) .. " in server"
+    end
+
+    local function addEntry(player)
+        if Entries[player] then
+            return
+        end
+
+        local Row = Instances:Create("Frame", {
+            Parent = Items["List"].Instance,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Size = UDim2New(1, 0, 0, 18)
+        })
+
+        local Label = Instances:Create("TextLabel", {
+            Parent = Row.Instance,
+            FontFace = Library.Font,
+            RichText = true,
+            TextColor3 = FromRGB(255, 255, 255),
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Size = UDim2New(1, 0, 1, 0),
+            TextSize = 14,
+            Text = string.format(
+                '<font color="#4DA6FF">%s</font>  <font color="#808080">(%s)</font>',
+                tostring(player.Name),
+                tostring(player.UserId)
+            )
+        })  Label:AddToTheme({TextColor3 = "Text"})
+
+        Entries[player] = Row
+        updateCount()
+    end
+
+    local function removeEntry(player)
+        local Row = Entries[player]
+        if Row then
+            Row:Clean()
+            Entries[player] = nil
+        end
+        updateCount()
+    end
+
+    function PlayerList:SetVisibility(Bool)
+        Items["PlayerList"].Instance.Visible = Bool
+    end
+
+    function PlayerList:GetPosition()
+        local p = Items["PlayerList"].Instance.Position
+        return {
+            XScale = p.X.Scale,
+            XOffset = p.X.Offset,
+            YScale = p.Y.Scale,
+            YOffset = p.Y.Offset
+        }
+    end
+
+    function PlayerList:SetPosition(Pos)
+        if not Pos then
+            return
+        end
+
+        Items["PlayerList"].Instance.Position = UDim2.new(
+            Pos.XScale or 0,
+            Pos.XOffset or 0,
+            Pos.YScale or 0,
+            Pos.YOffset or 0
+        )
+    end
+
+    function PlayerList:Refresh()
+        for player, row in pairs(Entries) do
+            row:Clean()
+            Entries[player] = nil
+        end
+
+        for _, player in ipairs(Players:GetPlayers()) do
+            addEntry(player)
+        end
+
+        updateCount()
+    end
+
+    PlayerList:Refresh()
+
+    Players.PlayerAdded:Connect(addEntry)
+    Players.PlayerRemoving:Connect(removeEntry)
+
+    return PlayerList
+end
+
 return Library
+
