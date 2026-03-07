@@ -3543,13 +3543,13 @@ end
                 AnchorPoint = Vector2New(0.5, 0.5),
                 Position = UDim2New(0.5, 0, 0.5, 0),
                 BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(0, 621, 0, 750),
+                Size = UDim2New(0, 621, 0, 790),
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(17, 21, 27)
             })  Items["MainFrame"]:AddToTheme({BackgroundColor3 = "Background 1"})
 
             Items["MainFrame"]:MakeDraggable()
-            Items["MainFrame"]:MakeResizeable(Vector2New(621, 750), Vector2New(9999, 9999))
+            Items["MainFrame"]:MakeResizeable(Vector2New(621, 790), Vector2New(9999, 9999))
             
             Items["UIStroke"] = Instances:Create("UIStroke", {
                 Parent = Items["MainFrame"].Instance,
@@ -5784,5 +5784,6 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
