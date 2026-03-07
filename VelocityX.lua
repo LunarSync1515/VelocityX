@@ -3418,84 +3418,92 @@ end
         end
 
         function TargetHud:AddBar(Color)
-            local NewBar = { }
+    local NewBar = { }
 
-            local NewBarBackground = Instances:Create("Frame", {
-                Parent = Items["Bars"].Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                AnchorPoint = Vector2New(0, 1),
-                ZIndex = 6,
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 77, 1, 0),
-                Size = UDim2New(1, 0, 0, 12),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-            
-            Instances:Create("UIStroke", {
-                Parent = NewBarBackground.Instance,
-                Name = "\0",
-                Color = FromRGB(46, 52, 61),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            }):AddToTheme({Color = "Border"})
-            
-            local BarAccent = Instances:Create("Frame", {
-                Parent = NewBarBackground.Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(0.8999999761581421, 0, 1, 0),
-                ZIndex = 6,
-                BorderSizePixel = 0,
-                BackgroundColor3 = Color
-            })
-            
-            Instances:Create("UIGradient", {
-                Parent = BarAccent.Instance,
-                Name = "\0",
-                Rotation = 90,
-                Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(153, 153, 153))}
-            })
-            
-            local BarValue = Instances:Create("TextLabel", {
-                Parent = NewBarBackground.Instance,
-                Name = "\0",
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 255, 255),
-                ZIndex = 6,
-                BorderColor3 = FromRGB(0, 0, 0),
-                Text = "90",
-                Size = UDim2New(0, 0, 1, 0),
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 1, 0, -1),
-                BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.X,
-                TextSize = 12,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })  BarValue:AddToTheme({TextColor3 = "Text"})
-            
-            Instances:Create("UIStroke", {
-                Parent = BarValue.Instance,
-                Name = "\0"
-            })
+    local NewBarBackground = Instances:Create("Frame", {
+        Parent = Items["Bars"].Instance,
+        Name = "\0",
+        BorderColor3 = FromRGB(0, 0, 0),
+        AnchorPoint = Vector2New(0, 1),
+        ZIndex = 6,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 77, 1, 0),
+        Size = UDim2New(1, 0, 0, 12),
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+    })
 
-            function NewBar:SetPercentage(Percentage)
-                local RealPercentage = 1 / 100 * Percentage
-    
-                if BarAccent and NewBarBackground then 
-                    BarAccent:Tween(TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2New(RealPercentage, 0, 1, 0)})
-                    BarValue.Instance.Text = math.floor(Percentage)
-                end
-            end
+    Instances:Create("UIStroke", {
+        Parent = NewBarBackground.Instance,
+        Name = "\0",
+        Color = FromRGB(46, 52, 61),
+        LineJoinMode = Enum.LineJoinMode.Miter,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    }):AddToTheme({Color = "Border"})
 
-            function NewBar:Remove()
-                NewBarBackground:Clean()
-                NewBar = nil
-            end
+    local BarAccent = Instances:Create("Frame", {
+        Parent = NewBarBackground.Instance,
+        Name = "\0",
+        BorderColor3 = FromRGB(0, 0, 0),
+        Size = UDim2New(0.8999999761581421, 0, 1, 0),
+        ZIndex = 6,
+        BorderSizePixel = 0,
+        BackgroundColor3 = Color
+    })
 
-            return NewBar
+    Instances:Create("UIGradient", {
+        Parent = BarAccent.Instance,
+        Name = "\0",
+        Rotation = 90,
+        Color = RGBSequence{
+            RGBSequenceKeypoint(0, FromRGB(255, 255, 255)),
+            RGBSequenceKeypoint(1, FromRGB(153, 153, 153))
+        }
+    })
+
+    -- HP number on the LEFT side of the bar
+    local LeftValue = Instances:Create("TextLabel", {
+        Parent = NewBarBackground.Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        TextColor3 = FromRGB(255, 255, 255),
+        ZIndex = 6,
+        BorderColor3 = FromRGB(0, 0, 0),
+        Text = "90",
+        Size = UDim2New(0, 35, 1, 0),
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, -40, 0, -1),
+        BorderSizePixel = 0,
+        TextSize = 12,
+        BackgroundColor3 = FromRGB(255, 255, 255),
+        TextXAlignment = Enum.TextXAlignment.Right
+    })  LeftValue:AddToTheme({TextColor3 = "Text"})
+
+    Instances:Create("UIStroke", {
+        Parent = LeftValue.Instance,
+        Name = "\0"
+    })
+
+    function NewBar:SetPercentage(Percentage)
+        local RealPercentage = 1 / 100 * Percentage
+
+        if BarAccent and NewBarBackground then
+            BarAccent:Tween(
+                TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {Size = UDim2New(RealPercentage, 0, 1, 0)}
+            )
+
+            LeftValue.Instance.Text = tostring(math.floor(Percentage))
         end
+    end
+
+    function NewBar:Remove()
+        NewBarBackground:Clean()
+        NewBar = nil
+    end
+
+    return NewBar
+end
         
         function TargetHud:SetPlayer(Player)
             local AvatarContent = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
@@ -5532,6 +5540,7 @@ end
 end
 
 return Library
+
 
 
 
