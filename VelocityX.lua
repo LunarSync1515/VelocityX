@@ -5618,6 +5618,25 @@ Library.PlayerList = function(self)
             BackgroundColor3 = FromRGB(46, 52, 61)
         })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
 
+        -- search box
+        Items["SearchBox"] = Instances:Create("TextBox", {
+            Parent = Items["PlayerList"].Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            PlaceholderText = "Search player...",
+            PlaceholderColor3 = FromRGB(140, 140, 140),
+            Text = "",
+            ClearTextOnFocus = false,
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Position = UDim2New(0, 8, 0, 36),
+            Size = UDim2New(1, -16, 0, 18),
+            BorderSizePixel = 0,
+            TextSize = 14,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })  Items["SearchBox"]:AddToTheme({TextColor3 = "Text"})
+
         Items["List"] = Instances:Create("ScrollingFrame", {
             Parent = Items["PlayerList"].Instance,
             Active = true,
@@ -5627,8 +5646,8 @@ Library.PlayerList = function(self)
             ScrollBarThickness = 3,
             ScrollBarImageColor3 = FromRGB(46, 52, 61),
             BackgroundTransparency = 1,
-            Position = UDim2New(0, 8, 0, 36),
-            Size = UDim2New(1, -16, 1, -44),
+            Position = UDim2New(0, 8, 0, 58),
+            Size = UDim2New(1, -16, 1, -66),
             ScrollingDirection = Enum.ScrollingDirection.Y
         })  Items["List"]:AddToTheme({ScrollBarImageColor3 = "Border"})
 
@@ -5641,6 +5660,25 @@ Library.PlayerList = function(self)
 
     local function updateCount()
         Items["Count"].Instance.Text = tostring(#Players:GetPlayers()) .. " in server"
+    end
+
+    local function applySearch()
+        local query = string.lower(Items["SearchBox"].Instance.Text or "")
+
+        for player, entry in pairs(Entries) do
+            if entry and entry.Row then
+                local name = string.lower(player.Name or "")
+                local displayName = string.lower(player.DisplayName or "")
+                local userId = tostring(player.UserId)
+
+                local match = query == ""
+                    or string.find(name, query, 1, true)
+                    or string.find(displayName, query, 1, true)
+                    or string.find(userId, query, 1, true)
+
+                entry.Row.Instance.Visible = match and true or false
+            end
+        end
     end
 
     local function addEntry(player)
@@ -5669,19 +5707,25 @@ Library.PlayerList = function(self)
                 tostring(player.Name),
                 tostring(player.UserId)
             )
-        })  Label:AddToTheme({TextColor3 = "Text"})
+        })
 
-        Entries[player] = Row
+        Entries[player] = {
+            Row = Row,
+            Label = Label
+        }
+
         updateCount()
+        applySearch()
     end
 
     local function removeEntry(player)
-        local Row = Entries[player]
-        if Row then
-            Row:Clean()
+        local Entry = Entries[player]
+        if Entry and Entry.Row then
+            Entry.Row:Clean()
             Entries[player] = nil
         end
         updateCount()
+        applySearch()
     end
 
     function PlayerList:SetVisibility(Bool)
@@ -5712,8 +5756,10 @@ Library.PlayerList = function(self)
     end
 
     function PlayerList:Refresh()
-        for player, row in pairs(Entries) do
-            row:Clean()
+        for player, entry in pairs(Entries) do
+            if entry and entry.Row then
+                entry.Row:Clean()
+            end
             Entries[player] = nil
         end
 
@@ -5722,9 +5768,14 @@ Library.PlayerList = function(self)
         end
 
         updateCount()
+        applySearch()
     end
 
     PlayerList:Refresh()
+
+    Items["SearchBox"].Instance:GetPropertyChangedSignal("Text"):Connect(function()
+        applySearch()
+    end)
 
     Players.PlayerAdded:Connect(addEntry)
     Players.PlayerRemoving:Connect(removeEntry)
@@ -5733,7 +5784,3 @@ Library.PlayerList = function(self)
 end
 
 return Library
-
-
-
-
