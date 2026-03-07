@@ -2573,32 +2573,29 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
-Items["TopBar"] = Instances:Create("Frame", {
-    Parent = Items["ModList"].Instance,
-    Position = UDim2New(0, -9, 0, -9),
-    Size = UDim2New(1, 18, 0, 3),
-    BorderSizePixel = 0,
-    BackgroundColor3 = FromRGB(0, 170, 255)
-})
-											
-        do
-    local sg = Items["ModList"].Instance:FindFirstAncestorOfClass("ScreenGui")
-    if sg then
-        sg.ZIndexBehavior = Enum.ZIndexBehavior.Global
-    end
-end
+        -- Blue top bar
+        Items["TopBar"] = Instances:Create("Frame", {
+            Parent = Items["ModList"].Instance,
+            Position = UDim2New(0, -9, 0, -9),
+            Size = UDim2New(1, 18, 0, 3),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(0,170,255)
+        })
 
-Items["ModList"].Instance.ZIndex = 50
+        local sg = Items["ModList"].Instance:FindFirstAncestorOfClass("ScreenGui")
+        if sg then
+            sg.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        end
 
+        Items["ModList"].Instance.ZIndex = 50
 
         Instances:Create("UIPadding", {
             Parent = Items["ModList"].Instance,
-            PaddingTop = UDimNew(0, 9),
-            PaddingBottom = UDimNew(0, 9),
-            PaddingRight = UDimNew(0, 9),
-            PaddingLeft = UDimNew(0, 9)
+            PaddingTop = UDimNew(0,9),
+            PaddingBottom = UDimNew(0,9),
+            PaddingRight = UDimNew(0,9),
+            PaddingLeft = UDimNew(0,9)
         })
-
 
         Items["Title"] = Instances:Create("TextLabel", {
             Parent = Items["ModList"].Instance,
@@ -2612,7 +2609,6 @@ Items["ModList"].Instance.ZIndex = 50
         })
         Items["Title"]:AddToTheme({TextColor3 = "Text"})
 
-
         Items["Liner2"] = Instances:Create("Frame", {
             Parent = Items["ModList"].Instance,
             Position = UDim2New(0,0,0,21),
@@ -2621,7 +2617,6 @@ Items["ModList"].Instance.ZIndex = 50
             BackgroundColor3 = FromRGB(46,52,61)
         })
         Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
-
 
         Items["Content"] = Instances:Create("Frame", {
             Parent = Items["ModList"].Instance,
@@ -2632,10 +2627,9 @@ Items["ModList"].Instance.ZIndex = 50
             AutomaticSize = Enum.AutomaticSize.Y
         })
 
-            Items["Title"].Instance.ZIndex = 51
-            Items["Liner2"].Instance.ZIndex = 51
-            Items["Content"].Instance.ZIndex = 51
-
+        Items["Title"].Instance.ZIndex = 51
+        Items["Liner2"].Instance.ZIndex = 51
+        Items["Content"].Instance.ZIndex = 51
 
         Instances:Create("UIListLayout", {
             Parent = Items["Content"].Instance,
@@ -2684,20 +2678,17 @@ Items["ModList"].Instance.ZIndex = 50
             Text = ""
         })
 
-       Line.Instance.TextColor3 = FromRGB(255,255,255)
+        Line.Instance.ZIndex = 53
+        ModFrame.Instance.ZIndex = 52
 
-       ModFrame.Instance.ZIndex = 52
-       Line.Instance.ZIndex = 53
+        Line.Instance.Visible = true
+        Line.Instance.TextTransparency = 0
 
-       Line.Instance.Visible = true
-       Line.Instance.TextTransparency = 0
-       Line.Instance.TextStrokeTransparency = 1
-
-
+        -- Blue username + gray role
         Line.Instance.Text = string.format(
             '<font color="#4DA6FF">%s</font>  <font color="#B9B9B9">%s</font>',
             tostring(Username),
-			tostring(Role)
+            tostring(Role)
         )
 
         Moderators[Username] = {
@@ -5379,4 +5370,5 @@ end
 end
 
 return Library
+
 
