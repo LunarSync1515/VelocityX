@@ -22,10 +22,10 @@ local Library do
         FadeSpeed = 0.2,
 
         Folders = {
-            Directory = "VelocityX",
-            Configs = "VelocityX/Configs",
-            Assets = "VelocityX/Assets",
-			Sounds = "VelocityX/Sounds",
+            Directory = "Aether",
+            Configs = "Aether/Configs",
+            Assets = "Aether/Assets",
+			Sounds = "Aether/Sounds",
         },
 
         -- Ignore below
@@ -5733,6 +5733,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
