@@ -694,17 +694,18 @@ Library.UnusedHolder = Instances:Create("ScreenGui", {
 })
 
 Library.NotifHolder = Instances:Create("Frame", {
-    Parent = Items["Notification"].Instance,
-    FontFace = Library.Font,
-    TextColor3 = FromRGB(255, 255, 255),
-    Text = Name,
-    Size = UDim2New(0, 260, 0, 15),
+    Parent = Library.Holder.Instance,
+    Name = "\0",
+    BorderColor3 = FromRGB(0, 0, 0),
+    AnchorPoint = Vector2New(1, 0),
     BackgroundTransparency = 1,
-    TextXAlignment = Enum.TextXAlignment.Center,
+    Position = UDim2New(1, 0, 0, 0),
+
+    Size = UDim2New(0, 300, 0, 0), -- wider notifications
+
     BorderSizePixel = 0,
-    AutomaticSize = Enum.AutomaticSize.Y,
-    TextWrapped = true,
-    TextSize = 14,
+    AutomaticSize = Enum.AutomaticSize.Y, -- grow downwards only
+
     BackgroundColor3 = FromRGB(255, 255, 255)
 })
 
@@ -5383,6 +5384,7 @@ end
 end
 
 return Library
+
 
 
 
