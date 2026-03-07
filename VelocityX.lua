@@ -2347,95 +2347,126 @@ do
         return Keybind, Items 
     end
 
-    Library.Watermark = function(self, Name)
-        local Watermark = { }
-        
-        local Items = { } do 
-            Items["Watermark"] = Instances:Create("Frame", {
-                Parent = Library.Holder.Instance,
-                Name = "\0",
-                AnchorPoint = Vector2New(0.5, 0),
-                Position = UDim2New(0.5, 0, 0, 25),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(0, 180, 0, 30),
-                BorderSizePixel = 2,
-                BackgroundColor3 = FromRGB(17, 21, 27),
-                ZIndex = 5,
-            })  Items["Watermark"]:AddToTheme({BackgroundColor3 = "Background 1"})
-            
-            Items["UIStroke"] = Instances:Create("UIStroke", {
-                Parent = Items["Watermark"].Instance,
-                Name = "\0",
-                Color = FromRGB(94, 213, 213),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            })  Items["UIStroke"]:AddToTheme({Color = "Accent"})
-            
-            Instances:Create("UIGradient", {
-                Parent = Items["UIStroke"].Instance,
-                Name = "\0",
-                Rotation = 90,
-                Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(0.696, 0.2749999761581421), NumSequenceKeypoint(0.84, 0.574999988079071), NumSequenceKeypoint(1, 1)}
-            })
-            
-            Items["Glow"] = Instances:Create("ImageLabel", {
-                Parent = Items["Watermark"].Instance,
-                Name = "\0",
-                ImageColor3 = FromRGB(94, 213, 213),
-                ScaleType = Enum.ScaleType.Slice,
-                ImageTransparency = 0.5,
-                BorderColor3 = FromRGB(0, 0, 0),
-                BackgroundColor3 = FromRGB(255, 255, 255),
-                Size = UDim2New(1, 25, 1, 25),
-                AnchorPoint = Vector2New(0.5, 0.5),
-                Image = "rbxassetid://18245826428",
-                BackgroundTransparency = 1,
-                Position = UDim2New(0.5, 0, 0.5, 0),
-                ZIndex = 4,
-                BorderSizePixel = 0,
-                SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-            })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-            
-            Instances:Create("UIGradient", {
-                Parent = Items["Glow"].Instance,
-                Name = "\0",
-                Rotation = 90,
-                Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
-            })
-            
-            Items["Text"] = Instances:Create("TextLabel", {
-                Parent = Items["Watermark"].Instance,
-                Name = "\0",
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 255, 255),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Text = Name,
-                AnchorPoint = Vector2New(0.5, 0.5),
-                Size = UDim2New(0, 0, 0, 15),
-                BackgroundTransparency = 1,
-                Position = UDim2New(0.5, 0, 0.5, 0),
-                BorderSizePixel = 0,
-                ZIndex = 5,
-                AutomaticSize = Enum.AutomaticSize.X,
-                TextSize = 14,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })  Items["Text"]:AddToTheme({TextColor3 = "Text"})
-        end
+Library.Watermark = function(self, Name)
+    local RunService = game:GetService("RunService")
 
-        function Watermark:SetText(Text)
-            Text = tostring(Text)
-            Items["Text"].Instance.Text = Text
-            Items["Watermark"]:Tween(nil, {Size = UDim2New(0, Items["Text"].Instance.TextBounds.X + 20, 0, 30)})
-        end
+    local Watermark = { }
+    local fps = 0
+    local frames = 0
+    local lastUpdate = tick()
 
-        function Watermark:SetVisibility(Bool)
-            Items["Watermark"].Instance.Visible = Bool
-        end
+    local Items = { } do 
+        Items["Watermark"] = Instances:Create("Frame", {
+            Parent = Library.Holder.Instance,
+            Name = "\0",
+            AnchorPoint = Vector2New(0.5, 0),
+            Position = UDim2New(0.5, 0, 0, 25),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Size = UDim2New(0, 180, 0, 30),
+            BorderSizePixel = 2,
+            BackgroundColor3 = FromRGB(17, 21, 27),
+            ZIndex = 5,
+        })  Items["Watermark"]:AddToTheme({BackgroundColor3 = "Background 1"})
 
-        Watermark:SetText(Name)
+        Items["Watermark"]:MakeDraggable()
 
-        return Watermark
+        Items["UIStroke"] = Instances:Create("UIStroke", {
+            Parent = Items["Watermark"].Instance,
+            Name = "\0",
+            Color = FromRGB(94, 213, 213),
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        })  Items["UIStroke"]:AddToTheme({Color = "Accent"})
+
+        Instances:Create("UIGradient", {
+            Parent = Items["UIStroke"].Instance,
+            Name = "\0",
+            Rotation = 90,
+            Transparency = NumSequence{
+                NumSequenceKeypoint(0, 0),
+                NumSequenceKeypoint(0.696, 0.2749999761581421),
+                NumSequenceKeypoint(0.84, 0.574999988079071),
+                NumSequenceKeypoint(1, 1)
+            }
+        })
+
+        Items["Glow"] = Instances:Create("ImageLabel", {
+            Parent = Items["Watermark"].Instance,
+            Name = "\0",
+            ImageColor3 = FromRGB(94, 213, 213),
+            ScaleType = Enum.ScaleType.Slice,
+            ImageTransparency = 0.5,
+            BorderColor3 = FromRGB(0, 0, 0),
+            BackgroundColor3 = FromRGB(255, 255, 255),
+            Size = UDim2New(1, 25, 1, 25),
+            AnchorPoint = Vector2New(0.5, 0.5),
+            Image = "rbxassetid://18245826428",
+            BackgroundTransparency = 1,
+            Position = UDim2New(0.5, 0, 0.5, 0),
+            ZIndex = 4,
+            BorderSizePixel = 0,
+            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
+        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
+
+        Instances:Create("UIGradient", {
+            Parent = Items["Glow"].Instance,
+            Name = "\0",
+            Rotation = 90,
+            Transparency = NumSequence{
+                NumSequenceKeypoint(0, 0),
+                NumSequenceKeypoint(1, 1)
+            }
+        })
+
+        Items["Text"] = Instances:Create("TextLabel", {
+            Parent = Items["Watermark"].Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Text = Name,
+            AnchorPoint = Vector2New(0.5, 0.5),
+            Size = UDim2New(0, 0, 0, 15),
+            BackgroundTransparency = 1,
+            Position = UDim2New(0.5, 0, 0.5, 0),
+            BorderSizePixel = 0,
+            ZIndex = 5,
+            AutomaticSize = Enum.AutomaticSize.X,
+            TextSize = 14,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })  Items["Text"]:AddToTheme({TextColor3 = "Text"})
     end
+
+    function Watermark:SetText(Text)
+        Text = tostring(Text)
+        Items["Text"].Instance.Text = Text
+        Items["Watermark"]:Tween(nil, {Size = UDim2New(0, Items["Text"].Instance.TextBounds.X + 20, 0, 30)})
+    end
+
+    function Watermark:SetVisibility(Bool)
+        Items["Watermark"].Instance.Visible = Bool
+    end
+
+    Watermark:SetText(Name)
+
+    RunService.RenderStepped:Connect(function()
+        frames += 1
+
+        if tick() - lastUpdate >= 1 then
+            fps = frames
+            frames = 0
+            lastUpdate = tick()
+
+            local now = os.date("*t")
+            local dateText = string.format("%02d/%02d/%04d", now.day, now.month, now.year)
+            local timeText = string.format("%02d:%02d:%02d", now.hour, now.min, now.sec)
+
+            Watermark:SetText(string.format("Fallen Survival | %s | %s | %d FPS", dateText, timeText, fps))
+        end
+    end)
+
+    return Watermark
+end
 
 Library.KeybindList = function(self)
     local KeybindList = { }
@@ -5784,6 +5815,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
