@@ -318,9 +318,12 @@ do
                 Default = 0,
             })
 
-            GunModsSection:Toggle({
+            GunModsSection:Slider({
                 Name = "No Spread",
                 Flag = "NoSpread",
+                Min = 0,
+                Max = 100,
+                Default = 0,
             })
 
             GunModsSection:Toggle({
@@ -955,11 +958,12 @@ end
               local recoilSlider = flags["NoRecoil"] or 0
               r.RecoilMult = -(recoilSlider / 100)
 
-              if flags['NoSpread'] then
-                  r.AimSpreadMult = -1;
-                  r.HipSpreadMult = -1;
-              end
-              
+              local spreadSlider = flags["NoSpread"] or 0
+              local spreadValue = -(spreadSlider / 100)
+
+              r.AimSpreadMult = spreadValue
+              r.HipSpreadMult = spreadValue
+
               if flags['NoSway'] then
                   r.SwayMult = -1;
               end
