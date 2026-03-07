@@ -310,9 +310,12 @@ do
         do 
             local GunModsSection = CombatPage:Section({Name = "Gun Mods", Side = 2})
 
-            GunModsSection:Toggle({
+            GunModsSection:Slider({
                 Name = "No Recoil",
                 Flag = "NoRecoil",
+                Min = 0,
+                Max = 100,
+                Default = 0,
             })
 
             GunModsSection:Toggle({
@@ -949,10 +952,9 @@ end
                   r.SpeedMult = 100
               end
               
-              if flags['NoRecoil'] then
-                  r.RecoilMult = -1;
-              end
-              
+              local recoilSlider = flags["NoRecoil"] or 0
+              r.RecoilMult = -(recoilSlider / 100)
+
               if flags['NoSpread'] then
                   r.AimSpreadMult = -1;
                   r.HipSpreadMult = -1;
