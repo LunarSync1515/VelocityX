@@ -2573,21 +2573,19 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
-        -- allow bar outside padding
+        -- Allow bar outside padding
         Items["ModList"].Instance.ClipsDescendants = false
 
- Items["TopBar"] = Instances:Create("Frame", {
-    Parent = Items["ModList"].Instance,
-    Position = UDim2New(0, -9, 0, -9), -- move outside padding
-    Size = UDim2New(1, 18, 0, 3),      -- extend across full width
-    BorderSizePixel = 0,
-    BackgroundColor3 = FromRGB(0,170,255)
-})
-
-Items["TopBar"].Instance.ZIndex = 60
+        -- BLUE TOP BAR (perfectly aligned)
+        Items["TopBar"] = Instances:Create("Frame", {
+            Parent = Items["ModList"].Instance,
+            Position = UDim2New(0, -9, 0, -9),
+            Size = UDim2New(1, 18, 0, 3),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(0,170,255)
+        })
 
         Items["TopBar"].Instance.ZIndex = 60
-        Items["TopBar"].Instance.BackgroundColor3 = FromRGB(0,170,255)
 
         local sg = Items["ModList"].Instance:FindFirstAncestorOfClass("ScreenGui")
         if sg then
@@ -2691,7 +2689,7 @@ Items["TopBar"].Instance.ZIndex = 60
         Line.Instance.Visible = true
         Line.Instance.TextTransparency = 0
 
-        -- blue username + gray role
+        -- Blue username + gray role
         Line.Instance.Text = string.format(
             '<font color="#4DA6FF">%s</font>  <font color="#B9B9B9">%s</font>',
             tostring(Username),
@@ -5377,6 +5375,7 @@ end
 end
 
 return Library
+
 
 
 
