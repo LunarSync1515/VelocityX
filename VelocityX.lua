@@ -3417,19 +3417,54 @@ end
             })
         end
 
-        function TargetHud:AddBar(Color)
+function TargetHud:AddBar(Color)
     local NewBar = { }
 
-    local NewBarBackground = Instances:Create("Frame", {
+    -- whole row
+    local Row = Instances:Create("Frame", {
         Parent = Items["Bars"].Instance,
         Name = "\0",
         BorderColor3 = FromRGB(0, 0, 0),
-        AnchorPoint = Vector2New(0, 1),
-        ZIndex = 6,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 77, 1, 0),
         Size = UDim2New(1, 0, 0, 12),
         BorderSizePixel = 0,
+        ZIndex = 6,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+    })
+
+    -- hp number on the left
+    local LeftValue = Instances:Create("TextLabel", {
+        Parent = Row.Instance,
+        Name = "\0",
+        FontFace = Library.Font,
+        TextColor3 = FromRGB(255, 255, 255),
+        BorderColor3 = FromRGB(0, 0, 0),
+        Text = "90",
+        Size = UDim2New(0, 32, 1, 0),
+        Position = UDim2New(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        BorderSizePixel = 0,
+        ZIndex = 6,
+        TextSize = 12,
+        BackgroundColor3 = FromRGB(255, 255, 255)
+    })  LeftValue:AddToTheme({TextColor3 = "Text"})
+
+    Instances:Create("UIStroke", {
+        Parent = LeftValue.Instance,
+        Name = "\0"
+    })
+
+    -- actual bar background
+    local NewBarBackground = Instances:Create("Frame", {
+        Parent = Row.Instance,
+        Name = "\0",
+        BorderColor3 = FromRGB(0, 0, 0),
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 36, 0, 0),
+        Size = UDim2New(1, -36, 1, 0),
+        BorderSizePixel = 0,
+        ZIndex = 6,
         BackgroundColor3 = FromRGB(255, 255, 255)
     })
 
@@ -3445,7 +3480,7 @@ end
         Parent = NewBarBackground.Instance,
         Name = "\0",
         BorderColor3 = FromRGB(0, 0, 0),
-        Size = UDim2New(0.8999999761581421, 0, 1, 0),
+        Size = UDim2New(0.9, 0, 1, 0),
         ZIndex = 6,
         BorderSizePixel = 0,
         BackgroundColor3 = Color
@@ -3459,29 +3494,6 @@ end
             RGBSequenceKeypoint(0, FromRGB(255, 255, 255)),
             RGBSequenceKeypoint(1, FromRGB(153, 153, 153))
         }
-    })
-
-    -- HP number on the LEFT side of the bar
-    local LeftValue = Instances:Create("TextLabel", {
-        Parent = NewBarBackground.Instance,
-        Name = "\0",
-        FontFace = Library.Font,
-        TextColor3 = FromRGB(255, 255, 255),
-        ZIndex = 6,
-        BorderColor3 = FromRGB(0, 0, 0),
-        Text = "90",
-        Size = UDim2New(0, 35, 1, 0),
-        BackgroundTransparency = 1,
-        Position = UDim2New(0, -40, 0, -1),
-        BorderSizePixel = 0,
-        TextSize = 12,
-        BackgroundColor3 = FromRGB(255, 255, 255),
-        TextXAlignment = Enum.TextXAlignment.Right
-    })  LeftValue:AddToTheme({TextColor3 = "Text"})
-
-    Instances:Create("UIStroke", {
-        Parent = LeftValue.Instance,
-        Name = "\0"
     })
 
     function NewBar:SetPercentage(Percentage)
@@ -3498,7 +3510,7 @@ end
     end
 
     function NewBar:Remove()
-        NewBarBackground:Clean()
+        Row:Clean()
         NewBar = nil
     end
 
@@ -5540,6 +5552,7 @@ end
 end
 
 return Library
+
 
 
 
