@@ -5348,91 +5348,102 @@ end
         return Textbox
     end
 
-    Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, ModeratorList)
-        local SettingsPage = Window:Page({Name = "Settings", Columns = 2})
-        local SettingsSection = SettingsPage:Section({Name = "Settings", Side = 1}) do
-            SettingsSection:Button({
-                Name = "Unload",
-                Callback = function()
-                    Library:Unload()
-                end
-            })
+Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, ModeratorList, PlayerList)
+    local SettingsPage = Window:Page({Name = "Settings", Columns = 2})
+    local SettingsSection = SettingsPage:Section({Name = "Settings", Side = 1}) do
+        SettingsSection:Button({
+            Name = "Unload",
+            Callback = function()
+                Library:Unload()
+            end
+        })
 
-            SettingsSection:Toggle({
-                Name = "Watermark",
-                Flag = "Watermark",
-                Default = true,
-                Callback = function(Value)
-                    Watermark:SetVisibility(Value)
-                end
-            })
+        SettingsSection:Toggle({
+            Name = "Watermark",
+            Flag = "Watermark",
+            Default = true,
+            Callback = function(Value)
+                Watermark:SetVisibility(Value)
+            end
+        })
 
-            SettingsSection:Toggle({
-                Name = "Keybind List",
-                Flag = "Keybind list",
-                Default = true,
-                Callback = function(Value)
-                    KeybindList:SetVisibility(Value)
-                end
-            })
+        SettingsSection:Toggle({
+            Name = "Keybind List",
+            Flag = "Keybind list",
+            Default = true,
+            Callback = function(Value)
+                KeybindList:SetVisibility(Value)
+            end
+        })
 
-            SettingsSection:Toggle({
-                Name = "Moderator List",
-                Flag = "Moderator list",
-                Default = true,
-                Callback = function(Value)
-                    if ModeratorList then
-                        ModeratorList:SetVisibility(Value)
-                    end
+        SettingsSection:Toggle({
+            Name = "Moderator List",
+            Flag = "Moderator list",
+            Default = true,
+            Callback = function(Value)
+                if ModeratorList then
+                    ModeratorList:SetVisibility(Value)
                 end
-            })
-            
-            SettingsSection:Label("Menu Keybind"):Keybind({
-                Name = "Menu Keybind",
-                Flag = "MenuKeybind",
-                Default = Library.MenuKeybind,
-                Mode = "Toggle",
-                Callback = function()
-                    Library.MenuKeybind = Library.Flags["MenuKeybind"].Key
-                end
-            })
+            end
+        })
 
-            SettingsSection:Slider({
-                Name = "Tween Speed",
-                Default = 0.2,
-                Flag = "Tween Speed",
-                Decimals = 0.01,
-                Suffix = "s",
-                Max = 10,
-                Min = 0,
-                Callback = function(Value)
-                    Library.Tween.Time = Value
+        SettingsSection:Toggle({
+            Name = "Player List",
+            Flag = "Player list",
+            Default = true,
+            Callback = function(Value)
+                if PlayerList then
+                    PlayerList:SetVisibility(Value)
                 end
-            })
+            end
+        })
+        
+        SettingsSection:Label("Menu Keybind"):Keybind({
+            Name = "Menu Keybind",
+            Flag = "MenuKeybind",
+            Default = Library.MenuKeybind,
+            Mode = "Toggle",
+            Callback = function()
+                Library.MenuKeybind = Library.Flags["MenuKeybind"].Key
+            end
+        })
 
-            SettingsSection:Dropdown({
-                Name = "Tween Style",
-                Flag = "Tween style",
-                MaxSize = 200,
-                Items = { "Linear", "Quad", "Quart", "Back", "Bounce", "Circular", "Cubic", "Elastic", "Exponential", "Sine", "Quint" },
-                Default = "Quint",
-                Callback = function(Value)
-                    if not Value then Value = "Quint" end
-                    Library.Tween.Style = Enum.EasingStyle[Value]
-                end
-            })
+        SettingsSection:Slider({
+            Name = "Tween Speed",
+            Default = 0.2,
+            Flag = "Tween Speed",
+            Decimals = 0.01,
+            Suffix = "s",
+            Max = 10,
+            Min = 0,
+            Callback = function(Value)
+                Library.Tween.Time = Value
+            end
+        })
 
-            SettingsSection:Dropdown({
-                Name = "Tween Direction",
-                Flag = "Tween direction",
-                Items = { "In", "Out", "InOut" },
-                Default = "Out",
-                Callback = function(Value)
-                    if not Value then Value = "Out" end
-                    Library.Tween.Direction = Enum.EasingDirection[Value]
-                end
-            })
-        end
+        SettingsSection:Dropdown({
+            Name = "Tween Style",
+            Flag = "Tween style",
+            MaxSize = 200,
+            Items = { "Linear", "Quad", "Quart", "Back", "Bounce", "Circular", "Cubic", "Elastic", "Exponential", "Sine", "Quint" },
+            Default = "Quint",
+            Callback = function(Value)
+                if not Value then Value = "Quint" end
+                Library.Tween.Style = Enum.EasingStyle[Value]
+            end
+        })
+
+        SettingsSection:Dropdown({
+            Name = "Tween Direction",
+            Flag = "Tween direction",
+            Items = { "In", "Out", "InOut" },
+            Default = "Out",
+            Callback = function(Value)
+                if not Value then Value = "Out" end
+                Library.Tween.Direction = Enum.EasingDirection[Value]
+            end
+        })
+    end
         
         local ConfigsSection = SettingsPage:Section({Name = "Configs", Side = 2}) do
             local ConfigName 
@@ -5712,4 +5723,5 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
