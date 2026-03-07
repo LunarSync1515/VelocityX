@@ -771,7 +771,7 @@ Library.SafeCall = function(self, Function, ...)
     local Success, Result = pcall(Function, TableUnpack(Arguements))
 
     if not Success then
-        LocalPlayer:Kick("Luna Callback Error: " .. tostring(Result))
+        LocalPlayer:Kick("Aether Callback Error: " .. tostring(Result))
         return false
     end
 
@@ -5784,3 +5784,4 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
