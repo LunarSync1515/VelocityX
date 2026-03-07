@@ -55,7 +55,7 @@ local TweenService = game:GetService("TweenService")
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/constructorr12/VelocityX/main/VelocityX.lua"))()
 
-Library:Notification("                    Loading Bypass                    ", 4, 5)
+Library:Notification("Loading Bypass", 4,5)
 task.wait(4.6)
 Library:Notification("✓ Bypass Loaded Successfully", 4.5)
 
