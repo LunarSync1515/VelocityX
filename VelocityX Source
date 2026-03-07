@@ -75,86 +75,113 @@ Library.PlayerListInstance = MyPlayerList
 MyModList:SetVisibility(false)
   
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
 
 -- create the UI first
 local MyModList = Library:ModeratorList()
 MyModList:SetVisibility(true)
 
--- CENTER ALERT FUNCTION
+-- keep track of who is currently added
+local trackedMods = {}
+
+-- SMALLER + HIGHER ALERT
 local function CenterAlert(text, duration)
-    duration = duration or 6
+    duration = duration or 3
+
+    local old = CoreGui:FindFirstChild("ModeratorAlert")
+    if old then
+        old:Destroy()
+    end
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "ModeratorAlert"
     ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = game:GetService("CoreGui")
+    ScreenGui.Parent = CoreGui
 
     local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 420, 0, 90)
-    Frame.Position = UDim2.new(0.5, -210, 0.4, 0)
-    Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    Frame.Size = UDim2.new(0, 300, 0, 55)
+    Frame.Position = UDim2.new(0.5, -150, 0.18, 0) -- higher up
+    Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     Frame.BorderSizePixel = 0
     Frame.Parent = ScreenGui
 
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = Frame
+
     local Stroke = Instance.new("UIStroke")
-    Stroke.Color = Color3.fromRGB(255,60,60)
+    Stroke.Color = Color3.fromRGB(255, 60, 60)
     Stroke.Thickness = 2
     Stroke.Parent = Frame
 
     local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(1,0,1,0)
+    Label.Size = UDim2.new(1, -12, 1, -12)
+    Label.Position = UDim2.new(0, 6, 0, 6)
     Label.BackgroundTransparency = 1
     Label.Text = text
-    Label.TextColor3 = Color3.fromRGB(255,60,60)
+    Label.TextColor3 = Color3.fromRGB(255, 60, 60)
     Label.TextScaled = true
     Label.Font = Enum.Font.GothamBold
     Label.Parent = Frame
 
     task.delay(duration, function()
-        ScreenGui:Destroy()
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        end
     end)
 end
-
 
 -- Chunk Studios group
 local GROUP_ID = 1154360
 local MODERATOR_RANK = 15 -- Game Moderator rank
 
+local function addModerator(player, tag)
+    if trackedMods[player.UserId] then
+        return
+    end
+
+    trackedMods[player.UserId] = true
+    MyModList:add_mod(player.UserId, player.Name, tag)
+
+    warn(("⚠️ GROUP MODERATOR: %s detected!"):format(player.Name))
+    CenterAlert("⚠ MODERATOR DETECTED ⚠\n" .. player.Name, 3)
+end
+
+local function removeModerator(player)
+    if trackedMods[player.UserId] then
+        trackedMods[player.UserId] = nil
+        MyModList:remove_mod(player.UserId)
+    end
+end
+
 local function checkPlayer(player)
     if not player:IsInGroup(GROUP_ID) then
+        removeModerator(player)
         return
     end
 
     local rank = player:GetRankInGroup(GROUP_ID)
 
     if rank == MODERATOR_RANK then
-        local tag = "Moderator"
-
-        -- add to moderator UI
-        MyModList:add_mod(player.UserId, player.Name, tag)
-
-        -- console warning
-        warn(("⚠️ GROUP MODERATOR: %s detected!"):format(player.Name))
-
-        -- BIG CENTER WARNING
-        CenterAlert("⚠ MODERATOR DETECTED ⚠\n"..player.Name, 10)
+        addModerator(player, "Moderator")
+    else
+        removeModerator(player)
     end
 end
-
 
 -- Detect players already in the server
 for _, player in ipairs(Players:GetPlayers()) do
     checkPlayer(player)
 end
 
-
 -- Detect new joins
-Players.PlayerAdded:Connect(checkPlayer)
-
+Players.PlayerAdded:Connect(function(player)
+    checkPlayer(player)
+end)
 
 -- Auto-remove when they leave
 Players.PlayerRemoving:Connect(function(player)
-    MyModList:remove_mod(player.UserId)
+    removeModerator(player)
 end)
 
   local CombatPage = Window:Page({Name = 'Combat'})
