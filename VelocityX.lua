@@ -693,16 +693,17 @@ Library.UnusedHolder = Instances:Create("ScreenGui", {
     ResetOnSpawn = false
 })
 
-Items["Text"] = Instances:Create("TextLabel", {
+Library.NotifHolder = Instances:Create("Frame", {
     Parent = Items["Notification"].Instance,
     FontFace = Library.Font,
     TextColor3 = FromRGB(255, 255, 255),
     Text = Name,
-    Size = UDim2New(0, 260, 0, 15), -- wider notification
+    Size = UDim2New(0, 260, 0, 15),
     BackgroundTransparency = 1,
-    TextXAlignment = Enum.TextXAlignment.Center, -- optional: center text
+    TextXAlignment = Enum.TextXAlignment.Center,
     BorderSizePixel = 0,
-    AutomaticSize = Enum.AutomaticSize.Y, -- only grow vertically
+    AutomaticSize = Enum.AutomaticSize.Y,
+    TextWrapped = true,
     TextSize = 14,
     BackgroundColor3 = FromRGB(255, 255, 255)
 })
@@ -5382,6 +5383,7 @@ end
 end
 
 return Library
+
 
 
 
