@@ -2573,6 +2573,16 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
+-- Top blue accent bar (full-bleed)
+Items["TopBar"] = Instances:Create("Frame", {
+    Parent = Items["ModList"].Instance,
+    Position = UDim2New(0, -9, 0, -9),
+    Size = UDim2New(1, 18, 0, 3),
+    BorderSizePixel = 0,
+    BackgroundColor3 = FromRGB(0, 170, 255)
+})
+Items["TopBar"].Instance.ZIndex = 60
+											
         do
     local sg = Items["ModList"].Instance:FindFirstAncestorOfClass("ScreenGui")
     if sg then
@@ -2649,7 +2659,7 @@ Items["ModList"].Instance.ZIndex = 50
     end
 
 
-    function ModList:add_mod(Username, Role)
+    function ModList:add_mod(UserId, Username, Role)
 
         if Moderators[Username] then
             ModList:remove_mod(Username)
@@ -2687,9 +2697,9 @@ Items["ModList"].Instance.ZIndex = 50
 
 
         Line.Instance.Text = string.format(
-            '%s  <font color="#B9B9B9">%s</font>',
-            Username,
-            Role
+            '<font color="#4DA6FF">%s</font>  <font color="#B9B9B9">%s</font>',
+            tostring(Username),
+			tostring(Role)
         )
 
         Moderators[Username] = {
