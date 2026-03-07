@@ -884,6 +884,10 @@ Library.GetConfig = function(self)
             Config.WidgetPositions.ModeratorList = Library.ModeratorListInstance:GetPosition()
         end
 
+        if Library.PlayerListInstance and Library.PlayerListInstance.GetPosition then
+            Config.WidgetPositions.PlayerList = Library.PlayerListInstance:GetPosition()
+        end
+
     end)
 
     return HttpService:JSONEncode(Config)
@@ -931,7 +935,6 @@ Library.LoadConfig = function(self, Config)
                 )
             end
 
-
             if Decoded.WidgetPositions.ArmorViewer
             and Library.ArmorViewerInstance
             and Library.ArmorViewerInstance.SetPosition then
@@ -941,13 +944,21 @@ Library.LoadConfig = function(self, Config)
                 )
             end
 
-
             if Decoded.WidgetPositions.ModeratorList
             and Library.ModeratorListInstance
             and Library.ModeratorListInstance.SetPosition then
 
                 Library.ModeratorListInstance:SetPosition(
                     Decoded.WidgetPositions.ModeratorList
+                )
+            end
+
+            if Decoded.WidgetPositions.PlayerList
+            and Library.PlayerListInstance
+            and Library.PlayerListInstance.SetPosition then
+
+                Library.PlayerListInstance:SetPosition(
+                    Decoded.WidgetPositions.PlayerList
                 )
             end
         end
@@ -965,7 +976,6 @@ Library.DeleteConfig = function(self, Config)
     end
 
 end
-
 
 Library.RefreshConfigsList = function(self, Element)
 
@@ -5723,5 +5733,6 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
