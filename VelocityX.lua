@@ -845,67 +845,145 @@ Library.AddToTheme = function(self, Item, Properties)
 end
 
 Library.GetConfig = function(self)
-    local Config = { } 
+    local Config = {}
 
     local Success, Result = Library:SafeCall(function()
-        for Index, Value in Library.Flags do 
+
+        -- Save normal flags
+        for Index, Value in Library.Flags do
             if type(Value) == "table" and Value.Key then
-                Config[Index] = {Key = tostring(Value.Key), Mode = Value.Mode, Toggled = Value.Toggled}
+                Config[Index] = {
+                    Key = tostring(Value.Key),
+                    Mode = Value.Mode,
+                    Toggled = Value.Toggled
+                }
+
             elseif type(Value) == "table" and Value.Color then
-                Config[Index] = {Color = "#" .. Value.HexValue, Alpha = Value.Alpha}
+                Config[Index] = {
+                    Color = "#" .. Value.HexValue,
+                    Alpha = Value.Alpha
+                }
+
             else
                 Config[Index] = Value
             end
         end
+
+        -- Save widget positions
+        Config.WidgetPositions = {}
+
+        if Library.KeybindListInstance and Library.KeybindListInstance.GetPosition then
+            Config.WidgetPositions.KeybindList = Library.KeybindListInstance:GetPosition()
+        end
+
+        if Library.ArmorViewerInstance and Library.ArmorViewerInstance.GetPosition then
+            Config.WidgetPositions.ArmorViewer = Library.ArmorViewerInstance:GetPosition()
+        end
+
+        if Library.ModeratorListInstance and Library.ModeratorListInstance.GetPosition then
+            Config.WidgetPositions.ModeratorList = Library.ModeratorListInstance:GetPosition()
+        end
+
     end)
 
     return HttpService:JSONEncode(Config)
 end
 
+
 Library.LoadConfig = function(self, Config)
+
     local Decoded = HttpService:JSONDecode(Config)
 
     local Success, Result = Library:SafeCall(function()
-        for Index, Value in Decoded do 
+
+        for Index, Value in Decoded do
+
+            if Index == "WidgetPositions" then
+                continue
+            end
+
             local SetFunction = Library.SetFlags[Index]
 
             if not SetFunction then
                 continue
             end
 
-            if type(Value) == "table" and Value.Key then 
+            if type(Value) == "table" and Value.Key then
                 SetFunction(Value)
+
             elseif type(Value) == "table" and Value.Color then
                 SetFunction(Value.Color, Value.Alpha)
+
             else
                 SetFunction(Value)
             end
         end
+
+        -- Restore widget positions
+        if Decoded.WidgetPositions then
+
+            if Decoded.WidgetPositions.KeybindList
+            and Library.KeybindListInstance
+            and Library.KeybindListInstance.SetPosition then
+
+                Library.KeybindListInstance:SetPosition(
+                    Decoded.WidgetPositions.KeybindList
+                )
+            end
+
+
+            if Decoded.WidgetPositions.ArmorViewer
+            and Library.ArmorViewerInstance
+            and Library.ArmorViewerInstance.SetPosition then
+
+                Library.ArmorViewerInstance:SetPosition(
+                    Decoded.WidgetPositions.ArmorViewer
+                )
+            end
+
+
+            if Decoded.WidgetPositions.ModeratorList
+            and Library.ModeratorListInstance
+            and Library.ModeratorListInstance.SetPosition then
+
+                Library.ModeratorListInstance:SetPosition(
+                    Decoded.WidgetPositions.ModeratorList
+                )
+            end
+        end
+
     end)
 
     return Success, Result
 end
 
+
 Library.DeleteConfig = function(self, Config)
-    if isfile(Library.Folders.Configs .. "/" .. Config) then 
+
+    if isfile(Library.Folders.Configs .. "/" .. Config) then
         delfile(Library.Folders.Configs .. "/" .. Config)
     end
+
 end
 
+
 Library.RefreshConfigsList = function(self, Element)
-    local List = { }
-    local ReturnList = { }
+
+    local List = {}
+    local ReturnList = {}
 
     List = listfiles(Library.Folders.Configs)
 
-    for Index = 1, #List do 
+    for Index = 1, #List do
         local File = List[Index]
 
         if File:sub(-5) == ".json" then
+
             local Position = File:find(".json", 1, true)
             local StartPosition = Position
 
             local Character = File:sub(Position, Position)
+
             while Character ~= "/" and Character ~= "\\" and Character ~= "" do
                 Position = Position - 1
                 Character = File:sub(Position, Position)
@@ -918,6 +996,7 @@ Library.RefreshConfigsList = function(self, Element)
     end
 
     Element:Refresh(ReturnList)
+
 end
 
 Library.ChangeItemTheme = function(self, Item, Properties)
@@ -5453,6 +5532,7 @@ end
 end
 
 return Library
+
 
 
 
