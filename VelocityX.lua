@@ -2508,6 +2508,35 @@ Library.KeybindList = function(self)
         Items["KeybindList"].Instance.Visible = Bool
     end
 
+    function KeybindList:GetPosition()
+        local p = Items["KeybindList"].Instance.Position
+
+        return {
+            XScale = p.X.Scale,
+            XOffset = p.X.Offset,
+            YScale = p.Y.Scale,
+            YOffset = p.Y.Offset
+        }
+    end
+
+    function KeybindList:SetPosition(Pos)
+        if not Pos then
+            return
+        end
+
+        if typeof(Pos) == "UDim2" then
+            Items["KeybindList"].Instance.Position = Pos
+            return
+        end
+
+        Items["KeybindList"].Instance.Position = UDim2.new(
+            Pos.XScale or 0,
+            Pos.XOffset or 0,
+            Pos.YScale or 0,
+            Pos.YOffset or 0
+        )
+    end
+
     function KeybindList:Add(Name, Key)
         local NewKey = Instances:Create("TextLabel", {
             Parent = Items["Content"].Instance,
@@ -2655,6 +2684,30 @@ Library.ModeratorList = function(self)
         Items["ModList"].Instance.Visible = Bool
     end
 
+    function ModList:GetPosition()
+        local p = Items["ModList"].Instance.Position
+
+        return {
+            XScale = p.X.Scale,
+            XOffset = p.X.Offset,
+            YScale = p.Y.Scale,
+            YOffset = p.Y.Offset
+        }
+    end
+
+    function ModList:SetPosition(Pos)
+        if not Pos then
+            return
+        end
+
+        Items["ModList"].Instance.Position = UDim2.new(
+            Pos.XScale or 0,
+            Pos.XOffset or 0,
+            Pos.YScale or 0,
+            Pos.YOffset or 0
+        )
+    end
+
 
     function ModList:add_mod(UserId, Username, Role)
 
@@ -2728,284 +2781,309 @@ Library.ModeratorList = function(self)
     return ModList
 end
 
-    Library.ArmorViewer = function(self)
-        local Viewer = {
-            Items = { }
-        }
+Library.ArmorViewer = function(self)
+    local Viewer = {
+        Items = { }
+    }
 
-        local Items = { }
-        local Layout
+    local Items = { }
+    local Layout
 
-        local MinWidth = 180
-        local MaxWidth = 9999
-        local BarHeight = 120
-        local ItemSize = 82
-        local Gap = 8
-        local PadL, PadR = 8, 8
-        local PadT, PadB = 6, 10
-        local HeaderH = 32
+    local MinWidth = 180
+    local MaxWidth = 9999
+    local BarHeight = 120
+    local ItemSize = 82
+    local Gap = 8
+    local PadL, PadR = 8, 8
+    local PadT, PadB = 6, 10
+    local HeaderH = 32
 
-        local function Clamp(x, a, b)
-            if (x < a) then return a end
-            if (x > b) then return b end
-            return x
-        end
-
-        local function CountItems()
-            local n = 0
-            for _, c in ipairs(Items["RealHolder"].Instance:GetChildren()) do
-                if (c:IsA("Frame")) then
-                    n += 1
-                end
-            end
-            return n
-        end
-
-        local function UpdateBarSize()
-            if (not Items["ArmorViewer"]) then
-                return
-            end
-
-            local n = CountItems()
-            local contentW
-
-            if (n <= 0) then
-                contentW = PadL + PadR
-            else
-                contentW = PadL + PadR + (n * ItemSize) + ((n - 1) * Gap)
-            end
-
-            local outerW = contentW + 16
-            local w = Clamp(outerW, MinWidth, MaxWidth)
-
-            Items["ArmorViewer"].Instance.Size = UDim2New(0, w, 0, BarHeight)
-            Items["Holder"].Instance.Size = UDim2New(1, -16, 1, -(HeaderH + 8))
-            Items["RealHolder"].Instance.Size = UDim2New(1, 0, 1, 0)
-            Items["RealHolder"].Instance.CanvasSize = UDim2New(0, math.max(0, contentW), 0, 0)
-        end
-
-        do
-            Items["ArmorViewer"] = Instances:Create("Frame", {
-                Parent = Library.Holder.Instance,
-                Name = "\0",
-                Position = UDim2New(0, 0, 0.5, 0),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(0, MinWidth, 0, BarHeight),
-                BorderSizePixel = 0,
-                ZIndex = 8,
-                BackgroundColor3 = FromRGB(24, 28, 36),
-                AnchorPoint = Vector2New(0, 0.5)
-            })  Items["ArmorViewer"]:AddToTheme({BackgroundColor3 = "Background 2"})
-
-            Items["ArmorViewer"]:MakeDraggable()
-
-            Items["Liner"] = Instances:Create("Frame", {
-                Parent = Items["ArmorViewer"].Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(1, 0, 0, 2),
-                BorderSizePixel = 0,
-                ZIndex = 8,
-                BackgroundColor3 = FromRGB(94, 213, 213)
-            })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-
-            Items["Glow"] = Instances:Create("ImageLabel", {
-                Parent = Items["Liner"].Instance,
-                Name = "\0",
-                ImageColor3 = FromRGB(94, 213, 213),
-                ScaleType = Enum.ScaleType.Slice,
-                ImageTransparency = 0.5,
-                BorderColor3 = FromRGB(0, 0, 0),
-                BackgroundColor3 = FromRGB(94, 213, 213),
-                Size = UDim2New(1, 8, 1, 8),
-                AnchorPoint = Vector2New(0.5, 0.5),
-                Image = "rbxassetid://18245826428",
-                BackgroundTransparency = 1,
-                Position = UDim2New(0.5, 0, 0.5, 0),
-                ZIndex = 8,
-                BorderSizePixel = 0,
-                SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-            })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-
-            Instances:Create("UIGradient", {
-                Parent = Items["Glow"].Instance,
-                Name = "\0",
-                Rotation = 90,
-                Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
-            })
-
-            Items["Title"] = Instances:Create("TextLabel", {
-                Parent = Items["ArmorViewer"].Instance,
-                Name = "\0",
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 255, 255),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Text = "sametexe009's inventory",
-                Size = UDim2New(1, -16, 0, 15),
-                Position = UDim2New(0, 8, 0, 8),
-                BackgroundTransparency = 1,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                BorderSizePixel = 0,
-                ZIndex = 8,
-                AutomaticSize = Enum.AutomaticSize.None,
-                TextSize = 14,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
-
-            Items["Holder"] = Instances:Create("Frame", {
-                Parent = Items["ArmorViewer"].Instance,
-                Name = "\0",
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 8, 0, HeaderH),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(1, -16, 1, -(HeaderH + 8)),
-                BorderSizePixel = 0,
-                ZIndex = 8,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-
-            Instances:Create("UIStroke", {
-                Parent = Items["Holder"].Instance,
-                Name = "\0",
-                Color = FromRGB(46, 52, 61),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            }):AddToTheme({Color = "Border"})
-
-            Items["RealHolder"] = Instances:Create("ScrollingFrame", {
-                Parent = Items["Holder"].Instance,
-                Name = "\0",
-                Active = true,
-                AutomaticCanvasSize = Enum.AutomaticSize.None,
-                BorderSizePixel = 0,
-                CanvasSize = UDim2New(0, 0, 0, 0),
-                ScrollBarImageColor3 = FromRGB(46, 52, 61),
-                MidImage = "rbxassetid://93024691806056",
-                BorderColor3 = FromRGB(0, 0, 0),
-                ScrollBarThickness = 3,
-                Size = UDim2New(1, 0, 1, 0),
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 0, 0, 0),
-                ZIndex = 8,
-                BottomImage = "rbxassetid://93024691806056",
-                TopImage = "rbxassetid://93024691806056",
-                BackgroundColor3 = FromRGB(255, 255, 255),
-                ScrollingDirection = Enum.ScrollingDirection.X
-            })  Items["RealHolder"]:AddToTheme({ScrollBarImageColor3 = "Border"})
-
-            Layout = Instances:Create("UIListLayout", {
-                Parent = Items["RealHolder"].Instance,
-                Name = "\0",
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                FillDirection = Enum.FillDirection.Horizontal,
-                HorizontalAlignment = Enum.HorizontalAlignment.Left,
-                VerticalAlignment = Enum.VerticalAlignment.Center,
-                Padding = UDimNew(0, Gap)
-            })
-
-            Instances:Create("UIPadding", {
-                Parent = Items["RealHolder"].Instance,
-                Name = "\0",
-                PaddingTop = UDimNew(0, PadT),
-                PaddingBottom = UDimNew(0, PadB),
-                PaddingRight = UDimNew(0, PadR),
-                PaddingLeft = UDimNew(0, PadL)
-            })
-
-            Items["RealHolder"].Instance.ChildAdded:Connect(function()
-                UpdateBarSize()
-            end)
-
-            Items["RealHolder"].Instance.ChildRemoved:Connect(function()
-                UpdateBarSize()
-            end)
-
-            UpdateBarSize()
-        end
-
-        function Viewer:Add(Name, Icon)
-            local NewItemTable = { }
-
-            local NewItem = Instances:Create("Frame", {
-                Parent = Items["RealHolder"].Instance,
-                Name = "\0",
-                BackgroundTransparency = 1,
-                BorderColor3 = FromRGB(0, 0, 0),
-                ZIndex = 8,
-                Size = UDim2New(0, ItemSize, 0, ItemSize),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-
-            Instances:Create("UIStroke", {
-                Parent = NewItem.Instance,
-                Name = "\0",
-                Color = FromRGB(46, 52, 61),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            }):AddToTheme({Color = "Border"})
-
-            Instances:Create("ImageLabel", {
-                Parent = NewItem.Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                AnchorPoint = Vector2New(0.5, 0.5),
-                ZIndex = 8,
-                Image = Icon,
-                BackgroundTransparency = 1,
-                Position = UDim2New(0.5, 0, 0.5, 0),
-                Size = UDim2New(0, 50, 0, 50),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-
-            function NewItemTable:Remove()
-                NewItem:Clean()
-                Viewer.Items[Name] = nil
-                UpdateBarSize()
-            end
-
-            Viewer.Items[Name] = NewItemTable
-            UpdateBarSize()
-            return NewItemTable
-        end
-
-        function Viewer:ClearAllItems()
-            for _, Value in Viewer.Items do
-                if (not Value or not Value.Remove) then
-                    continue
-                end
-                Value:Remove()
-            end
-            UpdateBarSize()
-        end
-
-        function Viewer:SetVisibility(Bool)
-            Items["ArmorViewer"].Instance.Visible = Bool
-        end
-
-        function Viewer:SetTitle(Name)
-            Items["Title"].Instance.Text = Name
-        end
-
-        function Viewer:SetPosition(Position)
-            Items["ArmorViewer"].Instance.Position = Position
-        end
-
-        function Viewer:SetSizeLimits(Min, Max)
-            MinWidth = Min or MinWidth
-            MaxWidth = Max or MaxWidth
-            UpdateBarSize()
-        end
-
-        function Viewer:SetBarHeight(H)
-            BarHeight = H or BarHeight
-            Items["ArmorViewer"].Instance.Size = UDim2New(0, Items["ArmorViewer"].Instance.Size.X.Offset, 0, BarHeight)
-            UpdateBarSize()
-        end
-
-        return Viewer
+    local function Clamp(x, a, b)
+        if (x < a) then return a end
+        if (x > b) then return b end
+        return x
     end
+
+    local function CountItems()
+        local n = 0
+        for _, c in ipairs(Items["RealHolder"].Instance:GetChildren()) do
+            if (c:IsA("Frame")) then
+                n += 1
+            end
+        end
+        return n
+    end
+
+    local function UpdateBarSize()
+        if (not Items["ArmorViewer"]) then
+            return
+        end
+
+        local n = CountItems()
+        local contentW
+
+        if (n <= 0) then
+            contentW = PadL + PadR
+        else
+            contentW = PadL + PadR + (n * ItemSize) + ((n - 1) * Gap)
+        end
+
+        local outerW = contentW + 16
+        local w = Clamp(outerW, MinWidth, MaxWidth)
+
+        Items["ArmorViewer"].Instance.Size = UDim2New(0, w, 0, BarHeight)
+        Items["Holder"].Instance.Size = UDim2New(1, -16, 1, -(HeaderH + 8))
+        Items["RealHolder"].Instance.Size = UDim2New(1, 0, 1, 0)
+        Items["RealHolder"].Instance.CanvasSize = UDim2New(0, math.max(0, contentW), 0, 0)
+    end
+
+    do
+        Items["ArmorViewer"] = Instances:Create("Frame", {
+            Parent = Library.Holder.Instance,
+            Name = "\0",
+            Position = UDim2New(0, 0, 0.5, 0),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Size = UDim2New(0, MinWidth, 0, BarHeight),
+            BorderSizePixel = 0,
+            ZIndex = 8,
+            BackgroundColor3 = FromRGB(24, 28, 36),
+            AnchorPoint = Vector2New(0, 0.5)
+        })  Items["ArmorViewer"]:AddToTheme({BackgroundColor3 = "Background 2"})
+
+        Items["ArmorViewer"]:MakeDraggable()
+
+        Items["Liner"] = Instances:Create("Frame", {
+            Parent = Items["ArmorViewer"].Instance,
+            Name = "\0",
+            BorderColor3 = FromRGB(0, 0, 0),
+            Size = UDim2New(1, 0, 0, 2),
+            BorderSizePixel = 0,
+            ZIndex = 8,
+            BackgroundColor3 = FromRGB(94, 213, 213)
+        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+
+        Items["Glow"] = Instances:Create("ImageLabel", {
+            Parent = Items["Liner"].Instance,
+            Name = "\0",
+            ImageColor3 = FromRGB(94, 213, 213),
+            ScaleType = Enum.ScaleType.Slice,
+            ImageTransparency = 0.5,
+            BorderColor3 = FromRGB(0, 0, 0),
+            BackgroundColor3 = FromRGB(94, 213, 213),
+            Size = UDim2New(1, 8, 1, 8),
+            AnchorPoint = Vector2New(0.5, 0.5),
+            Image = "rbxassetid://18245826428",
+            BackgroundTransparency = 1,
+            Position = UDim2New(0.5, 0, 0.5, 0),
+            ZIndex = 8,
+            BorderSizePixel = 0,
+            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
+        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
+
+        Instances:Create("UIGradient", {
+            Parent = Items["Glow"].Instance,
+            Name = "\0",
+            Rotation = 90,
+            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
+        })
+
+        Items["Title"] = Instances:Create("TextLabel", {
+            Parent = Items["ArmorViewer"].Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Text = "sametexe009's inventory",
+            Size = UDim2New(1, -16, 0, 15),
+            Position = UDim2New(0, 8, 0, 8),
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            BorderSizePixel = 0,
+            ZIndex = 8,
+            AutomaticSize = Enum.AutomaticSize.None,
+            TextSize = 14,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+
+        Items["Holder"] = Instances:Create("Frame", {
+            Parent = Items["ArmorViewer"].Instance,
+            Name = "\0",
+            BackgroundTransparency = 1,
+            Position = UDim2New(0, 8, 0, HeaderH),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Size = UDim2New(1, -16, 1, -(HeaderH + 8)),
+            BorderSizePixel = 0,
+            ZIndex = 8,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })
+
+        Instances:Create("UIStroke", {
+            Parent = Items["Holder"].Instance,
+            Name = "\0",
+            Color = FromRGB(46, 52, 61),
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        }):AddToTheme({Color = "Border"})
+
+        Items["RealHolder"] = Instances:Create("ScrollingFrame", {
+            Parent = Items["Holder"].Instance,
+            Name = "\0",
+            Active = true,
+            AutomaticCanvasSize = Enum.AutomaticSize.None,
+            BorderSizePixel = 0,
+            CanvasSize = UDim2New(0, 0, 0, 0),
+            ScrollBarImageColor3 = FromRGB(46, 52, 61),
+            MidImage = "rbxassetid://93024691806056",
+            BorderColor3 = FromRGB(0, 0, 0),
+            ScrollBarThickness = 3,
+            Size = UDim2New(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Position = UDim2New(0, 0, 0, 0),
+            ZIndex = 8,
+            BottomImage = "rbxassetid://93024691806056",
+            TopImage = "rbxassetid://93024691806056",
+            BackgroundColor3 = FromRGB(255, 255, 255),
+            ScrollingDirection = Enum.ScrollingDirection.X
+        })  Items["RealHolder"]:AddToTheme({ScrollBarImageColor3 = "Border"})
+
+        Layout = Instances:Create("UIListLayout", {
+            Parent = Items["RealHolder"].Instance,
+            Name = "\0",
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            FillDirection = Enum.FillDirection.Horizontal,
+            HorizontalAlignment = Enum.HorizontalAlignment.Left,
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            Padding = UDimNew(0, Gap)
+        })
+
+        Instances:Create("UIPadding", {
+            Parent = Items["RealHolder"].Instance,
+            Name = "\0",
+            PaddingTop = UDimNew(0, PadT),
+            PaddingBottom = UDimNew(0, PadB),
+            PaddingRight = UDimNew(0, PadR),
+            PaddingLeft = UDimNew(0, PadL)
+        })
+
+        Items["RealHolder"].Instance.ChildAdded:Connect(function()
+            UpdateBarSize()
+        end)
+
+        Items["RealHolder"].Instance.ChildRemoved:Connect(function()
+            UpdateBarSize()
+        end)
+
+        UpdateBarSize()
+    end
+
+    function Viewer:Add(Name, Icon)
+        local NewItemTable = { }
+
+        local NewItem = Instances:Create("Frame", {
+            Parent = Items["RealHolder"].Instance,
+            Name = "\0",
+            BackgroundTransparency = 1,
+            BorderColor3 = FromRGB(0, 0, 0),
+            ZIndex = 8,
+            Size = UDim2New(0, ItemSize, 0, ItemSize),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })
+
+        Instances:Create("UIStroke", {
+            Parent = NewItem.Instance,
+            Name = "\0",
+            Color = FromRGB(46, 52, 61),
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        }):AddToTheme({Color = "Border"})
+
+        Instances:Create("ImageLabel", {
+            Parent = NewItem.Instance,
+            Name = "\0",
+            BorderColor3 = FromRGB(0, 0, 0),
+            AnchorPoint = Vector2New(0.5, 0.5),
+            ZIndex = 8,
+            Image = Icon,
+            BackgroundTransparency = 1,
+            Position = UDim2New(0.5, 0, 0.5, 0),
+            Size = UDim2New(0, 50, 0, 50),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })
+
+        function NewItemTable:Remove()
+            NewItem:Clean()
+            Viewer.Items[Name] = nil
+            UpdateBarSize()
+        end
+
+        Viewer.Items[Name] = NewItemTable
+        UpdateBarSize()
+        return NewItemTable
+    end
+
+    function Viewer:ClearAllItems()
+        for _, Value in Viewer.Items do
+            if (not Value or not Value.Remove) then
+                continue
+            end
+            Value:Remove()
+        end
+        UpdateBarSize()
+    end
+
+    function Viewer:SetVisibility(Bool)
+        Items["ArmorViewer"].Instance.Visible = Bool
+    end
+
+    function Viewer:SetTitle(Name)
+        Items["Title"].Instance.Text = Name
+    end
+
+    function Viewer:GetPosition()
+        local p = Items["ArmorViewer"].Instance.Position
+
+        return {
+            XScale = p.X.Scale,
+            XOffset = p.X.Offset,
+            YScale = p.Y.Scale,
+            YOffset = p.Y.Offset
+        }
+    end
+
+    function Viewer:SetPosition(Position)
+        if not Position then
+            return
+        end
+
+        if typeof(Position) == "UDim2" then
+            Items["ArmorViewer"].Instance.Position = Position
+            return
+        end
+
+        Items["ArmorViewer"].Instance.Position = UDim2.new(
+            Position.XScale or 0,
+            Position.XOffset or 0,
+            Position.YScale or 0,
+            Position.YOffset or 0
+        )
+    end
+
+    function Viewer:SetSizeLimits(Min, Max)
+        MinWidth = Min or MinWidth
+        MaxWidth = Max or MaxWidth
+        UpdateBarSize()
+    end
+
+    function Viewer:SetBarHeight(H)
+        BarHeight = H or BarHeight
+        Items["ArmorViewer"].Instance.Size = UDim2New(0, Items["ArmorViewer"].Instance.Size.X.Offset, 0, BarHeight)
+        UpdateBarSize()
+    end
+
+    return Viewer
+end
 
     Library.Notification = function(self, Name, Duration)
         local Items = { } do
@@ -5375,6 +5453,7 @@ end
 end
 
 return Library
+
 
 
 
