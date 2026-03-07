@@ -700,7 +700,7 @@ Library.NotifHolder = Instances:Create("Frame", {
     AnchorPoint = Vector2New(1, 0),
     BackgroundTransparency = 1,
     Position = UDim2New(1, 0, 0, 0),
-    Size = UDim2New(0, 0, 1, 0),
+    Size = UDim2New(0, 260, 0, 15),
     BorderSizePixel = 0,
     AutomaticSize = Enum.AutomaticSize.X,
     BackgroundColor3 = FromRGB(255, 255, 255)
@@ -5381,6 +5381,7 @@ end
 end
 
 return Library
+
 
 
 
