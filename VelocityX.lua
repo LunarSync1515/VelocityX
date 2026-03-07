@@ -3250,277 +3250,269 @@ end
         end)
     end
 
-Library.TargetHud = function(self)
-    local TargetHud = {}
+    Library.TargetHud = function(self)
+        local TargetHud = { }
 
-    local Items = {} do
-        Items["TargetHud"] = Instances:Create("Frame", {
-            Parent = Library.Holder.Instance,
-            Name = "\0",
-            Size = UDim2New(0, 295, 0, 21),
-            Position = UDim2New(0, 0, 0.8, 0),
-            BorderColor3 = FromRGB(0, 0, 0),
-            BorderSizePixel = 0,
-            ZIndex = 6,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundColor3 = FromRGB(17, 21, 27)
-        })  Items["TargetHud"]:AddToTheme({BackgroundColor3 = "Background 1"})
+        local Items = { } do 
+            Items["TargetHud"] = Instances:Create("Frame", {
+                Parent = Library.Holder.Instance,
+                Name = "\0",
+                Size = UDim2New(0, 295, 0, 21),
+                Position = UDim2New(0, 0, 0.8, 0),
+                BorderColor3 = FromRGB(0, 0, 0),
+                BorderSizePixel = 0,
+                ZIndex = 6,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = FromRGB(17, 21, 27)
+            })  Items["TargetHud"]:AddToTheme({BackgroundColor3 = "Background 1"})
 
-        Items["TargetHud"]:MakeDraggable()
+            Items["TargetHud"]:MakeDraggable()
+            
+            Instances:Create("UIStroke", {
+                Parent = Items["TargetHud"].Instance,
+                Name = "\0",
+                Color = FromRGB(46, 52, 61),
+                LineJoinMode = Enum.LineJoinMode.Miter,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            }):AddToTheme({Color = "Border"})
+            
+            Items["Title"] = Instances:Create("TextLabel", {
+                Parent = Items["TargetHud"].Instance,
+                Name = "\0",
+                FontFace = Library.Font,
+                TextColor3 = FromRGB(255, 255, 255),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Text = "Target Hud",
+                Size = UDim2New(0, 0, 0, 15),
+                Position = UDim2New(0, 8, 0, 8),
+                BackgroundTransparency = 1,
+                ZIndex = 6,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.X,
+                TextSize = 14,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+            
+            Items["Liner"] = Instances:Create("Frame", {
+                Parent = Items["TargetHud"].Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(1, 0, 0, 2),
+                ZIndex = 6,
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(94, 213, 213)
+            })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+            
+            Items["Glow"] = Instances:Create("ImageLabel", {
+                Parent = Items["Liner"].Instance,
+                Name = "\0",
+                ImageColor3 = FromRGB(94, 213, 213),
+                ScaleType = Enum.ScaleType.Slice,
+                ImageTransparency = 0.5,
+                BorderColor3 = FromRGB(0, 0, 0),
+                ZIndex = 6,
+                BackgroundColor3 = FromRGB(94, 213, 213),
+                Size = UDim2New(1, 8, 1, 8),
+                AnchorPoint = Vector2New(0.5, 0.5),
+                Image = "rbxassetid://18245826428",
+                BackgroundTransparency = 1,
+                Position = UDim2New(0.5, 0, 0.5, 0),
+                BorderSizePixel = 0,
+                SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
+            })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
+            
+            Instances:Create("UIGradient", {
+                Parent = Items["Glow"].Instance,
+                Name = "\0",
+                Rotation = 90,
+                Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
+            })
+            
+            Items["Content"] = Instances:Create("Frame", {
+                Parent = Items["TargetHud"].Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                BackgroundTransparency = 1,
+                ZIndex = 6,
+                Position = UDim2New(0, 8, 0, 32),
+                Size = UDim2New(1, -16, 0, 0),
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })
+            
+            Instances:Create("UIStroke", {
+                Parent = Items["Content"].Instance,
+                Name = "\0",
+                Color = FromRGB(46, 52, 61),
+                LineJoinMode = Enum.LineJoinMode.Miter,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            }):AddToTheme({Color = "Border"})
+            
+            Items["Avatar"] = Instances:Create("ImageLabel", {
+                Parent = Items["Content"].Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+                BackgroundTransparency = 1,
+                ZIndex = 6,
+                Size = UDim2New(0, 70, 0, 70),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })           
+            
+            Items["Username"] = Instances:Create("TextLabel", {
+                Parent = Items["Content"].Instance,
+                Name = "\0",
+                FontFace = Library.Font,
+                TextColor3 = FromRGB(255, 255, 255),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Text = "-- (@--)",
+                Size = UDim2New(1, -77, 0, 15),
+                ZIndex = 6,
+                BackgroundTransparency = 1,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Position = UDim2New(0, 77, 0, 0),
+                BorderSizePixel = 0,
+                TextSize = 14,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })  Items["Username"]:AddToTheme({TextColor3 = "Text"})
+            
+            Instances:Create("UIPadding", {
+                Parent = Items["TargetHud"].Instance,
+                Name = "\0",
+                PaddingBottom = UDimNew(0, 8)
+            })
+            
+            Instances:Create("UIPadding", {
+                Parent = Items["Content"].Instance,
+                Name = "\0",
+                PaddingTop = UDimNew(0, 9),
+                PaddingBottom = UDimNew(0, 8),
+                PaddingRight = UDimNew(0, 9),
+                PaddingLeft = UDimNew(0, 9)
+            })
 
-        Instances:Create("UIStroke", {
-            Parent = Items["TargetHud"].Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
+            Items["Bars"] = Instances:Create("Frame", {
+                Parent = Items["Content"].Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                AnchorPoint = Vector2New(0, 1),
+                BackgroundTransparency = 1,
+                Position = UDim2New(0, 77, 1, 0),
+                Size = UDim2New(1, -77, 0, 0),
+                BorderSizePixel = 0,
+                ZIndex = 6,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })
 
-        Items["Title"] = Instances:Create("TextLabel", {
-            Parent = Items["TargetHud"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Text = "Target Hud",
-            Size = UDim2New(0, 0, 0, 15),
-            Position = UDim2New(0, 8, 0, 8),
-            BackgroundTransparency = 1,
-            ZIndex = 6,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.X,
-            TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+            Instances:Create("UIListLayout", {
+                Parent = Items["Bars"].Instance,
+                Name = "\0",
+                VerticalAlignment = Enum.VerticalAlignment.Bottom,
+                Padding = UDimNew(0, 4),
+                SortOrder = Enum.SortOrder.LayoutOrder
+            })
+        end
 
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["TargetHud"].Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 0, 0, 2),
-            ZIndex = 6,
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(94, 213, 213)
-        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+        function TargetHud:AddBar(Color)
+            local NewBar = { }
 
-        Items["Glow"] = Instances:Create("ImageLabel", {
-            Parent = Items["Liner"].Instance,
-            Name = "\0",
-            ImageColor3 = FromRGB(94, 213, 213),
-            ScaleType = Enum.ScaleType.Slice,
-            ImageTransparency = 0.5,
-            BorderColor3 = FromRGB(0, 0, 0),
-            ZIndex = 6,
-            BackgroundColor3 = FromRGB(94, 213, 213),
-            Size = UDim2New(1, 8, 1, 8),
-            AnchorPoint = Vector2New(0.5, 0.5),
-            Image = "rbxassetid://18245826428",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0.5, 0, 0.5, 0),
-            BorderSizePixel = 0,
-            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
+            local NewBarBackground = Instances:Create("Frame", {
+                Parent = Items["Bars"].Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                AnchorPoint = Vector2New(0, 1),
+                ZIndex = 6,
+                BackgroundTransparency = 1,
+                Position = UDim2New(0, 77, 1, 0),
+                Size = UDim2New(1, 0, 0, 12),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })
+            
+            Instances:Create("UIStroke", {
+                Parent = NewBarBackground.Instance,
+                Name = "\0",
+                Color = FromRGB(46, 52, 61),
+                LineJoinMode = Enum.LineJoinMode.Miter,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            }):AddToTheme({Color = "Border"})
+            
+            local BarAccent = Instances:Create("Frame", {
+                Parent = NewBarBackground.Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(0.8999999761581421, 0, 1, 0),
+                ZIndex = 6,
+                BorderSizePixel = 0,
+                BackgroundColor3 = Color
+            })
+            
+            Instances:Create("UIGradient", {
+                Parent = BarAccent.Instance,
+                Name = "\0",
+                Rotation = 90,
+                Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(153, 153, 153))}
+            })
+            
+            local BarValue = Instances:Create("TextLabel", {
+                Parent = NewBarBackground.Instance,
+                Name = "\0",
+                FontFace = Library.Font,
+                TextColor3 = FromRGB(255, 255, 255),
+                ZIndex = 6,
+                BorderColor3 = FromRGB(0, 0, 0),
+                Text = "90",
+                Size = UDim2New(0, 0, 1, 0),
+                BackgroundTransparency = 1,
+                Position = UDim2New(0, 1, 0, -1),
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.X,
+                TextSize = 12,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })  BarValue:AddToTheme({TextColor3 = "Text"})
+            
+            Instances:Create("UIStroke", {
+                Parent = BarValue.Instance,
+                Name = "\0"
+            })
 
-        Instances:Create("UIGradient", {
-            Parent = Items["Glow"].Instance,
-            Name = "\0",
-            Rotation = 90,
-            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
-        })
+            function NewBar:SetPercentage(Percentage)
+                local RealPercentage = 1 / 100 * Percentage
+    
+                if BarAccent and NewBarBackground then 
+                    BarAccent:Tween(TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2New(RealPercentage, 0, 1, 0)})
+                    BarValue.Instance.Text = math.floor(Percentage)
+                end
+            end
 
-        Items["Content"] = Instances:Create("Frame", {
-            Parent = Items["TargetHud"].Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundTransparency = 1,
-            ZIndex = 6,
-            Position = UDim2New(0, 8, 0, 32),
-            Size = UDim2New(1, -16, 0, 0),
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
+            function NewBar:Remove()
+                NewBarBackground:Clean()
+                NewBar = nil
+            end
 
-        Instances:Create("UIStroke", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
+            return NewBar
+        end
+        
+        function TargetHud:SetPlayer(Player)
+            local AvatarContent = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+            Items["Avatar"].Instance.Image = AvatarContent
+            Items["Username"].Instance.Text = Player.DisplayName .. " (@"..Player.Name..")"
+        end
 
-        Items["Avatar"] = Instances:Create("ImageLabel", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-            BackgroundTransparency = 1,
-            ZIndex = 6,
-            Size = UDim2New(0, 70, 0, 70),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
+        function TargetHud:SetVisibility(Bool)
+            Items["TargetHud"].Instance.Visible = Bool
+        end
 
-        Items["Username"] = Instances:Create("TextLabel", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Text = "-- (@--)",
-            Size = UDim2New(1, -77, 0, 15),
-            ZIndex = 6,
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2New(0, 77, 0, 0),
-            BorderSizePixel = 0,
-            TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  Items["Username"]:AddToTheme({TextColor3 = "Text"})
+        function TargetHud:SetPosition(Position)
+            Items["TargetHud"].Instance.Position = Position
+        end
 
-        Instances:Create("UIPadding", {
-            Parent = Items["TargetHud"].Instance,
-            Name = "\0",
-            PaddingBottom = UDimNew(0, 8)
-        })
-
-        Instances:Create("UIPadding", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            PaddingTop = UDimNew(0, 9),
-            PaddingBottom = UDimNew(0, 8),
-            PaddingRight = UDimNew(0, 9),
-            PaddingLeft = UDimNew(0, 9)
-        })
-
-        Items["Bars"] = Instances:Create("Frame", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            AnchorPoint = Vector2New(0, 1),
-            BackgroundTransparency = 1,
-            Position = UDim2New(0, 77, 1, 0),
-            Size = UDim2New(1, -77, 0, 0),
-            BorderSizePixel = 0,
-            ZIndex = 6,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })
-
-        Instances:Create("UIListLayout", {
-            Parent = Items["Bars"].Instance,
-            Name = "\0",
-            VerticalAlignment = Enum.VerticalAlignment.Bottom,
-            Padding = UDimNew(0, 4),
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
+        return TargetHud 
     end
-
-function TargetHud:AddBar(Color)
-    local NewBar = {}
-
-    -- bar background fills full width
-    local NewBarBackground = Instances:Create("Frame", {
-        Parent = Items["Bars"].Instance,
-        Name = "\0",
-        BorderColor3 = FromRGB(0, 0, 0),
-        BackgroundTransparency = 1,
-        Size = UDim2New(1, 0, 0, 12),
-        BorderSizePixel = 0,
-        ZIndex = 6,
-        BackgroundColor3 = FromRGB(255, 255, 255)
-    })
-
-    Instances:Create("UIStroke", {
-        Parent = NewBarBackground.Instance,
-        Name = "\0",
-        Color = FromRGB(46, 52, 61),
-        LineJoinMode = Enum.LineJoinMode.Miter,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    }):AddToTheme({Color = "Border"})
-
-    -- actual health fill, shifted right to leave room for number
-    local BarAccent = Instances:Create("Frame", {
-        Parent = NewBarBackground.Instance,
-        Name = "\0",
-        BorderColor3 = FromRGB(0, 0, 0),
-        Position = UDim2New(0, 40, 0, 0),
-        Size = UDim2New(0.9, -40, 1, 0),
-        ZIndex = 6,
-        BorderSizePixel = 0,
-        BackgroundColor3 = Color
-    })
-
-    Instances:Create("UIGradient", {
-        Parent = BarAccent.Instance,
-        Name = "\0",
-        Rotation = 90,
-        Color = RGBSequence{
-            RGBSequenceKeypoint(0, FromRGB(255, 255, 255)),
-            RGBSequenceKeypoint(1, FromRGB(153, 153, 153))
-        }
-    })
-
-    -- HP number on the LEFT, inside the same bar frame
-    local LeftValue = Instances:Create("TextLabel", {
-        Parent = NewBarBackground.Instance,
-        Name = "\0",
-        FontFace = Library.Font,
-        TextColor3 = FromRGB(255, 255, 255),
-        BorderColor3 = FromRGB(0, 0, 0),
-        Text = "90",
-        BackgroundTransparency = 1,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Position = UDim2New(0, 4, 0, 0),
-        Size = UDim2New(0, 32, 1, 0),
-        BorderSizePixel = 0,
-        ZIndex = 7,
-        TextSize = 12,
-        BackgroundColor3 = FromRGB(255, 255, 255)
-    })  LeftValue:AddToTheme({TextColor3 = "Text"})
-
-    Instances:Create("UIStroke", {
-        Parent = LeftValue.Instance,
-        Name = "\0"
-    })
-
-    function NewBar:SetPercentage(Percentage)
-        local hp = math.floor(Percentage or 0)
-        local RealPercentage = math.clamp((Percentage or 0) / 100, 0, 1)
-
-        BarAccent:Tween(
-            TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {Size = UDim2New(RealPercentage, -40, 1, 0)}
-        )
-
-        LeftValue.Instance.Text = tostring(hp)
-    end
-
-    function NewBar:Remove()
-        NewBarBackground:Clean()
-        NewBar = nil
-    end
-
-    return NewBar
-end
-
-    function TargetHud:SetPlayer(Player)
-        local AvatarContent = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-        Items["Avatar"].Instance.Image = AvatarContent
-        Items["Username"].Instance.Text = Player.DisplayName .. " (@" .. Player.Name .. ")"
-    end
-
-    function TargetHud:SetVisibility(Bool)
-        Items["TargetHud"].Instance.Visible = Bool
-    end
-
-    function TargetHud:SetPosition(Position)
-        Items["TargetHud"].Instance.Position = Position
-    end
-
-    return TargetHud
-end
 
     Library.Window = function(self, Data)
         Data = Data or { }
@@ -5540,15 +5532,3 @@ end
 end
 
 return Library
-
-
-
-
-
-
-
-
-
-
-
-
