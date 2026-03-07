@@ -2573,7 +2573,6 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
--- Top blue accent bar (full-bleed)
 Items["TopBar"] = Instances:Create("Frame", {
     Parent = Items["ModList"].Instance,
     Position = UDim2New(0, -9, 0, -9),
@@ -2581,7 +2580,6 @@ Items["TopBar"] = Instances:Create("Frame", {
     BorderSizePixel = 0,
     BackgroundColor3 = FromRGB(0, 170, 255)
 })
-Items["TopBar"].Instance.ZIndex = 60
 											
         do
     local sg = Items["ModList"].Instance:FindFirstAncestorOfClass("ScreenGui")
@@ -5381,3 +5379,4 @@ end
 end
 
 return Library
+
