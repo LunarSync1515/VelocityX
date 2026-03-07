@@ -3424,15 +3424,14 @@ function TargetHud:AddBar(Color)
     local Row = Instances:Create("Frame", {
         Parent = Items["Bars"].Instance,
         Name = "\0",
-        BorderColor3 = FromRGB(0, 0, 0),
         BackgroundTransparency = 1,
-        Size = UDim2New(1, 0, 0, 12),
         BorderSizePixel = 0,
+        Size = UDim2New(1, 0, 0, 12),
         ZIndex = 6,
         BackgroundColor3 = FromRGB(255, 255, 255)
     })
 
-    -- hp number on the left
+    -- HP text on the LEFT
     local LeftValue = Instances:Create("TextLabel", {
         Parent = Row.Instance,
         Name = "\0",
@@ -3440,29 +3439,32 @@ function TargetHud:AddBar(Color)
         TextColor3 = FromRGB(255, 255, 255),
         BorderColor3 = FromRGB(0, 0, 0),
         Text = "90",
-        Size = UDim2New(0, 32, 1, 0),
-        Position = UDim2New(0, 0, 0, 0),
         BackgroundTransparency = 1,
-        TextXAlignment = Enum.TextXAlignment.Left,
+        TextXAlignment = Enum.TextXAlignment.Right,
+        Position = UDim2New(0, 0, 0, 0),
+        Size = UDim2New(0, 32, 0, 12),
         BorderSizePixel = 0,
-        ZIndex = 6,
+        ZIndex = 7,
         TextSize = 12,
         BackgroundColor3 = FromRGB(255, 255, 255)
-    })  LeftValue:AddToTheme({TextColor3 = "Text"})
+    })
+    LeftValue:AddToTheme({TextColor3 = "Text"})
+    LeftValue.Instance.Visible = true
+    LeftValue.Instance.TextTransparency = 0
 
     Instances:Create("UIStroke", {
         Parent = LeftValue.Instance,
         Name = "\0"
     })
 
-    -- actual bar background
+    -- actual bar background on the RIGHT
     local NewBarBackground = Instances:Create("Frame", {
         Parent = Row.Instance,
         Name = "\0",
         BorderColor3 = FromRGB(0, 0, 0),
         BackgroundTransparency = 1,
         Position = UDim2New(0, 36, 0, 0),
-        Size = UDim2New(1, -36, 1, 0),
+        Size = UDim2New(1, -36, 0, 12),
         BorderSizePixel = 0,
         ZIndex = 6,
         BackgroundColor3 = FromRGB(255, 255, 255)
@@ -3497,16 +3499,14 @@ function TargetHud:AddBar(Color)
     })
 
     function NewBar:SetPercentage(Percentage)
-        local RealPercentage = 1 / 100 * Percentage
+        local RealPercentage = math.clamp(Percentage / 100, 0, 1)
 
-        if BarAccent and NewBarBackground then
-            BarAccent:Tween(
-                TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                {Size = UDim2New(RealPercentage, 0, 1, 0)}
-            )
+        BarAccent:Tween(
+            TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2New(RealPercentage, 0, 1, 0)}
+        )
 
-            LeftValue.Instance.Text = tostring(math.floor(Percentage))
-        end
+        LeftValue.Instance.Text = tostring(math.floor(Percentage))
     end
 
     function NewBar:Remove()
@@ -5552,6 +5552,7 @@ end
 end
 
 return Library
+
 
 
 
