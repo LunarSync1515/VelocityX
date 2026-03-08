@@ -2517,135 +2517,130 @@ Library.KeybindList = function(self)
     Library.KeyList = KeybindList
     self.KeyList = KeybindList
 
-    local Items = {} do
-        -- OUTER FRAME
-        Items["KeybindList"] = Instances:Create("Frame", {
-            Parent = Library.Holder.Instance,
-            Name = "\0",
-            AnchorPoint = Vector2New(0, 0.5),
-            Position = UDim2New(0, 20, 0.5, 0),
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(10, 12, 16),
-            ClipsDescendants = true
-        })
+    local Items = {}
 
-        -- REAL top line on outer frame
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, 0, 0, 0),
-            Size = UDim2New(1, 0, 0, 1),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(90, 190, 255),
-            ZIndex = 10
-        })
+    -- OUTER FRAME
+    Items["KeybindList"] = Instances:Create("Frame", {
+        Parent = Library.Holder.Instance,
+        Name = "\0",
+        AnchorPoint = Vector2New(0, 0.5),
+        Position = UDim2New(0, 20, 0.5, 0),
+        BorderSizePixel = 0,
+        AutomaticSize = Enum.AutomaticSize.XY,
+        BackgroundColor3 = FromRGB(10, 12, 16),
+        ClipsDescendants = false
+    })
 
-        Instances:Create("UIStroke", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Color = FromRGB(35, 40, 48),
-            Thickness = 1,
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        })
+    -- TOP BLUE LINE (FULL WIDTH)
+    Items["TopLine"] = Instances:Create("Frame", {
+        Parent = Items["KeybindList"].Instance,
+        Name = "\0",
+        Position = UDim2New(0, -1, 0, -1),
+        Size = UDim2New(1, 2, 0, 2),
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(90,190,255),
+        ZIndex = 5
+    })
 
-        -- INNER FRAME (padding goes here, not on outer frame)
-        Items["Inner"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 1), -- sits under the blue line
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Size = UDim2New(1, 0, 0, 0),
-            BorderSizePixel = 0
-        })
+    Instances:Create("UIStroke", {
+        Parent = Items["KeybindList"].Instance,
+        Color = FromRGB(35,40,48),
+        Thickness = 1,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    })
 
-        Instances:Create("UIPadding", {
-            Parent = Items["Inner"].Instance,
-            Name = "\0",
-            PaddingTop = UDimNew(0, 6),
-            PaddingBottom = UDimNew(0, 6),
-            PaddingRight = UDimNew(0, 10),
-            PaddingLeft = UDimNew(0, 10)
-        })
+    -- INNER CONTENT HOLDER
+    Items["Inner"] = Instances:Create("Frame", {
+        Parent = Items["KeybindList"].Instance,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0,0,0,1),
+        AutomaticSize = Enum.AutomaticSize.XY,
+        BorderSizePixel = 0
+    })
 
-        -- Dragging
-        do
-            local frame = Items["KeybindList"].Instance
-            local UIS = game:GetService("UserInputService")
+    Instances:Create("UIPadding", {
+        Parent = Items["Inner"].Instance,
+        PaddingTop = UDimNew(0,6),
+        PaddingBottom = UDimNew(0,6),
+        PaddingLeft = UDimNew(0,10),
+        PaddingRight = UDimNew(0,10)
+    })
 
-            local dragging = false
-            local dragStart, startPos
+    -- DRAGGING
+    do
+        local frame = Items["KeybindList"].Instance
+        local UIS = game:GetService("UserInputService")
 
-            local function update(input)
-                local delta = input.Position - dragStart
-                frame.Position = UDim2New(
-                    startPos.X.Scale, startPos.X.Offset + delta.X,
-                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
-                )
-            end
+        local dragging = false
+        local dragStart
+        local startPos
 
-            frame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                    dragStart = input.Position
-                    startPos = frame.Position
-
-                    input.Changed:Connect(function()
-                        if input.UserInputState == Enum.UserInputState.End then
-                            dragging = false
-                        end
-                    end)
-                end
-            end)
-
-            UIS.InputChanged:Connect(function(input)
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    update(input)
-                end
-            end)
+        local function update(input)
+            local delta = input.Position - dragStart
+            frame.Position = UDim2New(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
         end
 
-        Items["Title"] = Instances:Create("TextLabel", {
-            Parent = Items["Inner"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(235, 235, 235),
-            Text = "Keybinds",
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2New(0, 80, 0, 14),
-            BorderSizePixel = 0,
-            TextSize = 13,
-            Position = UDim2New(0, 0, 0, 0)
-        })
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = frame.Position
 
-        Items["Liner2"] = Instances:Create("Frame", {
-            Parent = Items["Inner"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, 0, 0, 18),
-            Size = UDim2New(1, 0, 0, 1),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(30, 34, 40)
-        })
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
 
-        Items["Content"] = Instances:Create("Frame", {
-            Parent = Items["Inner"].Instance,
-            Name = "\0",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 22),
-            BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY
-        })
-
-        Instances:Create("UIListLayout", {
-            Parent = Items["Content"].Instance,
-            Name = "\0",
-            Padding = UDimNew(0, 2),
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
+        UIS.InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                update(input)
+            end
+        end)
     end
+
+    -- TITLE
+    Items["Title"] = Instances:Create("TextLabel", {
+        Parent = Items["Inner"].Instance,
+        FontFace = Library.Font,
+        Text = "Keybinds",
+        TextColor3 = FromRGB(235,235,235),
+        BackgroundTransparency = 1,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Size = UDim2New(0,80,0,14),
+        TextSize = 13
+    })
+
+    -- DIVIDER
+    Items["Divider"] = Instances:Create("Frame", {
+        Parent = Items["Inner"].Instance,
+        Position = UDim2New(0,0,0,18),
+        Size = UDim2New(1,0,0,1),
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(30,34,40)
+    })
+
+    -- CONTENT
+    Items["Content"] = Instances:Create("Frame", {
+        Parent = Items["Inner"].Instance,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0,0,0,22),
+        AutomaticSize = Enum.AutomaticSize.XY,
+        BorderSizePixel = 0
+    })
+
+    Instances:Create("UIListLayout", {
+        Parent = Items["Content"].Instance,
+        Padding = UDimNew(0,2),
+        SortOrder = Enum.SortOrder.LayoutOrder
+    })
 
     function KeybindList:SetVisibility(Bool)
         Items["KeybindList"].Instance.Visible = Bool
@@ -2662,10 +2657,6 @@ Library.KeybindList = function(self)
     end
 
     function KeybindList:SetPosition(Pos)
-        if not Pos then
-            return
-        end
-
         if typeof(Pos) == "UDim2" then
             Items["KeybindList"].Instance.Position = Pos
             return
@@ -2684,90 +2675,69 @@ Library.KeybindList = function(self)
 
         local Row = Instances:Create("Frame", {
             Parent = Items["Content"].Instance,
-            Name = "\0",
             BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2New(0, 0, 0, 15),
+            Size = UDim2New(0,0,0,15),
             AutomaticSize = Enum.AutomaticSize.X
         })
 
         local Check = Instances:Create("Frame", {
             Parent = Row.Instance,
-            Name = "\0",
-            BackgroundColor3 = FromRGB(55, 60, 68),
+            BackgroundColor3 = FromRGB(55,60,68),
             BorderSizePixel = 0,
-            Size = UDim2New(0, 8, 0, 8),
-            Position = UDim2New(0, 0, 0, 3)
+            Size = UDim2New(0,8,0,8),
+            Position = UDim2New(0,0,0,3)
         })
 
         local CheckStroke = Instances:Create("UIStroke", {
             Parent = Check.Instance,
-            Name = "\0",
-            Color = FromRGB(80, 85, 95),
-            Thickness = 1,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            Color = FromRGB(80,85,95),
+            Thickness = 1
         })
 
         local MainText = Instances:Create("TextLabel", {
             Parent = Row.Instance,
-            Name = "\0",
             FontFace = Library.Font,
-            TextColor3 = FromRGB(220, 220, 220),
             Text = string.format("[%s] %s", Key, Name),
+            TextColor3 = FromRGB(220,220,220),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2New(0, 0, 0, 15),
-            Position = UDim2New(0, 14, 0, 0),
-            BorderSizePixel = 0,
+            Position = UDim2New(0,14,0,0),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 13
         })
 
         local Suffix = Instances:Create("TextLabel", {
             Parent = Row.Instance,
-            Name = "\0",
             FontFace = Library.Font,
-            TextColor3 = FromRGB(120, 120, 120),
-            Text = " (" .. tostring(Mode) .. ")",
+            Text = " ("..Mode..")",
+            TextColor3 = FromRGB(120,120,120),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2New(0, 0, 0, 15),
-            Position = UDim2New(0, 14, 0, 0),
-            BorderSizePixel = 0,
+            Position = UDim2New(0,14,0,0),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 13
         })
 
         local function UpdateSuffix()
-            Suffix.Instance.Position = UDim2New(0, 14 + MainText.Instance.TextBounds.X + 2, 0, 0)
+            Suffix.Instance.Position =
+                UDim2New(0,14 + MainText.Instance.TextBounds.X + 2,0,0)
         end
 
         UpdateSuffix()
 
-        function Row:SetText(NewName, NewKey, NewMode)
-            MainText.Instance.Text = string.format("[%s] %s", NewKey, NewName)
-            Suffix.Instance.Text = " (" .. tostring(NewMode or Mode or "Toggle") .. ")"
-            UpdateSuffix()
-        end
-
         function Row:SetStatus(Bool)
-            if MainText.Instance.Text:find("Menu Keybind") then
-                Row.Instance.Visible = false
-                return
-            end
-
-            Row.Instance.Visible = true
-
             if Bool then
-                Check.Instance.BackgroundColor3 = FromRGB(110, 200, 255)
-                CheckStroke.Instance.Color = FromRGB(150, 220, 255)
-                MainText.Instance.TextColor3 = FromRGB(140, 210, 255)
-                Suffix.Instance.TextColor3 = FromRGB(140, 210, 255)
+                Check.Instance.BackgroundColor3 = FromRGB(110,200,255)
+                CheckStroke.Instance.Color = FromRGB(150,220,255)
+
+                MainText.Instance.TextColor3 = FromRGB(140,210,255)
+                Suffix.Instance.TextColor3 = FromRGB(140,210,255)
             else
-                Check.Instance.BackgroundColor3 = FromRGB(55, 60, 68)
-                CheckStroke.Instance.Color = FromRGB(80, 85, 95)
-                MainText.Instance.TextColor3 = FromRGB(220, 220, 220)
-                Suffix.Instance.TextColor3 = FromRGB(120, 120, 120)
+                Check.Instance.BackgroundColor3 = FromRGB(55,60,68)
+                CheckStroke.Instance.Color = FromRGB(80,85,95)
+
+                MainText.Instance.TextColor3 = FromRGB(220,220,220)
+                Suffix.Instance.TextColor3 = FromRGB(120,120,120)
             end
         end
 
@@ -2972,10 +2942,10 @@ end
 
 Library.ArmorViewer = function(self)
     local Viewer = {
-        Items = { }
+        Items = {}
     }
 
-    local Items = { }
+    local Items = {}
     local Layout
 
     local MinWidth = 180
@@ -2985,7 +2955,7 @@ Library.ArmorViewer = function(self)
     local Gap = 8
     local PadL, PadR = 8, 8
     local PadT, PadB = 6, 10
-    local HeaderH = 32
+    local HeaderH = 0
 
     local function Clamp(x, a, b)
         if (x < a) then return a end
@@ -2996,7 +2966,7 @@ Library.ArmorViewer = function(self)
     local function CountItems()
         local n = 0
         for _, c in ipairs(Items["RealHolder"].Instance:GetChildren()) do
-            if (c:IsA("Frame")) then
+            if c:IsA("Frame") then
                 n += 1
             end
         end
@@ -3004,24 +2974,24 @@ Library.ArmorViewer = function(self)
     end
 
     local function UpdateBarSize()
-        if (not Items["ArmorViewer"]) then
+        if not Items["ArmorViewer"] then
             return
         end
 
         local n = CountItems()
         local contentW
 
-        if (n <= 0) then
+        if n <= 0 then
             contentW = PadL + PadR
         else
             contentW = PadL + PadR + (n * ItemSize) + ((n - 1) * Gap)
         end
 
-        local outerW = contentW + 16
+        local outerW = contentW
         local w = Clamp(outerW, MinWidth, MaxWidth)
 
         Items["ArmorViewer"].Instance.Size = UDim2New(0, w, 0, BarHeight)
-        Items["Holder"].Instance.Size = UDim2New(1, -16, 1, -(HeaderH + 8))
+        Items["Holder"].Instance.Size = UDim2New(1, 0, 1, 0)
         Items["RealHolder"].Instance.Size = UDim2New(1, 0, 1, 0)
         Items["RealHolder"].Instance.CanvasSize = UDim2New(0, math.max(0, contentW), 0, 0)
     end
@@ -3035,84 +3005,24 @@ Library.ArmorViewer = function(self)
             Size = UDim2New(0, MinWidth, 0, BarHeight),
             BorderSizePixel = 0,
             ZIndex = 8,
+            BackgroundTransparency = 1,
             BackgroundColor3 = FromRGB(24, 28, 36),
             AnchorPoint = Vector2New(0, 0.5)
-        })  Items["ArmorViewer"]:AddToTheme({BackgroundColor3 = "Background 2"})
-
-        Items["ArmorViewer"]:MakeDraggable()
-
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["ArmorViewer"].Instance,
-            Name = "\0",
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 0, 0, 2),
-            BorderSizePixel = 0,
-            ZIndex = 8,
-            BackgroundColor3 = FromRGB(94, 213, 213)
-        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-
-        Items["Glow"] = Instances:Create("ImageLabel", {
-            Parent = Items["Liner"].Instance,
-            Name = "\0",
-            ImageColor3 = FromRGB(94, 213, 213),
-            ScaleType = Enum.ScaleType.Slice,
-            ImageTransparency = 0.5,
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundColor3 = FromRGB(94, 213, 213),
-            Size = UDim2New(1, 8, 1, 8),
-            AnchorPoint = Vector2New(0.5, 0.5),
-            Image = "rbxassetid://18245826428",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0.5, 0, 0.5, 0),
-            ZIndex = 8,
-            BorderSizePixel = 0,
-            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-
-        Instances:Create("UIGradient", {
-            Parent = Items["Glow"].Instance,
-            Name = "\0",
-            Rotation = 90,
-            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
         })
 
-        Items["Title"] = Instances:Create("TextLabel", {
-            Parent = Items["ArmorViewer"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Text = "sametexe009's inventory",
-            Size = UDim2New(1, -16, 0, 15),
-            Position = UDim2New(0, 8, 0, 8),
-            BackgroundTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            BorderSizePixel = 0,
-            ZIndex = 8,
-            AutomaticSize = Enum.AutomaticSize.None,
-            TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+        Items["ArmorViewer"]:MakeDraggable()
 
         Items["Holder"] = Instances:Create("Frame", {
             Parent = Items["ArmorViewer"].Instance,
             Name = "\0",
             BackgroundTransparency = 1,
-            Position = UDim2New(0, 8, 0, HeaderH),
+            Position = UDim2New(0, 0, 0, 0),
             BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, -16, 1, -(HeaderH + 8)),
+            Size = UDim2New(1, 0, 1, 0),
             BorderSizePixel = 0,
             ZIndex = 8,
             BackgroundColor3 = FromRGB(255, 255, 255)
         })
-
-        Instances:Create("UIStroke", {
-            Parent = Items["Holder"].Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
 
         Items["RealHolder"] = Instances:Create("ScrollingFrame", {
             Parent = Items["Holder"].Instance,
@@ -3166,7 +3076,7 @@ Library.ArmorViewer = function(self)
     end
 
     function Viewer:Add(Name, Icon)
-        local NewItemTable = { }
+        local NewItemTable = {}
 
         local NewItem = Instances:Create("Frame", {
             Parent = Items["RealHolder"].Instance,
@@ -3178,14 +3088,6 @@ Library.ArmorViewer = function(self)
             BorderSizePixel = 0,
             BackgroundColor3 = FromRGB(255, 255, 255)
         })
-
-        Instances:Create("UIStroke", {
-            Parent = NewItem.Instance,
-            Name = "\0",
-            Color = FromRGB(46, 52, 61),
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
 
         Instances:Create("ImageLabel", {
             Parent = NewItem.Instance,
@@ -3214,7 +3116,7 @@ Library.ArmorViewer = function(self)
 
     function Viewer:ClearAllItems()
         for _, Value in Viewer.Items do
-            if (not Value or not Value.Remove) then
+            if not Value or not Value.Remove then
                 continue
             end
             Value:Remove()
@@ -3227,7 +3129,7 @@ Library.ArmorViewer = function(self)
     end
 
     function Viewer:SetTitle(Name)
-        Items["Title"].Instance.Text = Name
+        -- hidden in transparent version
     end
 
     function Viewer:GetPosition()
@@ -5890,6 +5792,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
