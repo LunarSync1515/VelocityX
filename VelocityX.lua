@@ -244,17 +244,26 @@ local Tween = { } do
     end
 
     Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-        local Item = Item or self.Item 
+        Item = Item or self.Item
+
+        if not Item then
+            return
+        end
 
         local OldTransparency = Item[Property]
         Item[Property] = Visibility and 1 or OldTransparency
 
-        local NewTween = Tween:Create(Item, TweenInfo.new(Speed or Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction), {
-            [Property] = Visibility and OldTransparency or 1
-        }, true)
+        local NewTween = Tween:Create(
+            Item,
+            TweenInfo.new(Speed or Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction),
+            {
+                [Property] = Visibility and OldTransparency or 1
+            },
+            true
+        )
 
         Library:Connect(NewTween.Tween.Completed, function()
-            if not Visibility then 
+            if not Visibility and Item then
                 task.wait()
                 Item[Property] = OldTransparency
             end
@@ -264,7 +273,7 @@ local Tween = { } do
     end
 
     Tween.Get = function(self)
-        if not self.Tween then 
+        if not self or not self.Tween then 
             return
         end
 
@@ -272,7 +281,7 @@ local Tween = { } do
     end
 
     Tween.Pause = function(self)
-        if not self.Tween then 
+        if not self or not self.Tween then 
             return
         end
 
@@ -280,7 +289,7 @@ local Tween = { } do
     end
 
     Tween.Play = function(self)
-        if not self.Tween then 
+        if not self or not self.Tween then 
             return
         end
 
@@ -288,12 +297,15 @@ local Tween = { } do
     end
 
     Tween.Clean = function(self)
-        if not self.Tween then 
+        if not self or not self.Tween then 
             return
         end
 
-        Tween:Pause()
-        self = nil
+        self.Tween:Pause()
+        self.Tween = nil
+        self.Info = nil
+        self.Goal = nil
+        self.Item = nil
     end
 end
 
@@ -5848,6 +5860,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
