@@ -2760,10 +2760,8 @@ Library.ModeratorList = function(self)
         Items["ModList"]:AddToTheme({BackgroundColor3 = "Background 2"})
         Items["ModList"]:MakeDraggable()
 
-        -- Allow bar outside padding
         Items["ModList"].Instance.ClipsDescendants = false
 
-        -- BLUE TOP BAR (perfectly aligned)
         Items["TopBar"] = Instances:Create("Frame", {
             Parent = Items["ModList"].Instance,
             Position = UDim2New(0, -9, 0, -9),
@@ -2837,14 +2835,12 @@ Library.ModeratorList = function(self)
         }):AddToTheme({Color = "Border"})
     end
 
-
     function ModList:SetVisibility(Bool)
         Items["ModList"].Instance.Visible = Bool
     end
 
     function ModList:GetPosition()
         local p = Items["ModList"].Instance.Position
-
         return {
             XScale = p.X.Scale,
             XOffset = p.X.Offset,
@@ -2866,11 +2862,9 @@ Library.ModeratorList = function(self)
         )
     end
 
-
     function ModList:add_mod(UserId, Username, Role)
-
-        if Moderators[Username] then
-            ModList:remove_mod(Username)
+        if Moderators[UserId] then
+            ModList:remove_mod(UserId)
         end
 
         Role = Role or "Moderator"
@@ -2896,45 +2890,46 @@ Library.ModeratorList = function(self)
 
         ModFrame.Instance.ZIndex = 52
         Line.Instance.ZIndex = 53
-
         Line.Instance.Visible = true
         Line.Instance.TextTransparency = 0
 
-        -- Blue username + gray role
         Line.Instance.Text = string.format(
             '<font color="#4DA6FF">%s</font>  <font color="#B9B9B9">%s</font>',
             tostring(Username),
             tostring(Role)
         )
 
-        Moderators[Username] = {
+        Moderators[UserId] = {
             Frame = ModFrame,
             Username = Username,
             Role = Role,
             Label = Line
         }
 
-        return Moderators[Username]
+        return Moderators[UserId]
     end
 
-
-    function ModList:remove_mod(Username)
-        local ModData = Moderators[Username]
+    function ModList:remove_mod(UserId)
+        local ModData = Moderators[UserId]
         if ModData then
             ModData.Frame:Clean()
-            Moderators[Username] = nil
+            Moderators[UserId] = nil
         end
     end
 
-
     function ModList:Get()
         local ModTable = {}
-        for Username, Data in pairs(Moderators) do
-            table.insert(ModTable, {username = Username, role = Data.Role})
+        for UserId, Data in pairs(Moderators) do
+            table.insert(ModTable, {
+                userid = UserId,
+                username = Data.Username,
+                role = Data.Role
+            })
         end
         return ModTable
     end
 
+    Library.ModeratorListInstance = ModList
 
     return ModList
 end
@@ -5853,6 +5848,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
