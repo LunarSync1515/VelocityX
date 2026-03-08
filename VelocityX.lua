@@ -888,6 +888,10 @@ Library.GetConfig = function(self)
             Config.WidgetPositions.PlayerList = Library.PlayerListInstance:GetPosition()
         end
 
+        if Library.WatermarkInstance and Library.WatermarkInstance.GetPosition then
+            Config.WidgetPositions.Watermark = Library.WatermarkInstance:GetPosition()
+        end
+
     end)
 
     return HttpService:JSONEncode(Config)
@@ -895,13 +899,11 @@ end
 
 
 Library.LoadConfig = function(self, Config)
-
     local Decoded = HttpService:JSONDecode(Config)
 
     local Success, Result = Library:SafeCall(function()
 
         for Index, Value in Decoded do
-
             if Index == "WidgetPositions" then
                 continue
             end
@@ -929,7 +931,6 @@ Library.LoadConfig = function(self, Config)
             if Decoded.WidgetPositions.KeybindList
             and Library.KeybindListInstance
             and Library.KeybindListInstance.SetPosition then
-
                 Library.KeybindListInstance:SetPosition(
                     Decoded.WidgetPositions.KeybindList
                 )
@@ -938,7 +939,6 @@ Library.LoadConfig = function(self, Config)
             if Decoded.WidgetPositions.ArmorViewer
             and Library.ArmorViewerInstance
             and Library.ArmorViewerInstance.SetPosition then
-
                 Library.ArmorViewerInstance:SetPosition(
                     Decoded.WidgetPositions.ArmorViewer
                 )
@@ -947,7 +947,6 @@ Library.LoadConfig = function(self, Config)
             if Decoded.WidgetPositions.ModeratorList
             and Library.ModeratorListInstance
             and Library.ModeratorListInstance.SetPosition then
-
                 Library.ModeratorListInstance:SetPosition(
                     Decoded.WidgetPositions.ModeratorList
                 )
@@ -956,9 +955,16 @@ Library.LoadConfig = function(self, Config)
             if Decoded.WidgetPositions.PlayerList
             and Library.PlayerListInstance
             and Library.PlayerListInstance.SetPosition then
-
                 Library.PlayerListInstance:SetPosition(
                     Decoded.WidgetPositions.PlayerList
+                )
+            end
+
+            if Decoded.WidgetPositions.Watermark
+            and Library.WatermarkInstance
+            and Library.WatermarkInstance.SetPosition then
+                Library.WatermarkInstance:SetPosition(
+                    Decoded.WidgetPositions.Watermark
                 )
             end
         end
@@ -2440,14 +2446,41 @@ Library.Watermark = function(self, Name)
     function Watermark:SetText(Text)
         Text = tostring(Text)
         Items["Text"].Instance.Text = Text
-        Items["Watermark"]:Tween(nil, {Size = UDim2New(0, Items["Text"].Instance.TextBounds.X + 20, 0, 30)})
+        Items["Watermark"]:Tween(nil, {
+            Size = UDim2New(0, Items["Text"].Instance.TextBounds.X + 20, 0, 30)
+        })
     end
 
     function Watermark:SetVisibility(Bool)
         Items["Watermark"].Instance.Visible = Bool
     end
 
+    function Watermark:GetPosition()
+        local Position = Items["Watermark"].Instance.Position
+        return {
+            XScale = Position.X.Scale,
+            XOffset = Position.X.Offset,
+            YScale = Position.Y.Scale,
+            YOffset = Position.Y.Offset
+        }
+    end
+
+    function Watermark:SetPosition(Position)
+        if not Position then
+            return
+        end
+
+        Items["Watermark"].Instance.Position = UDim2New(
+            Position.XScale or 0,
+            Position.XOffset or 0,
+            Position.YScale or 0,
+            Position.YOffset or 0
+        )
+    end
+
     Watermark:SetText(Name)
+
+    Library.WatermarkInstance = Watermark
 
     RunService.RenderStepped:Connect(function()
         frames += 1
@@ -2461,7 +2494,12 @@ Library.Watermark = function(self, Name)
             local dateText = string.format("%02d/%02d/%04d", now.day, now.month, now.year)
             local timeText = string.format("%02d:%02d:%02d", now.hour, now.min, now.sec)
 
-            Watermark:SetText(string.format("Fallen Survival | %s | %s | %d FPS", dateText, timeText, fps))
+            Watermark:SetText(string.format(
+                "Fallen Survival | %s | %s | %d FPS",
+                dateText,
+                timeText,
+                fps
+            ))
         end
     end)
 
@@ -5815,6 +5853,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
