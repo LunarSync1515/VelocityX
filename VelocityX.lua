@@ -3696,16 +3696,14 @@ local Items = { } do
         Size = UDim2New(1, 0, 0, 1)
     })  Items["PagesLine"]:AddToTheme({BackgroundColor3 = "Border"})
 
-Instances:Create("UIListLayout", {
-    Parent = Items["Pages"].Instance,
-    Name = "\0",
-    FillDirection = Enum.FillDirection.Horizontal,
-    HorizontalFlex = Enum.UIFlexAlignment.None,
-    HorizontalAlignment = Enum.HorizontalAlignment.Left,
-    VerticalAlignment = Enum.VerticalAlignment.Center,
-    Padding = UDimNew(0, 4),
-    SortOrder = Enum.SortOrder.LayoutOrder
-})
+    Instances:Create("UIListLayout", {
+        Parent = Items["Pages"].Instance,
+        Name = "\0",
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalFlex = Enum.UIFlexAlignment.Fill,
+        Padding = UDimNew(0, 0),
+        SortOrder = Enum.SortOrder.LayoutOrder
+    })
 
     Window.Items = Items
 end
@@ -4080,11 +4078,6 @@ Library.Pages.Section = function(self, Data)
             BackgroundColor3 = FromRGB(14,14,16)
         })  Items["Section"]:AddToTheme({BackgroundColor3 = "Inline"})
 
-        Instances:Create("UICorner", {
-            Parent = Items["Section"].Instance,
-            CornerRadius = UDim.new(0,4)
-        })
-
         Instances:Create("UIStroke", {
             Parent = Items["Section"].Instance,
             Color = FromRGB(55,60,68),
@@ -4092,23 +4085,23 @@ Library.Pages.Section = function(self, Data)
         }):AddToTheme({Color = "Border"})
 
 
-        -- Accent line
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["Section"].Instance,
-            Size = UDim2New(1,0,0,1),
-            Position = UDim2New(0,0,0,0),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(120,170,255)
-        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-
-
-        -- Topbar
+        -- Topbar (section header)
         Items["Topbar"] = Instances:Create("Frame", {
             Parent = Items["Section"].Instance,
-            Size = UDim2New(1,0,0,20),
+            Size = UDim2New(1, 0, 0, 20),
             BorderSizePixel = 0,
             BackgroundColor3 = FromRGB(14,14,16)
         })  Items["Topbar"]:AddToTheme({BackgroundColor3 = "Inline"})
+
+
+        -- Accent line
+        Items["Liner"] = Instances:Create("Frame", {
+            Parent = Items["Section"].Instance,
+            Size = UDim2New(1, 0, 0, 1),
+            Position = UDim2New(0, 0, 0, 0),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(120,170,255)
+        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
 
 
         -- Section title
@@ -4129,7 +4122,7 @@ Library.Pages.Section = function(self, Data)
         Items["Content"] = Instances:Create("Frame", {
             Parent = Items["Section"].Instance,
             BackgroundTransparency = 1,
-            Position = UDim2New(0,8,0,24),
+            Position = UDim2New(0,8,0,26),
             Size = UDim2New(1,-16,0,0),
             AutomaticSize = Enum.AutomaticSize.Y
         })
@@ -4138,7 +4131,7 @@ Library.Pages.Section = function(self, Data)
         -- Layout for controls
         Instances:Create("UIListLayout", {
             Parent = Items["Content"].Instance,
-            Padding = UDimNew(0,6),
+            Padding = UDimNew(0,4),
             SortOrder = Enum.SortOrder.LayoutOrder
         })
 
@@ -4156,130 +4149,121 @@ Library.Pages.Section = function(self, Data)
     return setmetatable(Section, Library.Sections)
 end
 
+    Library.Sections.Toggle = function(self, Data)
+        Data = Data or { }
 
-Library.Sections.Toggle = function(self, Data)
-    Data = Data or { }
+        local Toggle = {
+            Window = self.Window,
+            Page = self.Page,
+            Section = self,
 
-    local Toggle = {
-        Window = self.Window,
-        Page = self.Page,
-        Section = self,
+            Name = Data.Name or Data.name or "Toggle",
+            Flag = Data.Flag or Data.flag or Library:NextFlag(),
+            Default = Data.Default or Data.default or false,
+            Callback = Data.Callback or Data.callback or function() end,
 
-        Name = Data.Name or Data.name or "Toggle",
-        Flag = Data.Flag or Data.flag or Library:NextFlag(),
-        Default = Data.Default or Data.default or false,
-        Callback = Data.Callback or Data.callback or function() end,
+            Value = false
+        }
 
-        Value = false
-    }
-
-    local Items = { } do
-
-        Items["Toggle"] = Instances:Create("TextButton", {
-            Parent = Toggle.Section.Items["Content"].Instance,
-            Name = "\0",
-            FontFace = Library.Font,
-            Text = "",
-            AutoButtonColor = false,
-            BackgroundTransparency = 1,
-            Size = UDim2New(1,0,0,18),
-            BorderSizePixel = 0
-        })
-
-
-        -- Checkbox box
-        Items["IndicatorOutline"] = Instances:Create("Frame", {
-            Parent = Items["Toggle"].Instance,
-            AnchorPoint = Vector2New(0,0.5),
-            Position = UDim2New(0,0,0.5,0),
-            Size = UDim2New(0,14,0,14),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(28,30,34)
-        })  Items["IndicatorOutline"]:AddToTheme({BackgroundColor3 = "Element"})
-
-
-        Instances:Create("UICorner", {
-            Parent = Items["IndicatorOutline"].Instance,
-            CornerRadius = UDim.new(0,3)
-        })
-
-
-        Instances:Create("UIStroke", {
-            Parent = Items["IndicatorOutline"].Instance,
-            Color = FromRGB(46,52,61),
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
-
-
-        -- Checkbox fill
-        Items["IndicatorInline"] = Instances:Create("Frame", {
-            Parent = Items["IndicatorOutline"].Instance,
-            AnchorPoint = Vector2New(0.5,0.5),
-            Position = UDim2New(0.5,0,0.5,0),
-            Size = UDim2New(0,0,0,0),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(120,170,255)
-        })  Items["IndicatorInline"]:AddToTheme({BackgroundColor3 = "Accent"})
-
-
-        Instances:Create("UICorner", {
-            Parent = Items["IndicatorInline"].Instance,
-            CornerRadius = UDim.new(0,2)
-        })
-
-
-        -- Toggle text
-        Items["Text"] = Instances:Create("TextLabel", {
-            Parent = Items["Toggle"].Instance,
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255,255,255),
-            TextTransparency = 0.35,
-            Text = Toggle.Name,
-            Size = UDim2New(0,0,0,16),
-            AnchorPoint = Vector2New(0,0.5),
-            BackgroundTransparency = 1,
-            Position = UDim2New(0,22,0.5,0),
-            AutomaticSize = Enum.AutomaticSize.X,
-            TextSize = 13
-        })  Items["Text"]:AddToTheme({TextColor3 = "Text"})
-
-
-        -- Sub elements holder
-        Items["SubElements"] = Instances:Create("Frame", {
-            Parent = Items["Toggle"].Instance,
-            AnchorPoint = Vector2New(1,0),
-            BackgroundTransparency = 1,
-            Position = UDim2New(1,0,0,0),
-            Size = UDim2New(0,0,1,0),
-            AutomaticSize = Enum.AutomaticSize.X
-        })
-
-
-        Instances:Create("UIListLayout", {
-            Parent = Items["SubElements"].Instance,
-            VerticalAlignment = Enum.VerticalAlignment.Center,
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            Padding = UDimNew(0,6),
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-
-
-        -- Hover effect
-        Items["Toggle"]:OnHover(function()
-            Items["IndicatorOutline"]:Tween(nil,{
-                BackgroundColor3 = Library:GetLighterColor(Library.Theme.Element,1.2)
+        local Items = { } do 
+            Items["Toggle"] = Instances:Create("TextButton", {
+                Parent = Toggle.Section.Items["Content"].Instance,
+                Name = "\0",
+                FontFace = Library.Font,
+                TextColor3 = FromRGB(0, 0, 0),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Text = "",
+                AutoButtonColor = false,
+                BackgroundTransparency = 1,
+                Size = UDim2New(1, 0, 0, 15),
+                BorderSizePixel = 0,
+                TextSize = 14,
+                BackgroundColor3 = FromRGB(255, 255, 255)
             })
-        end)
-
-        Items["Toggle"]:OnHoverLeave(function()
-            Items["IndicatorOutline"]:Tween(nil,{
-                BackgroundColor3 = Library.Theme.Element
+            
+            Items["IndicatorOutline"] = Instances:Create("Frame", {
+                Parent = Items["Toggle"].Instance,
+                Name = "\0",
+                AnchorPoint = Vector2New(0, 0.5),
+                Position = UDim2New(0, 0, 0.5, 0),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(0, 12, 0, 12),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(32, 38, 48)
+            })  Items["IndicatorOutline"]:AddToTheme({BackgroundColor3 = "Element"})
+            
+            Instances:Create("UIStroke", {
+                Parent = Items["IndicatorOutline"].Instance,
+                Name = "\0",
+                Color = FromRGB(46, 52, 61),
+                LineJoinMode = Enum.LineJoinMode.Miter,
+                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            }):AddToTheme({Color = "Border"})
+            
+            Items["IndicatorInline"] = Instances:Create("Frame", {
+                Parent = Items["IndicatorOutline"].Instance,
+                Name = "\0",
+                AnchorPoint = Vector2New(0.5, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2New(0.5, 0, 0.5 ,0),
+                BorderColor3 = FromRGB(0, 0, 0),
+                Size = UDim2New(0, -2, 0, 0),
+                BorderSizePixel = 0,
+                BackgroundColor3 = FromRGB(94, 213, 213)
+            })  Items["IndicatorInline"]:AddToTheme({BackgroundColor3 = "Accent"})
+            
+            Items["Text"] = Instances:Create("TextLabel", {
+                Parent = Items["Toggle"].Instance,
+                Name = "\0",
+                FontFace = Library.Font,
+                TextColor3 = FromRGB(255, 255, 255),
+                TextTransparency = 0.4000000059604645,
+                Text = Toggle.Name,
+                Size = UDim2New(0, 0, 0, 15),
+                AnchorPoint = Vector2New(0, 0.5),
+                BorderSizePixel = 0,
+                BackgroundTransparency = 1,
+                Position = UDim2New(0, 20, 0.5, 0),
+                BorderColor3 = FromRGB(0, 0, 0),
+                AutomaticSize = Enum.AutomaticSize.X,
+                TextSize = 14,
+                BackgroundColor3 = FromRGB(255, 255, 255)
+            })  Items["Text"]:AddToTheme({TextColor3 = "Text"})
+            
+            Items["SubElements"] = Instances:Create("Frame", {
+                Parent = Items["Toggle"].Instance,
+                Name = "\0",
+                BorderColor3 = FromRGB(0, 0, 0),
+                AnchorPoint = Vector2New(1, 0),
+                BorderSizePixel = 0,
+                BackgroundTransparency = 1,
+                Position = UDim2New(1, 0, 0, 0),
+                Size = UDim2New(0, 0, 1, 0),
+                ZIndex = 2,
+                AutomaticSize = Enum.AutomaticSize.X,
+                BackgroundColor3 = FromRGB(255, 255, 255)
             })
-        end)
+            
+            Instances:Create("UIListLayout", {
+                Parent = Items["SubElements"].Instance,
+                Name = "\0",
+                VerticalAlignment = Enum.VerticalAlignment.Center,
+                FillDirection = Enum.FillDirection.Horizontal,
+                HorizontalAlignment = Enum.HorizontalAlignment.Right,
+                Padding = UDimNew(0, 8),
+                SortOrder = Enum.SortOrder.LayoutOrder
+            })
 
-    end
-end
+            Items["Toggle"]:OnHover(function()
+                -- if Toggle.Value then return end 
+                Items["IndicatorOutline"]:Tween(nil, {BackgroundColor3 = Library:GetLighterColor(Library.Theme.Element, 1.35)})
+            end)
+            
+            Items["Toggle"]:OnHoverLeave(function()
+                -- if Toggle.Value then return end 
+                Items["IndicatorOutline"]:Tween(nil, {BackgroundColor3 = Library.Theme.Element})
+            end)
+        end
 
         function Toggle:Get()
             return Toggle.Value 
@@ -5842,22 +5826,3 @@ Library.PlayerList = function(self)
 end
 
 return Library
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
