@@ -799,13 +799,13 @@ Library.Thread = function(self, Function)
     return NewThread
 end
 
---// SafeCall (Updated to Warn instead of Kick)
+--// UPDATE YOUR SAFECALL (Prevents the Kicking)
 Library.SafeCall = function(self, Function, ...)
     local Arguements = { ... }
-    local Success, Result = pcall(Function, TableUnpack(Arguements))
+    local Success, Result = pcall(Function, table.unpack(Arguements))
 
     if not Success then
-        -- We use warn() so you can see the error in F9 without being kicked
+        -- We warn in the console (F9) so you can fix bugs without being kicked
         warn("Aether Callback Error: " .. tostring(Result))
         return false
     end
@@ -813,76 +813,185 @@ Library.SafeCall = function(self, Function, ...)
     return Success
 end
 
-Library.Connect = function(self, Event, Callback, Name)
-    Name = Name or StringFormat("connection_number_%s_%s", self.UnnamedConnections + 1, HttpService:GenerateGUID(false))
-
-    local NewConnection = {
-        Event = Event,
-        Callback = Callback,
-        Name = Name,
-        Connection = nil
+--// UPDATE YOUR CONNECT (Fixed a major threading bug)
+Library.Connect = function(self, Signal, Callback)
+    local ConnectionData = {
+        Connection = nil,
+        Thread = nil
     }
-
-    Library:Thread(function()
-        NewConnection.Connection = Event:Connect(Callback)
+    
+    ConnectionData.Thread = coroutine.create(function()
+        ConnectionData.Connection = Signal:Connect(function(...)
+            self:SafeCall(Callback, ...)
+        end)
     end)
 
-    TableInsert(self.Connections, NewConnection)
-    return NewConnection
+    coroutine.resume(ConnectionData.Thread)
+    table.insert(self.Threads, ConnectionData.Thread)
+    table.insert(self.Connections, ConnectionData)
+    
+    return ConnectionData
 end
 
-Library.Disconnect = function(self, Name)
-    for _, Connection in pairs(self.Connections) do 
-        if Connection.Name == Name then
-            pcall(function()
-                if Connection.Connection then
-                    Connection.Connection:Disconnect()
-                end
-            end)
-            break
-        end
+--// UPDATE YOUR TWEEN MODULE (Fixed the "Time expects a number" error)
+local Tween = {}
+Tween.__index = Tween
+
+Tween.Create = function(self, Item, Info, Goal, IsRawItem)
+    local Target = IsRawItem and Item or (Item and Item.Instance)
+    if not Target then return end
+    
+    -- Robust Time check to prevent the kick you saw
+    local Time = 0.3
+    if Library and Library.Tween and type(Library.Tween.Time) == "number" then
+        Time = Library.Tween.Time
     end
-end
+    
+    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
+    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
+    
+    Info = Info or TweenInfo.new(Time, Style, Dir)
 
-Library.EscapePattern = function(self, String)
-    local ShouldEscape = false 
-
-    if string.match(String, "[%(%)%.%%%+%-%*%?%[%]%^%$]") then
-        ShouldEscape = true
-    end
-
-    if ShouldEscape then
-        return StringGSub(String, "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%1")
-    end
-
-    return String
-end
-
-Library.NextFlag = function(self)
-    local FlagNumber = self.UnnamedFlags + 1
-    return StringFormat("flag_number_%s_%s", FlagNumber, HttpService:GenerateGUID(false))
-end
-
-Library.AddToTheme = function(self, Item, Properties)
-    Item = Item.Instance or Item 
-
-    local ThemeData = {
-        Item = Item,
-        Properties = Properties,
+    local NewTween = {
+        Tween = game:GetService("TweenService"):Create(Target, Info, Goal),
+        Info = Info,
+        Goal = Goal,
+        Item = Target
     }
 
-    for Property, Value in pairs(ThemeData.Properties) do
-        if type(Value) == "string" then
-            Item[Property] = self.Theme[Value]
-        else
-            Item[Property] = Value()
-        end
-    end
-
-    TableInsert(self.ThemeItems, ThemeData)
-    self.ThemeMap[Item] = ThemeData
+    NewTween.Tween:Play()
+    return setmetatable(NewTween, Tween)
 end
 
+Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
+    if not Item then return end
+    local OldTransparency = Item[Property] or 0
+    if Visibility then Item[Property] = 1 end
+
+    local Time = type(Speed) == "number" and Speed or 0.3
+    
+    return Tween:Create(Item, TweenInfo.new(Time), {
+        [Property] = Visibility and (OldTransparency > 0 and OldTransparency or 0) or 1
+    }, true)
+end
+
+Tween.Clean = function(self)
+    if self.Tween then 
+        self.Tween:Cancel()
+        self.Tween = nil
+    end
+    self.Item = nil
+end
+
+Library.Tween = Tween
+
+--// UPDATE YOUR SAFECALL (Prevents the Kicking)
+Library.SafeCall = function(self, Function, ...)
+    local Arguements = { ... }
+    local Success, Result = pcall(Function, table.unpack(Arguements))
+
+    if not Success then
+        -- We warn in the console (F9) so you can fix bugs without being kicked
+        warn("Aether Callback Error: " .. tostring(Result))
+        return false
+    end
+
+    return Success
+end
+
+--// UPDATE YOUR CONNECT (Fixed a major threading bug)
+Library.Connect = function(self, Signal, Callback)
+    local ConnectionData = {
+        Connection = nil,
+        Thread = nil
+    }
+    
+    ConnectionData.Thread = coroutine.create(function()
+        ConnectionData.Connection = Signal:Connect(function(...)
+            self:SafeCall(Callback, ...)
+        end)
+    end)
+
+    coroutine.resume(ConnectionData.Thread)
+    table.insert(self.Threads, ConnectionData.Thread)
+    table.insert(self.Connections, ConnectionData)
+    
+    return ConnectionData
+end
+
+--// UPDATE YOUR TWEEN MODULE (Fixed the "Time expects a number" error)
+local Tween = {}
+Tween.__index = Tween
+
+Tween.Create = function(self, Item, Info, Goal, IsRawItem)
+    local Target = IsRawItem and Item or (Item and Item.Instance)
+    if not Target then return end
+    
+    -- Robust Time check to prevent the kick you saw
+    local Time = 0.3
+    if Library and Library.Tween and type(Library.Tween.Time) == "number" then
+        Time = Library.Tween.Time
+    end
+    
+    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
+    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
+    
+    Info = Info or TweenInfo.new(Time, Style, Dir)
+
+    local NewTween = {
+        Tween = game:GetService("TweenService"):Create(Target, Info, Goal),
+        Info = Info,
+        Goal = Goal,
+        Item = Target
+    }
+
+    NewTween.Tween:Play()
+    return setmetatable(NewTween, Tween)
+end
+
+Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
+    if not Item then return end
+    local OldTransparency = Item[Property] or 0
+    if Visibility then Item[Property] = 1 end
+
+    local Time = type(Speed) == "number" and Speed or 0.3
+    
+    return Tween:Create(Item, TweenInfo.new(Time), {
+        [Property] = Visibility and (OldTransparency > 0 and OldTransparency or 0) or 1
+    }, true)
+end
+
+Tween.Clean = function(self)
+    if self.Tween then 
+        self.Tween:Cancel()
+        self.Tween = nil
+    end
+    self.Item = nil
+end
+
+Library.Tween = Tween
+
+--// UPDATE YOUR UNLOAD (Safe Cleanup)
+Library.Unload = function(self)
+    for _, Value in pairs(self.Connections) do 
+        pcall(function()
+            if Value.Connection then Value.Connection:Disconnect() end
+        end)
+    end
+
+    for _, Value in pairs(self.Threads) do 
+        pcall(function()
+            if Value and coroutine.status(Value) ~= "dead" then coroutine.close(Value) end
+        end)
+    end
+
+    if self.Holder then 
+        pcall(function() self.Holder:Clean() end)
+    end
+
+    getgenv().Library = nil
+end
+										
 Library.GetConfig = function(self)
     local Config = {}
 
@@ -5887,4 +5996,5 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
