@@ -3612,13 +3612,13 @@ local Items = { } do
         AnchorPoint = Vector2New(0.5, 0.5),
         Position = UDim2New(0.5, 0, 0.5, 0),
         BorderColor3 = FromRGB(60, 65, 75),
-        Size = UDim2New(0, 621, 0, 790),
+        Size = UDim2New(0, 730, 0, 470),
         BorderSizePixel = 1,
         BackgroundColor3 = FromRGB(6, 6, 8)
     })  Items["MainFrame"]:AddToTheme({BackgroundColor3 = "Background 1"})
 
     Items["MainFrame"]:MakeDraggable()
-    Items["MainFrame"]:MakeResizeable(Vector2New(621, 790), Vector2New(9999, 9999))
+    Items["MainFrame"]:MakeResizeable(Vector2New(730, 470), Vector2New(9999, 9999))
 
     Instances:Create("UIStroke", {
         Parent = Items["MainFrame"].Instance,
@@ -3647,6 +3647,16 @@ local Items = { } do
         ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     }):AddToTheme({Color = "Window Outline"})
 
+    -- header divider
+    Items["HeaderLine"] = Instances:Create("Frame", {
+        Parent = Items["Inline"].Instance,
+        Name = "\0",
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(60, 65, 75),
+        Position = UDim2New(0, 8, 0, 31),
+        Size = UDim2New(1, -16, 0, 1)
+    })  Items["HeaderLine"]:AddToTheme({BackgroundColor3 = "Border"})
+
     Items["Logo"] = Instances:Create("ImageLabel", {
         Parent = Items["Inline"].Instance,
         Name = "\0",
@@ -3654,8 +3664,8 @@ local Items = { } do
         BorderColor3 = FromRGB(0, 0, 0),
         Image = "rbxassetid://" .. Window.Logo,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 8, 0, 10),
-        Size = UDim2New(0, 16, 0, 16),
+        Position = UDim2New(0, 8, 0, 8),
+        Size = UDim2New(0, 14, 0, 14),
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(255, 255, 255)
     })  Items["Logo"]:AddToTheme({ImageColor3 = "Accent"})
@@ -3667,12 +3677,12 @@ local Items = { } do
         TextColor3 = FromRGB(220, 220, 220),
         BorderColor3 = FromRGB(0, 0, 0),
         Text = Window.Name,
-        Size = UDim2New(0, 0, 0, 15),
+        Size = UDim2New(0, 0, 0, 14),
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 30, 0, 10),
+        Position = UDim2New(0, 28, 0, 8),
         BorderSizePixel = 0,
         AutomaticSize = Enum.AutomaticSize.X,
-        TextSize = 14,
+        TextSize = 13,
         BackgroundColor3 = FromRGB(255, 255, 255),
         TextXAlignment = Enum.TextXAlignment.Left
     })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
@@ -3682,9 +3692,9 @@ local Items = { } do
         Name = "\0",
         BorderColor3 = FromRGB(0, 0, 0),
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 7, 0, 39),
+        Position = UDim2New(0, 8, 0, 39),
         ClipsDescendants = true,
-        Size = UDim2New(1, -14, 1, -46),
+        Size = UDim2New(1, -16, 1, -47),
         ZIndex = 2,
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(255, 255, 255)
@@ -3703,17 +3713,28 @@ local Items = { } do
         Name = "\0",
         BackgroundTransparency = 1,
         BorderColor3 = FromRGB(0, 0, 0),
-        Size = UDim2New(1, 0, 0, 30),
+        Position = UDim2New(0, 0, 0, 0),
+        Size = UDim2New(1, 0, 0, 28),
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(255, 255, 255)
     })
+
+    -- line under tabs
+    Items["PagesLine"] = Instances:Create("Frame", {
+        Parent = Items["Content"].Instance,
+        Name = "\0",
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(60, 65, 75),
+        Position = UDim2New(0, 0, 0, 28),
+        Size = UDim2New(1, 0, 0, 1)
+    })  Items["PagesLine"]:AddToTheme({BackgroundColor3 = "Border"})
 
     Instances:Create("UIListLayout", {
         Parent = Items["Pages"].Instance,
         Name = "\0",
         FillDirection = Enum.FillDirection.Horizontal,
         HorizontalFlex = Enum.UIFlexAlignment.Fill,
-        Padding = UDimNew(0, 1),
+        Padding = UDimNew(0, 0),
         SortOrder = Enum.SortOrder.LayoutOrder
     })
 
@@ -5862,5 +5883,6 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
