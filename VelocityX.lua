@@ -2526,7 +2526,8 @@ Library.KeybindList = function(self)
             BorderColor3 = FromRGB(0, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(10, 12, 16)
+            BackgroundColor3 = FromRGB(10, 12, 16),
+            ClipsDescendants = false
         })
 
         -- Dragging
@@ -2575,14 +2576,15 @@ Library.KeybindList = function(self)
             PaddingLeft = UDimNew(0, 10)
         })
 
-        -- Top cyan line
+        -- Blue line pinned to absolute top
         Items["Liner"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
-            Position = UDim2New(0, 0, 0, 0),
+            Position = UDim2New(0, 0, 0, -6),
             Size = UDim2New(1, 0, 0, 1),
             BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(90, 190, 255)
+            BackgroundColor3 = FromRGB(90, 190, 255),
+            ZIndex = 5
         })
 
         Items["Title"] = Instances:Create("TextLabel", {
@@ -2671,7 +2673,13 @@ Library.KeybindList = function(self)
         )
     end
 
-    function KeybindList:Add(Name, Key)
+    -- Add(Name, Key, Mode)
+    -- examples:
+    -- KeybindList:Add("Zoom", "Z", "Hold")
+    -- KeybindList:Add("Flight", "C", "Toggle")
+    function KeybindList:Add(Name, Key, Mode)
+        Mode = Mode or "Toggle"
+
         local Row = Instances:Create("Frame", {
             Parent = Items["Content"].Instance,
             Name = "\0",
@@ -2721,7 +2729,7 @@ Library.KeybindList = function(self)
             FontFace = Library.Font,
             TextColor3 = FromRGB(120, 120, 120),
             BorderColor3 = FromRGB(0, 0, 0),
-            Text = " (Toggle)",
+            Text = " (" .. tostring(Mode) .. ")",
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
             Size = UDim2New(0, 0, 0, 15),
@@ -2738,8 +2746,9 @@ Library.KeybindList = function(self)
 
         UpdateSuffix()
 
-        function Row:SetText(NewName, NewKey)
+        function Row:SetText(NewName, NewKey, NewMode)
             MainText.Instance.Text = string.format("[%s] %s", NewKey, NewName)
+            Suffix.Instance.Text = " (" .. tostring(NewMode or Mode or "Toggle") .. ")"
             UpdateSuffix()
         end
 
@@ -2752,14 +2761,12 @@ Library.KeybindList = function(self)
             Row.Instance.Visible = true
 
             if Bool then
-                -- Active
                 Check.Instance.BackgroundColor3 = FromRGB(110, 200, 255)
                 CheckStroke.Instance.Color = FromRGB(150, 220, 255)
 
                 MainText.Instance.TextColor3 = FromRGB(140, 210, 255)
                 Suffix.Instance.TextColor3 = FromRGB(140, 210, 255)
             else
-                -- Inactive
                 Check.Instance.BackgroundColor3 = FromRGB(55, 60, 68)
                 CheckStroke.Instance.Color = FromRGB(80, 85, 95)
 
@@ -5887,6 +5894,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
