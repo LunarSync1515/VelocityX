@@ -186,7 +186,7 @@ local Themes = {
 
         ["Accent"] = FromRGB(140, 180, 255),
 
-        ["Background 1"] = FromRGB(6,6,8),
+        ["Background 1"] = FromRGB(18,18,19),
         ["Background 2"] = FromRGB(10,10,12),
 
         ["Inline"] = FromRGB(12,12,14),
@@ -4131,7 +4131,7 @@ Library.Pages.Section = function(self, Data)
         Items["Liner"] = Instances:Create("Frame", {
             Parent = Items["Topbar"].Instance,
             Size = UDim2New(1,0,0,1),
-            Position = UDim2New(0,0,1,-1),
+            Position = UDim2New(0,0,0,2),
             BorderSizePixel = 0,
             BackgroundColor3 = FromRGB(120,170,255)
         })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
@@ -5859,6 +5859,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
