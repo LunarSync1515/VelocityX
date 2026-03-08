@@ -209,7 +209,6 @@ local Tween = {} do
 
     Tween.Create = function(self, Item, Info, Goal, IsRawItem)
         Item = IsRawItem and Item or (Item and Item.Instance)
-
         if not Item then
             return nil
         end
@@ -220,69 +219,67 @@ local Tween = {} do
             Library.Tween.Direction
         )
 
-        local RobloxTween
-        local success, err = pcall(function()
-            RobloxTween = TweenService:Create(Item, Info, Goal)
+        local ok, robloxTween = pcall(function()
+            return TweenService:Create(Item, Info, Goal)
         end)
 
-        if not success or not RobloxTween then
+        if not ok or not robloxTween then
             return nil
         end
 
-        local NewTween = {
-            Tween = RobloxTween,
+        local NewTween = setmetatable({
+            Tween = robloxTween,
             Info = Info,
             Goal = Goal,
             Item = Item
-        }
-
-        setmetatable(NewTween, Tween)
+        }, Tween)
 
         pcall(function()
-            RobloxTween:Play()
+            robloxTween:Play()
         end)
 
         return NewTween
     end
 
-
     Tween.GetProperty = function(self, Item)
         Item = Item or (self and self.Item)
-
         if not Item then
-            return
+            return nil
         end
 
         if Item:IsA("Frame") then
-            return {"BackgroundTransparency"}
-
+            return { "BackgroundTransparency" }
         elseif Item:IsA("TextLabel") or Item:IsA("TextButton") then
-            return {"TextTransparency","BackgroundTransparency"}
-
+            return { "TextTransparency", "BackgroundTransparency" }
         elseif Item:IsA("ImageLabel") or Item:IsA("ImageButton") then
-            return {"BackgroundTransparency","ImageTransparency"}
-
+            return { "BackgroundTransparency", "ImageTransparency" }
         elseif Item:IsA("ScrollingFrame") then
-            return {"BackgroundTransparency","ScrollBarImageTransparency"}
-
+            return { "BackgroundTransparency", "ScrollBarImageTransparency" }
         elseif Item:IsA("TextBox") then
-            return {"TextTransparency","BackgroundTransparency"}
-
+            return { "TextTransparency", "BackgroundTransparency" }
         elseif Item:IsA("UIStroke") then
-            return {"Transparency"}
+            return { "Transparency" }
         end
-    end
 
+        return nil
+    end
 
     Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
         Item = Item or (self and self.Item)
-
         if not Item or not Property then
             return nil
         end
 
-        local OldTransparency = Item[Property]
-        Item[Property] = Visibility and 1 or OldTransparency
+        local okRead, OldTransparency = pcall(function()
+            return Item[Property]
+        end)
+        if not okRead then
+            return nil
+        end
+
+        pcall(function()
+            Item[Property] = Visibility and 1 or OldTransparency
+        end)
 
         local NewTween = Tween:Create(
             Item,
@@ -298,28 +295,26 @@ local Tween = {} do
         )
 
         if NewTween and NewTween.Tween then
-            Library:Connect(NewTween.Tween.Completed,function()
-
+            Library:Connect(NewTween.Tween.Completed, function()
                 if not Visibility and Item and Item.Parent then
                     task.wait()
-                    Item[Property] = OldTransparency
+                    pcall(function()
+                        Item[Property] = OldTransparency
+                    end)
                 end
-
             end)
         end
 
         return NewTween
     end
 
-
     Tween.Get = function(self)
         if not self or not self.Tween then
-            return
+            return nil
         end
 
         return self.Tween, self.Info, self.Goal
     end
-
 
     Tween.Pause = function(self)
         if not self or not self.Tween then
@@ -331,7 +326,6 @@ local Tween = {} do
         end)
     end
 
-
     Tween.Play = function(self)
         if not self or not self.Tween then
             return
@@ -341,7 +335,6 @@ local Tween = {} do
             self.Tween:Play()
         end)
     end
-
 
     Tween.Clean = function(self)
         if not self or not self.Tween then
@@ -5914,6 +5907,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
