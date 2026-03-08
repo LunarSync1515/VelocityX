@@ -182,15 +182,20 @@ local Keys = {
 
 local Themes = {
     ["Preset"] = {
-        ["Window Outline"] = FromRGB(0, 0, 0),
-        ["Accent"] = FromRGB(0, 203, 255),
-        ["Background 1"] = FromRGB(20,20,20),
-        ["Text"] = FromRGB(255, 255, 255),
-        ["Inline"] = FromHex('#161616'),
-        ["Element"] = FromHex('#1c1c1c'),
-        ["Inactive Text"] = FromRGB(185, 185, 185),
-        ["Border"] =  FromHex('#323232'),
-        ["Background 2"] = FromRGB(0,0,0)
+        ["Window Outline"] = FromRGB(60, 65, 75),
+
+        ["Accent"] = FromRGB(140, 180, 255),
+
+        ["Background 1"] = FromRGB(6,6,8),
+        ["Background 2"] = FromRGB(10,10,12),
+
+        ["Inline"] = FromRGB(12,12,14),
+        ["Element"] = FromRGB(18,18,20),
+
+        ["Border"] = FromRGB(60, 65, 75),
+
+        ["Text"] = FromRGB(220,220,220),
+        ["Inactive Text"] = FromRGB(170,170,170)
     }
 }
 
@@ -5857,4 +5862,5 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
