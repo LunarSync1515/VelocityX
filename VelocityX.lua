@@ -4086,125 +4086,101 @@ end
         return setmetatable(Page, Library.Pages)
     end
 
-    Library.Pages.Section = function(self, Data)
-        Data = Data or { }
+Library.Pages.Section = function(self, Data)
+    Data = Data or {}
 
-        local Section = {
-            Window = self.Window,
-            Page = self,
+    local Section = {
+        Window = self.Window,
+        Page = self,
 
-            Name = Data.Name or Data.name or "Section",
-            Side = Data.Side or Data.side or 1,
+        Name = Data.Name or Data.name or "Section",
+        Side = Data.Side or Data.side or 1,
 
-            Items = { }
-        }
+        Items = {}
+    }
 
-        local Items = { } do
-            Items["Section"] = Instances:Create("Frame", {
-                Parent = Section.Page.ColumnsData[Section.Side].Instance,
-                Name = "\0",
-                Size = UDim2New(1, 0, 0, 40),
-                BorderColor3 = FromRGB(0, 0, 0),
-                BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = FromRGB(19, 25, 31)
-            })  Items["Section"]:AddToTheme({BackgroundColor3 = "Inline"})
-            
-            Instances:Create("UIStroke", {
-                Parent = Items["Section"].Instance,
-                Name = "\0",
-                Color = FromRGB(46, 52, 61),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            }):AddToTheme({Color = "Border"})
-            
-            Instances:Create("UIPadding", {
-                Parent = Items["Section"].Instance,
-                Name = "\0",
-                PaddingBottom = UDimNew(0, 8)
-            })
-            
-            Items["Topbar"] = Instances:Create("Frame", {
-                Parent = Items["Section"].Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(1, 0, 0, 25),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(19, 25, 31)
-            })  Items["Topbar"]:AddToTheme({BackgroundColor3 = "Inline"})
-            
-            Instances:Create("UIGradient", {
-                Parent = Items["Topbar"].Instance,
-                Name = "\0",
-                Rotation = 90,
-                Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(165, 165, 165))}
-            })
-            
-            Instances:Create("UIStroke", {
-                Parent = Items["Topbar"].Instance,
-                Name = "\0",
-                Color = FromRGB(46, 52, 61),
-                LineJoinMode = Enum.LineJoinMode.Miter,
-                ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            }):AddToTheme({Color = "Border"})
-            
-            Items["Liner"] = Instances:Create("Frame", {
-                Parent = Items["Topbar"].Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                Size = UDim2New(0, 1, 1, 0),
-                BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(94, 213, 213)
-            })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-            
-            Instances:Create("UIGradient", {
-                Parent = Items["Liner"].Instance,
-                Name = "\0",
-                Rotation = 90,
-                Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(171, 171, 171))}
-            })
-            
-            Items["Text"] = Instances:Create("TextLabel", {
-                Parent = Items["Topbar"].Instance,
-                Name = "\0",
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 255, 255),
-                BorderColor3 = FromRGB(0, 0, 0),
-                Text = Section.Name,
-                AnchorPoint = Vector2New(0, 0.5),
-                Size = UDim2New(0, 0, 0, 15),
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 8, 0.5, -1),
-                BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.X,
-                TextSize = 14,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })  Items["Text"]:AddToTheme({TextColor3 = "Text"})
-            
-            Items["Content"] = Instances:Create("Frame", {
-                Parent = Items["Section"].Instance,
-                Name = "\0",
-                BorderColor3 = FromRGB(0, 0, 0),
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 8, 0, 35),
-                Size = UDim2New(1, -16, 0, 0),
-                BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-            
-            Instances:Create("UIListLayout", {
-                Parent = Items["Content"].Instance,
-                Name = "\0",
-                Padding = UDimNew(0, 6),
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-            
-            Section.Items = Items
-        end
+    local Items = {} do
 
-        return setmetatable(Section, Library.Sections)
+        -- Main section box
+        Items["Section"] = Instances:Create("Frame", {
+            Parent = Section.Page.ColumnsData[Section.Side].Instance,
+            Name = "\0",
+            Size = UDim2New(1, 0, 0, 32),
+            BorderSizePixel = 0,
+            AutomaticSize = Enum.AutomaticSize.Y,
+            BackgroundColor3 = FromRGB(14,14,16)
+        })  Items["Section"]:AddToTheme({BackgroundColor3 = "Inline"})
+
+        Instances:Create("UIStroke", {
+            Parent = Items["Section"].Instance,
+            Color = FromRGB(55,60,68),
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        }):AddToTheme({Color = "Border"})
+
+
+        -- Topbar (section header)
+        Items["Topbar"] = Instances:Create("Frame", {
+            Parent = Items["Section"].Instance,
+            Size = UDim2New(1, 0, 0, 20),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(14,14,16)
+        })  Items["Topbar"]:AddToTheme({BackgroundColor3 = "Inline"})
+
+
+        -- Accent line
+        Items["Liner"] = Instances:Create("Frame", {
+            Parent = Items["Topbar"].Instance,
+            Size = UDim2New(1,0,0,1),
+            Position = UDim2New(0,0,1,-1),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(120,170,255)
+        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
+
+
+        -- Section title
+        Items["Text"] = Instances:Create("TextLabel", {
+            Parent = Items["Topbar"].Instance,
+            FontFace = Library.Font,
+            Text = Section.Name,
+            TextSize = 13,
+            TextColor3 = FromRGB(220,220,220),
+            BackgroundTransparency = 1,
+            Position = UDim2New(0,8,0.5,0),
+            AnchorPoint = Vector2New(0,0.5),
+            AutomaticSize = Enum.AutomaticSize.X
+        })  Items["Text"]:AddToTheme({TextColor3 = "Text"})
+
+
+        -- Content area
+        Items["Content"] = Instances:Create("Frame", {
+            Parent = Items["Section"].Instance,
+            BackgroundTransparency = 1,
+            Position = UDim2New(0,8,0,26),
+            Size = UDim2New(1,-16,0,0),
+            AutomaticSize = Enum.AutomaticSize.Y
+        })
+
+
+        -- Layout for controls
+        Instances:Create("UIListLayout", {
+            Parent = Items["Content"].Instance,
+            Padding = UDimNew(0,4),
+            SortOrder = Enum.SortOrder.LayoutOrder
+        })
+
+
+        -- Bottom padding
+        Instances:Create("UIPadding", {
+            Parent = Items["Section"].Instance,
+            PaddingBottom = UDim.new(0,6)
+        })
+
+
+        Section.Items = Items
     end
+
+    return setmetatable(Section, Library.Sections)
+end
 
     Library.Sections.Toggle = function(self, Data)
         Data = Data or { }
@@ -5883,6 +5859,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
