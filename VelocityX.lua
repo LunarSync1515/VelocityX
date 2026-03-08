@@ -2518,16 +2518,56 @@ Library.KeybindList = function(self)
     self.KeyList = KeybindList
 
     local Items = {} do
+        -- OUTER FRAME
         Items["KeybindList"] = Instances:Create("Frame", {
             Parent = Library.Holder.Instance,
             Name = "\0",
             AnchorPoint = Vector2New(0, 0.5),
             Position = UDim2New(0, 20, 0.5, 0),
-            BorderColor3 = FromRGB(0, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.XY,
             BackgroundColor3 = FromRGB(10, 12, 16),
-            ClipsDescendants = false
+            ClipsDescendants = true
+        })
+
+        -- REAL top line on outer frame
+        Items["Liner"] = Instances:Create("Frame", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            Position = UDim2New(0, 0, 0, 0),
+            Size = UDim2New(1, 0, 0, 1),
+            BorderSizePixel = 0,
+            BackgroundColor3 = FromRGB(90, 190, 255),
+            ZIndex = 10
+        })
+
+        Instances:Create("UIStroke", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            Color = FromRGB(35, 40, 48),
+            Thickness = 1,
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        })
+
+        -- INNER FRAME (padding goes here, not on outer frame)
+        Items["Inner"] = Instances:Create("Frame", {
+            Parent = Items["KeybindList"].Instance,
+            Name = "\0",
+            BackgroundTransparency = 1,
+            Position = UDim2New(0, 0, 0, 1), -- sits under the blue line
+            AutomaticSize = Enum.AutomaticSize.XY,
+            Size = UDim2New(1, 0, 0, 0),
+            BorderSizePixel = 0
+        })
+
+        Instances:Create("UIPadding", {
+            Parent = Items["Inner"].Instance,
+            Name = "\0",
+            PaddingTop = UDimNew(0, 6),
+            PaddingBottom = UDimNew(0, 6),
+            PaddingRight = UDimNew(0, 10),
+            PaddingLeft = UDimNew(0, 10)
         })
 
         -- Dragging
@@ -2567,61 +2607,36 @@ Library.KeybindList = function(self)
             end)
         end
 
-        Instances:Create("UIPadding", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            PaddingTop = UDimNew(0, 6),
-            PaddingBottom = UDimNew(0, 6),
-            PaddingRight = UDimNew(0, 10),
-            PaddingLeft = UDimNew(0, 10)
-        })
-
-        -- Blue line pinned to absolute top
-        Items["Liner"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Position = UDim2New(0, 0, 0, -6),
-            Size = UDim2New(1, 0, 0, 1),
-            BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(90, 190, 255),
-            ZIndex = 5
-        })
-
         Items["Title"] = Instances:Create("TextLabel", {
-            Parent = Items["KeybindList"].Instance,
+            Parent = Items["Inner"].Instance,
             Name = "\0",
             FontFace = Library.Font,
             TextColor3 = FromRGB(235, 235, 235),
-            BorderColor3 = FromRGB(0, 0, 0),
             Text = "Keybinds",
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
             Size = UDim2New(0, 80, 0, 14),
             BorderSizePixel = 0,
             TextSize = 13,
-            BackgroundColor3 = FromRGB(255, 255, 255),
-            Position = UDim2New(0, 0, 0, 2)
+            Position = UDim2New(0, 0, 0, 0)
         })
 
         Items["Liner2"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
+            Parent = Items["Inner"].Instance,
             Name = "\0",
-            Position = UDim2New(0, 0, 0, 20),
-            BorderColor3 = FromRGB(0, 0, 0),
+            Position = UDim2New(0, 0, 0, 18),
             Size = UDim2New(1, 0, 0, 1),
             BorderSizePixel = 0,
             BackgroundColor3 = FromRGB(30, 34, 40)
         })
 
         Items["Content"] = Instances:Create("Frame", {
-            Parent = Items["KeybindList"].Instance,
+            Parent = Items["Inner"].Instance,
             Name = "\0",
             BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 24),
-            BorderColor3 = FromRGB(0, 0, 0),
+            Position = UDim2New(0, 0, 0, 22),
             BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(255, 255, 255)
+            AutomaticSize = Enum.AutomaticSize.XY
         })
 
         Instances:Create("UIListLayout", {
@@ -2629,15 +2644,6 @@ Library.KeybindList = function(self)
             Name = "\0",
             Padding = UDimNew(0, 2),
             SortOrder = Enum.SortOrder.LayoutOrder
-        })
-
-        Instances:Create("UIStroke", {
-            Parent = Items["KeybindList"].Instance,
-            Name = "\0",
-            Color = FromRGB(35, 40, 48),
-            Thickness = 1,
-            LineJoinMode = Enum.LineJoinMode.Miter,
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
         })
     end
 
@@ -2673,10 +2679,6 @@ Library.KeybindList = function(self)
         )
     end
 
-    -- Add(Name, Key, Mode)
-    -- examples:
-    -- KeybindList:Add("Zoom", "Z", "Hold")
-    -- KeybindList:Add("Flight", "C", "Toggle")
     function KeybindList:Add(Name, Key, Mode)
         Mode = Mode or "Toggle"
 
@@ -2711,7 +2713,6 @@ Library.KeybindList = function(self)
             Name = "\0",
             FontFace = Library.Font,
             TextColor3 = FromRGB(220, 220, 220),
-            BorderColor3 = FromRGB(0, 0, 0),
             Text = string.format("[%s] %s", Key, Name),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -2719,8 +2720,7 @@ Library.KeybindList = function(self)
             Position = UDim2New(0, 14, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.X,
-            TextSize = 13,
-            BackgroundColor3 = FromRGB(255, 255, 255)
+            TextSize = 13
         })
 
         local Suffix = Instances:Create("TextLabel", {
@@ -2728,7 +2728,6 @@ Library.KeybindList = function(self)
             Name = "\0",
             FontFace = Library.Font,
             TextColor3 = FromRGB(120, 120, 120),
-            BorderColor3 = FromRGB(0, 0, 0),
             Text = " (" .. tostring(Mode) .. ")",
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -2736,8 +2735,7 @@ Library.KeybindList = function(self)
             Position = UDim2New(0, 14, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.X,
-            TextSize = 13,
-            BackgroundColor3 = FromRGB(255, 255, 255)
+            TextSize = 13
         })
 
         local function UpdateSuffix()
@@ -2763,13 +2761,11 @@ Library.KeybindList = function(self)
             if Bool then
                 Check.Instance.BackgroundColor3 = FromRGB(110, 200, 255)
                 CheckStroke.Instance.Color = FromRGB(150, 220, 255)
-
                 MainText.Instance.TextColor3 = FromRGB(140, 210, 255)
                 Suffix.Instance.TextColor3 = FromRGB(140, 210, 255)
             else
                 Check.Instance.BackgroundColor3 = FromRGB(55, 60, 68)
                 CheckStroke.Instance.Color = FromRGB(80, 85, 95)
-
                 MainText.Instance.TextColor3 = FromRGB(220, 220, 220)
                 Suffix.Instance.TextColor3 = FromRGB(120, 120, 120)
             end
@@ -5894,6 +5890,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
