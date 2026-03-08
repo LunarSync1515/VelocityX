@@ -2519,54 +2519,51 @@ Library.KeybindList = function(self)
 
     local Items = {}
 
-    -- OUTER FRAME
     Items["KeybindList"] = Instances:Create("Frame", {
         Parent = Library.Holder.Instance,
         Name = "\0",
-        AnchorPoint = Vector2New(0, 0.5),
-        Position = UDim2New(0, 20, 0.5, 0),
+        AnchorPoint = Vector2.new(0, 0.5),
+        Position = UDim2.new(0, 20, 0.5, 0),
         BorderSizePixel = 0,
         AutomaticSize = Enum.AutomaticSize.XY,
-        BackgroundColor3 = FromRGB(10, 12, 16),
+        BackgroundColor3 = Color3.fromRGB(10,12,16),
         ClipsDescendants = false
     })
 
-    -- TOP BLUE LINE (FULL WIDTH)
+    -- Top blue line
     Items["TopLine"] = Instances:Create("Frame", {
         Parent = Items["KeybindList"].Instance,
-        Name = "\0",
-        Position = UDim2New(0, -1, 0, -1),
-        Size = UDim2New(1, 2, 0, 2),
+        Position = UDim2.new(0,-1,0,-1),
+        Size = UDim2.new(1,2,0,2),
         BorderSizePixel = 0,
-        BackgroundColor3 = FromRGB(90,190,255),
+        BackgroundColor3 = Color3.fromRGB(90,190,255),
         ZIndex = 5
     })
 
     Instances:Create("UIStroke", {
         Parent = Items["KeybindList"].Instance,
-        Color = FromRGB(35,40,48),
+        Color = Color3.fromRGB(35,40,48),
         Thickness = 1,
         ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     })
 
-    -- INNER CONTENT HOLDER
     Items["Inner"] = Instances:Create("Frame", {
         Parent = Items["KeybindList"].Instance,
         BackgroundTransparency = 1,
-        Position = UDim2New(0,0,0,1),
+        Position = UDim2.new(0,0,0,1),
         AutomaticSize = Enum.AutomaticSize.XY,
         BorderSizePixel = 0
     })
 
     Instances:Create("UIPadding", {
         Parent = Items["Inner"].Instance,
-        PaddingTop = UDimNew(0,6),
-        PaddingBottom = UDimNew(0,6),
-        PaddingLeft = UDimNew(0,10),
-        PaddingRight = UDimNew(0,10)
+        PaddingTop = UDim.new(0,6),
+        PaddingBottom = UDim.new(0,6),
+        PaddingLeft = UDim.new(0,10),
+        PaddingRight = UDim.new(0,10)
     })
 
-    -- DRAGGING
+    -- Dragging
     do
         local frame = Items["KeybindList"].Instance
         local UIS = game:GetService("UserInputService")
@@ -2577,7 +2574,7 @@ Library.KeybindList = function(self)
 
         local function update(input)
             local delta = input.Position - dragStart
-            frame.Position = UDim2New(
+            frame.Position = UDim2.new(
                 startPos.X.Scale,
                 startPos.X.Offset + delta.X,
                 startPos.Y.Scale,
@@ -2606,39 +2603,36 @@ Library.KeybindList = function(self)
         end)
     end
 
-    -- TITLE
     Items["Title"] = Instances:Create("TextLabel", {
         Parent = Items["Inner"].Instance,
         FontFace = Library.Font,
         Text = "Keybinds",
-        TextColor3 = FromRGB(235,235,235),
+        TextColor3 = Color3.fromRGB(235,235,235),
         BackgroundTransparency = 1,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Size = UDim2New(0,80,0,14),
+        Size = UDim2.new(0,80,0,14),
         TextSize = 13
     })
 
-    -- DIVIDER
     Items["Divider"] = Instances:Create("Frame", {
         Parent = Items["Inner"].Instance,
-        Position = UDim2New(0,0,0,18),
-        Size = UDim2New(1,0,0,1),
+        Position = UDim2.new(0,0,0,18),
+        Size = UDim2.new(1,0,0,1),
         BorderSizePixel = 0,
-        BackgroundColor3 = FromRGB(30,34,40)
+        BackgroundColor3 = Color3.fromRGB(30,34,40)
     })
 
-    -- CONTENT
     Items["Content"] = Instances:Create("Frame", {
         Parent = Items["Inner"].Instance,
         BackgroundTransparency = 1,
-        Position = UDim2New(0,0,0,22),
+        Position = UDim2.new(0,0,0,22),
         AutomaticSize = Enum.AutomaticSize.XY,
         BorderSizePixel = 0
     })
 
     Instances:Create("UIListLayout", {
         Parent = Items["Content"].Instance,
-        Padding = UDimNew(0,2),
+        Padding = UDim.new(0,2),
         SortOrder = Enum.SortOrder.LayoutOrder
     })
 
@@ -2676,21 +2670,21 @@ Library.KeybindList = function(self)
         local Row = Instances:Create("Frame", {
             Parent = Items["Content"].Instance,
             BackgroundTransparency = 1,
-            Size = UDim2New(0,0,0,15),
+            Size = UDim2.new(0,0,0,15),
             AutomaticSize = Enum.AutomaticSize.X
         })
 
         local Check = Instances:Create("Frame", {
             Parent = Row.Instance,
-            BackgroundColor3 = FromRGB(55,60,68),
+            BackgroundColor3 = Color3.fromRGB(55,60,68),
             BorderSizePixel = 0,
-            Size = UDim2New(0,8,0,8),
-            Position = UDim2New(0,0,0,3)
+            Size = UDim2.new(0,8,0,8),
+            Position = UDim2.new(0,0,0,3)
         })
 
         local CheckStroke = Instances:Create("UIStroke", {
             Parent = Check.Instance,
-            Color = FromRGB(80,85,95),
+            Color = Color3.fromRGB(80,85,95),
             Thickness = 1
         })
 
@@ -2698,10 +2692,10 @@ Library.KeybindList = function(self)
             Parent = Row.Instance,
             FontFace = Library.Font,
             Text = string.format("[%s] %s", Key, Name),
-            TextColor3 = FromRGB(220,220,220),
+            TextColor3 = Color3.fromRGB(220,220,220),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2New(0,14,0,0),
+            Position = UDim2.new(0,14,0,0),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 13
         })
@@ -2710,34 +2704,46 @@ Library.KeybindList = function(self)
             Parent = Row.Instance,
             FontFace = Library.Font,
             Text = " ("..Mode..")",
-            TextColor3 = FromRGB(120,120,120),
+            TextColor3 = Color3.fromRGB(120,120,120),
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2New(0,14,0,0),
+            Position = UDim2.new(0,14,0,0),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 13
         })
 
+        local CurrentMode = Mode
+
         local function UpdateSuffix()
             Suffix.Instance.Position =
-                UDim2New(0,14 + MainText.Instance.TextBounds.X + 2,0,0)
+                UDim2.new(0,14 + MainText.Instance.TextBounds.X + 2,0,0)
         end
 
         UpdateSuffix()
 
+        function Row:SetText(NewName, NewKey, NewMode)
+            Name = NewName or Name
+            Key = NewKey or Key
+            CurrentMode = NewMode or CurrentMode
+
+            MainText.Instance.Text = string.format("[%s] %s", Key, Name)
+            Suffix.Instance.Text = " ("..CurrentMode..")"
+            UpdateSuffix()
+        end
+
         function Row:SetStatus(Bool)
             if Bool then
-                Check.Instance.BackgroundColor3 = FromRGB(110,200,255)
-                CheckStroke.Instance.Color = FromRGB(150,220,255)
+                Check.Instance.BackgroundColor3 = Color3.fromRGB(110,200,255)
+                CheckStroke.Instance.Color = Color3.fromRGB(150,220,255)
 
-                MainText.Instance.TextColor3 = FromRGB(140,210,255)
-                Suffix.Instance.TextColor3 = FromRGB(140,210,255)
+                MainText.Instance.TextColor3 = Color3.fromRGB(140,210,255)
+                Suffix.Instance.TextColor3 = Color3.fromRGB(140,210,255)
             else
-                Check.Instance.BackgroundColor3 = FromRGB(55,60,68)
-                CheckStroke.Instance.Color = FromRGB(80,85,95)
+                Check.Instance.BackgroundColor3 = Color3.fromRGB(55,60,68)
+                CheckStroke.Instance.Color = Color3.fromRGB(80,85,95)
 
-                MainText.Instance.TextColor3 = FromRGB(220,220,220)
-                Suffix.Instance.TextColor3 = FromRGB(120,120,120)
+                MainText.Instance.TextColor3 = Color3.fromRGB(220,220,220)
+                Suffix.Instance.TextColor3 = Color3.fromRGB(120,120,120)
             end
         end
 
@@ -5792,6 +5798,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
