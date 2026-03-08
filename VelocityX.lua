@@ -204,11 +204,15 @@ for Index, Value in Library.Folders do
 end
 
 -- Tweening
-local Tween = { } do
+local Tween = {} do
     Tween.__index = Tween
 
     Tween.Create = function(self, Item, Info, Goal, IsRawItem)
-        Item = IsRawItem and Item or Item.Instance
+        Item = IsRawItem and Item or (Item and Item.Instance)
+        if not Item then
+            return nil
+        end
+
         Info = Info or TweenInfo.new(Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction)
 
         local NewTween = {
@@ -218,15 +222,17 @@ local Tween = { } do
             Item = Item
         }
 
-        NewTween.Tween:Play()
-
         setmetatable(NewTween, Tween)
+        NewTween.Tween:Play()
 
         return NewTween
     end
 
     Tween.GetProperty = function(self, Item)
-        Item = Item or self.Item 
+        Item = Item or (self and self.Item)
+        if not Item then
+            return
+        end
 
         if Item:IsA("Frame") then
             return { "BackgroundTransparency" }
@@ -238,15 +244,14 @@ local Tween = { } do
             return { "BackgroundTransparency", "ScrollBarImageTransparency" }
         elseif Item:IsA("TextBox") then
             return { "TextTransparency", "BackgroundTransparency" }
-        elseif Item:IsA("UIStroke") then 
+        elseif Item:IsA("UIStroke") then
             return { "Transparency" }
         end
     end
 
     Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-        Item = Item or self.Item
-
-        if not Item then
+        Item = Item or (self and self.Item)
+        if not Item or not Property then
             return
         end
 
@@ -262,18 +267,22 @@ local Tween = { } do
             true
         )
 
-        Library:Connect(NewTween.Tween.Completed, function()
-            if not Visibility and Item then
-                task.wait()
-                Item[Property] = OldTransparency
-            end
-        end)
+        if NewTween and NewTween.Tween then
+            Library:Connect(NewTween.Tween.Completed, function()
+                if not Visibility and Item then
+                    task.wait()
+                    if Item.Parent then
+                        Item[Property] = OldTransparency
+                    end
+                end
+            end)
+        end
 
         return NewTween
     end
 
     Tween.Get = function(self)
-        if not self or not self.Tween then 
+        if not self or not self.Tween then
             return
         end
 
@@ -281,7 +290,7 @@ local Tween = { } do
     end
 
     Tween.Pause = function(self)
-        if not self or not self.Tween then 
+        if not self or not self.Tween then
             return
         end
 
@@ -289,7 +298,7 @@ local Tween = { } do
     end
 
     Tween.Play = function(self)
-        if not self or not self.Tween then 
+        if not self or not self.Tween then
             return
         end
 
@@ -297,11 +306,12 @@ local Tween = { } do
     end
 
     Tween.Clean = function(self)
-        if not self or not self.Tween then 
+        if not self or not self.Tween then
             return
         end
 
         self.Tween:Pause()
+        self.Tween:Destroy()
         self.Tween = nil
         self.Info = nil
         self.Goal = nil
@@ -5860,6 +5870,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
