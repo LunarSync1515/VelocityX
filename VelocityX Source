@@ -61,7 +61,7 @@ Library:Notification("✓ Bypass Loaded Successfully", 4.5)
 
 local flags = Library.Flags
 local Window = Library:Window({Name = 'Aether', Logo = '117147967081502'})
-local Watermark = Window:Watermark("Aether")
+local Watermark = Window:Watermark("Fallen Survival")
 local KeybindList = Window:KeybindList()
 local ArmorViewer = Window:ArmorViewer()
 local MyModList = Library:ModeratorList()
@@ -71,6 +71,7 @@ Library.KeybindListInstance = KeybindList
 Library.ArmorViewerInstance = ArmorViewer
 Library.ModeratorListInstance = MyModList
 Library.PlayerListInstance = MyPlayerList
+Library.WatermarkInstance = Watermark
 
 MyModList:SetVisibility(false)
   
