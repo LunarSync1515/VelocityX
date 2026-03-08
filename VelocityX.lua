@@ -3972,35 +3972,75 @@ end
 
         local Debounce = false
 
-        function Page:Turn(Bool)
-            if Debounce then 
-                return 
-            end
+function Page:Turn(Bool)
+    if Debounce then
+        return
+    end
 
-            Page.Active = Bool 
-            
-            Debounce = true
-            Items["Page"].Instance.Visible = Bool 
-            Items["Page"].Instance.Parent = Bool and Page.Window.Items["Content"].Instance or Library.UnusedHolder.Instance
+    Page.Active = Bool
+    Debounce = true
 
-            if Page.Active then
-                Items["Liner"]:Tween(TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0, Size = UDim2New(1, 0, 0, 1)})
-                Items["TextGlow"]:Tween(nil, {ImageTransparency = 0.7})
-                Items["Text"]:Tween(nil, {TextTransparency = 0})
-                Items["Hide"]:Tween(nil, {BackgroundTransparency = 0})
+    if Items["Page"] and Items["Page"].Instance then
+        Items["Page"].Instance.Visible = Bool
+        Items["Page"].Instance.Parent = Bool and Page.Window.Items["Content"].Instance or Library.UnusedHolder.Instance
+    end
 
-                Items["Page"]:Tween(TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2New(0, 0, 0, 35)})
-            else
-                Items["Liner"]:Tween(TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0, Size = UDim2New(0, 0, 0, 1)})
-                Items["TextGlow"]:Tween(nil, {ImageTransparency = 1})
-                Items["Text"]:Tween(nil, {TextTransparency = 0.4})
-                Items["Hide"]:Tween(nil, {BackgroundTransparency = 1})
-
-                Items["Page"]:Tween(TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2New(0, 0, 0, 80)})
-            end
-
-            Debounce = false
+    if Page.Active then
+        if Items["Liner"] and Items["Liner"].Tween then
+            Items["Liner"]:Tween(
+                TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0, Size = UDim2New(1, 0, 0, 1)}
+            )
         end
+
+        if Items["TextGlow"] and Items["TextGlow"].Tween then
+            Items["TextGlow"]:Tween(nil, {ImageTransparency = 0.7})
+        end
+
+        if Items["Text"] and Items["Text"].Tween then
+            Items["Text"]:Tween(nil, {TextTransparency = 0})
+        end
+
+        if Items["Hide"] and Items["Hide"].Tween then
+            Items["Hide"]:Tween(nil, {BackgroundTransparency = 0})
+        end
+
+        if Items["Page"] and Items["Page"].Tween then
+            Items["Page"]:Tween(
+                TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                {Position = UDim2New(0, 0, 0, 35)}
+            )
+        end
+    else
+        if Items["Liner"] and Items["Liner"].Tween then
+            Items["Liner"]:Tween(
+                TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                {BackgroundTransparency = 0, Size = UDim2New(0, 0, 0, 1)}
+            )
+        end
+
+        if Items["TextGlow"] and Items["TextGlow"].Tween then
+            Items["TextGlow"]:Tween(nil, {ImageTransparency = 1})
+        end
+
+        if Items["Text"] and Items["Text"].Tween then
+            Items["Text"]:Tween(nil, {TextTransparency = 0.4})
+        end
+
+        if Items["Hide"] and Items["Hide"].Tween then
+            Items["Hide"]:Tween(nil, {BackgroundTransparency = 1})
+        end
+
+        if Items["Page"] and Items["Page"].Tween then
+            Items["Page"]:Tween(
+                TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                {Position = UDim2New(0, 0, 0, 80)}
+            )
+        end
+    end
+
+    Debounce = false
+end
 
         Items["Inactive"]:Connect("MouseButton1Down", function()
             for Index, Value in Page.Window.Pages do 
@@ -5817,3 +5857,4 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
