@@ -2512,13 +2512,12 @@ Library.Watermark = function(self, Name)
 end
 
 Library.KeybindList = function(self)
-    local KeybindList = { }
+    local KeybindList = {}
 
-    -- Keybind elements check Library.KeyList (global), not just self.KeyList (window)
     Library.KeyList = KeybindList
     self.KeyList = KeybindList
 
-    local Items = { } do
+    local Items = {} do
         Items["KeybindList"] = Instances:Create("Frame", {
             Parent = Library.Holder.Instance,
             Name = "\0",
@@ -2527,10 +2526,10 @@ Library.KeybindList = function(self)
             BorderColor3 = FromRGB(0, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.XY,
-            BackgroundColor3 = FromRGB(24, 28, 36)
-        })  Items["KeybindList"]:AddToTheme({BackgroundColor3 = "Background 2"})
+            BackgroundColor3 = FromRGB(10, 12, 16)
+        })
 
-        -- Draggable
+        -- Dragging
         do
             local frame = Items["KeybindList"].Instance
             local UIS = game:GetService("UserInputService")
@@ -2570,80 +2569,53 @@ Library.KeybindList = function(self)
         Instances:Create("UIPadding", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
-            PaddingTop = UDimNew(0, 9),
-            PaddingBottom = UDimNew(0, 9),
-            PaddingRight = UDimNew(0, 9),
-            PaddingLeft = UDimNew(0, 9)
+            PaddingTop = UDimNew(0, 6),
+            PaddingBottom = UDimNew(0, 6),
+            PaddingRight = UDimNew(0, 10),
+            PaddingLeft = UDimNew(0, 10)
         })
 
-        -- Top bar (static, no glow changes)
+        -- Top cyan line
         Items["Liner"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
-            Position = UDim2New(0, -9, 0, -9),
-            BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 18, 0, 2),
+            Position = UDim2New(0, 0, 0, 0),
+            Size = UDim2New(1, 0, 0, 1),
             BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(94, 213, 213)
-        })  Items["Liner"]:AddToTheme({BackgroundColor3 = "Accent"})
-
-        -- Keep the decorative glow asset if you want the same look,
-        -- but we DO NOT animate it or brighten it.
-        Items["Glow"] = Instances:Create("ImageLabel", {
-            Parent = Items["Liner"].Instance,
-            Name = "\0",
-            ImageColor3 = FromRGB(94, 213, 213),
-            ScaleType = Enum.ScaleType.Slice,
-            ImageTransparency = 0.5,
-            BorderColor3 = FromRGB(0, 0, 0),
-            BackgroundColor3 = FromRGB(94, 213, 213),
-            Size = UDim2New(0, 113, 1, 8),
-            AnchorPoint = Vector2New(0.5, 0.5),
-            Image = "rbxassetid://18245826428",
-            BackgroundTransparency = 1,
-            Position = UDim2New(0.5, 0, 0.5, 0),
-            ZIndex = 2,
-            BorderSizePixel = 0,
-            SliceCenter = RectNew(Vector2New(21, 21), Vector2New(79, 79))
-        })  Items["Glow"]:AddToTheme({ImageColor3 = "Accent"})
-
-        Instances:Create("UIGradient", {
-            Parent = Items["Glow"].Instance,
-            Name = "\0",
-            Rotation = 90,
-            Transparency = NumSequence{NumSequenceKeypoint(0, 0), NumSequenceKeypoint(1, 1)}
+            BackgroundColor3 = FromRGB(90, 190, 255)
         })
 
         Items["Title"] = Instances:Create("TextLabel", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
             FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
+            TextColor3 = FromRGB(235, 235, 235),
             BorderColor3 = FromRGB(0, 0, 0),
             Text = "Keybinds",
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
-            Size = UDim2New(0, 75, 0, 15),
+            Size = UDim2New(0, 80, 0, 14),
             BorderSizePixel = 0,
-            TextSize = 14,
-            BackgroundColor3 = FromRGB(255, 255, 255)
-        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+            TextSize = 13,
+            BackgroundColor3 = FromRGB(255, 255, 255),
+            Position = UDim2New(0, 0, 0, 2)
+        })
 
         Items["Liner2"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
-            Position = UDim2New(0, 0, 0, 21),
+            Position = UDim2New(0, 0, 0, 20),
             BorderColor3 = FromRGB(0, 0, 0),
             Size = UDim2New(1, 0, 0, 1),
             BorderSizePixel = 0,
-            BackgroundColor3 = FromRGB(46, 52, 61)
-        })  Items["Liner2"]:AddToTheme({BackgroundColor3 = "Border"})
+            BackgroundColor3 = FromRGB(30, 34, 40)
+        })
 
         Items["Content"] = Instances:Create("Frame", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
             BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 28),
+            Position = UDim2New(0, 0, 0, 24),
             BorderColor3 = FromRGB(0, 0, 0),
             BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.XY,
@@ -2653,27 +2625,26 @@ Library.KeybindList = function(self)
         Instances:Create("UIListLayout", {
             Parent = Items["Content"].Instance,
             Name = "\0",
-            Padding = UDimNew(0, 4),
+            Padding = UDimNew(0, 2),
             SortOrder = Enum.SortOrder.LayoutOrder
         })
 
         Instances:Create("UIStroke", {
             Parent = Items["KeybindList"].Instance,
             Name = "\0",
-            Color = FromRGB(46, 52, 61),
+            Color = FromRGB(35, 40, 48),
+            Thickness = 1,
             LineJoinMode = Enum.LineJoinMode.Miter,
             ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        }):AddToTheme({Color = "Border"})
+        })
     end
 
-    -- Main source expects this method
     function KeybindList:SetVisibility(Bool)
         Items["KeybindList"].Instance.Visible = Bool
     end
 
     function KeybindList:GetPosition()
         local p = Items["KeybindList"].Instance.Position
-
         return {
             XScale = p.X.Scale,
             XOffset = p.X.Offset,
@@ -2701,46 +2672,103 @@ Library.KeybindList = function(self)
     end
 
     function KeybindList:Add(Name, Key)
-        local NewKey = Instances:Create("TextLabel", {
+        local Row = Instances:Create("Frame", {
             Parent = Items["Content"].Instance,
             Name = "\0",
-            FontFace = Library.Font,
-            TextColor3 = FromRGB(255, 255, 255),
-            TextTransparency = 0.4,
-            Text = Name .. " [".. Key .."]",
-            Size = UDim2New(0, 0, 0, 15),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
+            Size = UDim2New(0, 0, 0, 15),
+            AutomaticSize = Enum.AutomaticSize.X
+        })
+
+        local Check = Instances:Create("Frame", {
+            Parent = Row.Instance,
+            Name = "\0",
+            BackgroundColor3 = FromRGB(55, 60, 68),
+            BorderSizePixel = 0,
+            Size = UDim2New(0, 8, 0, 8),
+            Position = UDim2New(0, 0, 0, 3)
+        })
+
+        local CheckStroke = Instances:Create("UIStroke", {
+            Parent = Check.Instance,
+            Name = "\0",
+            Color = FromRGB(80, 85, 95),
+            Thickness = 1,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        })
+
+        local MainText = Instances:Create("TextLabel", {
+            Parent = Row.Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(220, 220, 220),
             BorderColor3 = FromRGB(0, 0, 0),
+            Text = string.format("[%s] %s", Key, Name),
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Size = UDim2New(0, 0, 0, 15),
+            Position = UDim2New(0, 14, 0, 0),
+            BorderSizePixel = 0,
             AutomaticSize = Enum.AutomaticSize.X,
-            TextSize = 14,
+            TextSize = 13,
             BackgroundColor3 = FromRGB(255, 255, 255)
         })
 
-        -- Important: don't theme TextColor3 here or it can override the active blue
-        -- NewKey:AddToTheme({TextColor3 = "Text"})
+        local Suffix = Instances:Create("TextLabel", {
+            Parent = Row.Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(120, 120, 120),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Text = " (Toggle)",
+            BackgroundTransparency = 1,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Size = UDim2New(0, 0, 0, 15),
+            Position = UDim2New(0, 14, 0, 0),
+            BorderSizePixel = 0,
+            AutomaticSize = Enum.AutomaticSize.X,
+            TextSize = 13,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })
 
-        function NewKey:SetText(Name, Key)
-            NewKey.Instance.Text = Name .. " [".. Key .."]"
+        local function UpdateSuffix()
+            Suffix.Instance.Position = UDim2New(0, 14 + MainText.Instance.TextBounds.X + 2, 0, 0)
         end
 
-        -- Blue text when active, no glow
-        function NewKey:SetStatus(Bool)
-            if NewKey.Instance.Text:find("Menu Keybind") then
-                NewKey.Instance.Visible = false
+        UpdateSuffix()
+
+        function Row:SetText(NewName, NewKey)
+            MainText.Instance.Text = string.format("[%s] %s", NewKey, NewName)
+            UpdateSuffix()
+        end
+
+        function Row:SetStatus(Bool)
+            if MainText.Instance.Text:find("Menu Keybind") then
+                Row.Instance.Visible = false
                 return
             end
 
-            NewKey.Instance.Visible = true
+            Row.Instance.Visible = true
 
-            local ActiveBlue = FromRGB(60, 150, 255) -- softer blue
-            local NormalText = FromRGB(255, 255, 255)
+            if Bool then
+                -- Active
+                Check.Instance.BackgroundColor3 = FromRGB(110, 200, 255)
+                CheckStroke.Instance.Color = FromRGB(150, 220, 255)
 
-            NewKey.Instance.TextColor3 = Bool and ActiveBlue or NormalText
-            NewKey.Instance.TextTransparency = Bool and 0 or 0.4
+                MainText.Instance.TextColor3 = FromRGB(140, 210, 255)
+                Suffix.Instance.TextColor3 = FromRGB(140, 210, 255)
+            else
+                -- Inactive
+                Check.Instance.BackgroundColor3 = FromRGB(55, 60, 68)
+                CheckStroke.Instance.Color = FromRGB(80, 85, 95)
+
+                MainText.Instance.TextColor3 = FromRGB(220, 220, 220)
+                Suffix.Instance.TextColor3 = FromRGB(120, 120, 120)
+            end
         end
 
-        return NewKey
+        return Row
     end
 
     return KeybindList
@@ -5859,6 +5887,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
