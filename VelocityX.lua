@@ -203,117 +203,99 @@ for Index, Value in Library.Folders do
     end
 end
 
-local TweenService = game:GetService("TweenService")
+-- Tweening
+local Tween = { } do
+    Tween.__index = Tween
 
-local Tween = {}
-Tween.__index = Tween
+    Tween.Create = function(self, Item, Info, Goal, IsRawItem)
+        Item = IsRawItem and Item or Item.Instance
+        Info = Info or TweenInfo.new(Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction)
 
---// Create a new Tween object
-Tween.Create = function(self, Item, Info, Goal, IsRawItem)
-    local Target = IsRawItem and Item or Item.Instance
-    
-    -- Fallback to default values if Library.Tween isn't defined
-    local Time = (Library and Library.Tween and Library.Tween.Time) or 0.3
-    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
-    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
-    
-    Info = Info or TweenInfo.new(Time, Style, Dir)
+        local NewTween = {
+            Tween = TweenService:Create(Item, Info, Goal),
+            Info = Info,
+            Goal = Goal,
+            Item = Item
+        }
 
-    local NewTween = {
-        Tween = TweenService:Create(Target, Info, Goal),
-        Info = Info,
-        Goal = Goal,
-        Item = Target
-    }
+        NewTween.Tween:Play()
 
-    NewTween.Tween:Play()
-    setmetatable(NewTween, Tween)
+        setmetatable(NewTween, Tween)
 
-    return NewTween
-end
-
---// Helper to identify transparency properties for various objects
-Tween.GetProperty = function(self, Item)
-    Item = Item or self.Item 
-    if not Item then return {} end
-
-    if Item:IsA("Frame") or Item:IsA("ScrollingFrame") then
-        return { "BackgroundTransparency" }
-    elseif Item:IsA("TextLabel") or Item:IsA("TextButton") or Item:IsA("TextBox") then
-        return { "TextTransparency", "BackgroundTransparency" }
-    elseif Item:IsA("ImageLabel") or Item:IsA("ImageButton") then
-        return { "BackgroundTransparency", "ImageTransparency" }
-    elseif Item:IsA("UIStroke") then 
-        return { "Transparency" }
-    end
-    
-    return {}
-end
-
---// Fades an item in or out
-Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-    local Item = Item or self.Item 
-    if not Item then return end
-
-    local OldTransparency = Item[Property]
-    
-    -- If we are fading IN, start from invisible (1)
-    if Visibility then
-        Item[Property] = 1
+        return NewTween
     end
 
-    local Time = Speed or (Library and Library.Tween and Library.Tween.Time) or 0.3
-    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
-    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
+    Tween.GetProperty = function(self, Item)
+        Item = Item or self.Item 
 
-    local NewTween = Tween:Create(Item, TweenInfo.new(Time, Style, Dir), {
-        [Property] = Visibility and (OldTransparency > 0 and OldTransparency or 0) or 1
-    }, true)
+        if Item:IsA("Frame") then
+            return { "BackgroundTransparency" }
+        elseif Item:IsA("TextLabel") or Item:IsA("TextButton") then
+            return { "TextTransparency", "BackgroundTransparency" }
+        elseif Item:IsA("ImageLabel") or Item:IsA("ImageButton") then
+            return { "BackgroundTransparency", "ImageTransparency" }
+        elseif Item:IsA("ScrollingFrame") then
+            return { "BackgroundTransparency", "ScrollBarImageTransparency" }
+        elseif Item:IsA("TextBox") then
+            return { "TextTransparency", "BackgroundTransparency" }
+        elseif Item:IsA("UIStroke") then 
+            return { "Transparency" }
+        end
+    end
 
-    -- Cleanup connection to handle post-fade logic
-    if Library and Library.Connect then
+    Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
+        local Item = Item or self.Item 
+
+        local OldTransparency = Item[Property]
+        Item[Property] = Visibility and 1 or OldTransparency
+
+        local NewTween = Tween:Create(Item, TweenInfo.new(Speed or Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction), {
+            [Property] = Visibility and OldTransparency or 1
+        }, true)
+
         Library:Connect(NewTween.Tween.Completed, function()
             if not Visibility then 
                 task.wait()
-                -- Optional: Reset to old transparency if you want it to reappear later
-                -- Item[Property] = OldTransparency 
+                Item[Property] = OldTransparency
             end
         end)
+
+        return NewTween
     end
 
-    return NewTween
-end
+    Tween.Get = function(self)
+        if not self.Tween then 
+            return
+        end
 
---// Returns tween data
-Tween.Get = function(self)
-    if not self.Tween then return end
-    return self.Tween, self.Info, self.Goal
-end
+        return self.Tween, self.Info, self.Goal
+    end
 
---// Standard Controls
-Tween.Pause = function(self)
-    if self.Tween then 
+    Tween.Pause = function(self)
+        if not self.Tween then 
+            return
+        end
+
         self.Tween:Pause()
     end
-end
 
-Tween.Play = function(self)
-    if self.Tween then 
+    Tween.Play = function(self)
+        if not self.Tween then 
+            return
+        end
+
         self.Tween:Play()
     end
-end
 
---// Proper Cleanup
-Tween.Clean = function(self)
-    if self.Tween then 
-        self.Tween:Cancel() -- Use Cancel to stop it immediately
-        self.Tween = nil
+    Tween.Clean = function(self)
+        if not self.Tween then 
+            return
+        end
+
+        Tween:Pause()
+        self = nil
     end
-    self.Item = nil
 end
-
--- Assign back to your Library
-Library.Tween = Tween
 
 -- Instances
 Instances = { } do
@@ -741,36 +723,21 @@ Instances:Create("UIPadding", {
     PaddingLeft = UDimNew(0, 15)
 })
 
---// Library Unload (Fixed to prevent errors)
 Library.Unload = function(self)
-    -- Disconnect connections safely
-    for Index, Value in pairs(self.Connections) do 
-        pcall(function()
-            if Value and Value.Connection then
-                Value.Connection:Disconnect()
-            end
-        end)
+    for Index, Value in self.Connections do 
+        Value.Connection:Disconnect()
     end
 
-    -- Close threads safely
-    for Index, Value in pairs(self.Threads) do 
-        pcall(function()
-            if Value and coroutine.status(Value) ~= "dead" then
-                coroutine.close(Value)
-            end
-        end)
+    for Index, Value in self.Threads do 
+        coroutine.close(Value)
     end
 
-    -- Clean UI safely
     if self.Holder then 
-        pcall(function()
-            self.Holder:Clean()
-        end)
+        self.Holder:Clean()
     end
 
-    -- Cleanup Globals
-    getgenv().Library = nil
     Library = nil 
+    getgenv().Library = nil
 end
 
 Library.GetImage = function(self, Image)
@@ -799,199 +766,84 @@ Library.Thread = function(self, Function)
     return NewThread
 end
 
---// UPDATE YOUR SAFECALL (Prevents the Kicking)
 Library.SafeCall = function(self, Function, ...)
     local Arguements = { ... }
-    local Success, Result = pcall(Function, table.unpack(Arguements))
+    local Success, Result = pcall(Function, TableUnpack(Arguements))
 
     if not Success then
-        -- We warn in the console (F9) so you can fix bugs without being kicked
-        warn("Aether Callback Error: " .. tostring(Result))
+        LocalPlayer:Kick("Aether Callback Error: " .. tostring(Result))
         return false
     end
 
     return Success
 end
 
---// UPDATE YOUR CONNECT (Fixed a major threading bug)
-Library.Connect = function(self, Signal, Callback)
-    local ConnectionData = {
-        Connection = nil,
-        Thread = nil
+Library.Connect = function(self, Event, Callback, Name)
+    Name = Name or StringFormat("connection_number_%s_%s", self.UnnamedConnections + 1, HttpService:GenerateGUID(false))
+
+    local NewConnection = {
+        Event = Event,
+        Callback = Callback,
+        Name = Name,
+        Connection = nil
     }
-    
-    ConnectionData.Thread = coroutine.create(function()
-        ConnectionData.Connection = Signal:Connect(function(...)
-            self:SafeCall(Callback, ...)
-        end)
+
+    Library:Thread(function()
+        NewConnection.Connection = Event:Connect(Callback)
     end)
 
-    coroutine.resume(ConnectionData.Thread)
-    table.insert(self.Threads, ConnectionData.Thread)
-    table.insert(self.Connections, ConnectionData)
-    
-    return ConnectionData
+    TableInsert(self.Connections, NewConnection)
+    return NewConnection
 end
 
---// UPDATE YOUR TWEEN MODULE (Fixed the "Time expects a number" error)
-local Tween = {}
-Tween.__index = Tween
-
-Tween.Create = function(self, Item, Info, Goal, IsRawItem)
-    local Target = IsRawItem and Item or (Item and Item.Instance)
-    if not Target then return end
-    
-    -- Robust Time check to prevent the kick you saw
-    local Time = 0.3
-    if Library and Library.Tween and type(Library.Tween.Time) == "number" then
-        Time = Library.Tween.Time
+Library.Disconnect = function(self, Name)
+    for _, Connection in self.Connections do 
+        if Connection.Name == Name then
+            Connection.Connection:Disconnect()
+            break
+        end
     end
-    
-    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
-    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
-    
-    Info = Info or TweenInfo.new(Time, Style, Dir)
+end
 
-    local NewTween = {
-        Tween = game:GetService("TweenService"):Create(Target, Info, Goal),
-        Info = Info,
-        Goal = Goal,
-        Item = Target
+Library.EscapePattern = function(self, String)
+    local ShouldEscape = false 
+
+    if string.match(String, "[%(%)%.%%%+%-%*%?%[%]%^%$]") then
+        ShouldEscape = true
+    end
+
+    if ShouldEscape then
+        return StringGSub(String, "[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%1")
+    end
+
+    return String
+end
+
+Library.NextFlag = function(self)
+    local FlagNumber = self.UnnamedFlags + 1
+    return StringFormat("flag_number_%s_%s", FlagNumber, HttpService:GenerateGUID(false))
+end
+
+Library.AddToTheme = function(self, Item, Properties)
+    Item = Item.Instance or Item 
+
+    local ThemeData = {
+        Item = Item,
+        Properties = Properties,
     }
 
-    NewTween.Tween:Play()
-    return setmetatable(NewTween, Tween)
-end
-
-Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-    if not Item then return end
-    local OldTransparency = Item[Property] or 0
-    if Visibility then Item[Property] = 1 end
-
-    local Time = type(Speed) == "number" and Speed or 0.3
-    
-    return Tween:Create(Item, TweenInfo.new(Time), {
-        [Property] = Visibility and (OldTransparency > 0 and OldTransparency or 0) or 1
-    }, true)
-end
-
-Tween.Clean = function(self)
-    if self.Tween then 
-        self.Tween:Cancel()
-        self.Tween = nil
-    end
-    self.Item = nil
-end
-
-Library.Tween = Tween
-
---// UPDATE YOUR SAFECALL (Prevents the Kicking)
-Library.SafeCall = function(self, Function, ...)
-    local Arguements = { ... }
-    local Success, Result = pcall(Function, table.unpack(Arguements))
-
-    if not Success then
-        -- We warn in the console (F9) so you can fix bugs without being kicked
-        warn("Aether Callback Error: " .. tostring(Result))
-        return false
+    for Property, Value in ThemeData.Properties do
+        if type(Value) == "string" then
+            Item[Property] = self.Theme[Value]
+        else
+            Item[Property] = Value()
+        end
     end
 
-    return Success
+    TableInsert(self.ThemeItems, ThemeData)
+    self.ThemeMap[Item] = ThemeData
 end
 
---// UPDATE YOUR CONNECT (Fixed a major threading bug)
-Library.Connect = function(self, Signal, Callback)
-    local ConnectionData = {
-        Connection = nil,
-        Thread = nil
-    }
-    
-    ConnectionData.Thread = coroutine.create(function()
-        ConnectionData.Connection = Signal:Connect(function(...)
-            self:SafeCall(Callback, ...)
-        end)
-    end)
-
-    coroutine.resume(ConnectionData.Thread)
-    table.insert(self.Threads, ConnectionData.Thread)
-    table.insert(self.Connections, ConnectionData)
-    
-    return ConnectionData
-end
-
---// UPDATE YOUR TWEEN MODULE (Fixed the "Time expects a number" error)
-local Tween = {}
-Tween.__index = Tween
-
-Tween.Create = function(self, Item, Info, Goal, IsRawItem)
-    local Target = IsRawItem and Item or (Item and Item.Instance)
-    if not Target then return end
-    
-    -- Robust Time check to prevent the kick you saw
-    local Time = 0.3
-    if Library and Library.Tween and type(Library.Tween.Time) == "number" then
-        Time = Library.Tween.Time
-    end
-    
-    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
-    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
-    
-    Info = Info or TweenInfo.new(Time, Style, Dir)
-
-    local NewTween = {
-        Tween = game:GetService("TweenService"):Create(Target, Info, Goal),
-        Info = Info,
-        Goal = Goal,
-        Item = Target
-    }
-
-    NewTween.Tween:Play()
-    return setmetatable(NewTween, Tween)
-end
-
-Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-    if not Item then return end
-    local OldTransparency = Item[Property] or 0
-    if Visibility then Item[Property] = 1 end
-
-    local Time = type(Speed) == "number" and Speed or 0.3
-    
-    return Tween:Create(Item, TweenInfo.new(Time), {
-        [Property] = Visibility and (OldTransparency > 0 and OldTransparency or 0) or 1
-    }, true)
-end
-
-Tween.Clean = function(self)
-    if self.Tween then 
-        self.Tween:Cancel()
-        self.Tween = nil
-    end
-    self.Item = nil
-end
-
-Library.Tween = Tween
-
---// UPDATE YOUR UNLOAD (Safe Cleanup)
-Library.Unload = function(self)
-    for _, Value in pairs(self.Connections) do 
-        pcall(function()
-            if Value.Connection then Value.Connection:Disconnect() end
-        end)
-    end
-
-    for _, Value in pairs(self.Threads) do 
-        pcall(function()
-            if Value and coroutine.status(Value) ~= "dead" then coroutine.close(Value) end
-        end)
-    end
-
-    if self.Holder then 
-        pcall(function() self.Holder:Clean() end)
-    end
-
-    getgenv().Library = nil
-end
-										
 Library.GetConfig = function(self)
     local Config = {}
 
@@ -5996,5 +5848,3 @@ Library.PlayerList = function(self)
 end
 
 return Library
-
-
