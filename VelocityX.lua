@@ -204,48 +204,29 @@ for Index, Value in Library.Folders do
 end
 
 -- Tweening
-local Tween = {} do
+local Tween = { } do
     Tween.__index = Tween
 
     Tween.Create = function(self, Item, Info, Goal, IsRawItem)
-        Item = IsRawItem and Item or (Item and Item.Instance)
-        if not Item then
-            return nil
-        end
+        Item = IsRawItem and Item or Item.Instance
+        Info = Info or TweenInfo.new(Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction)
 
-        Info = Info or TweenInfo.new(
-            Library.Tween.Time,
-            Library.Tween.Style,
-            Library.Tween.Direction
-        )
-
-        local ok, robloxTween = pcall(function()
-            return TweenService:Create(Item, Info, Goal)
-        end)
-
-        if not ok or not robloxTween then
-            return nil
-        end
-
-        local NewTween = setmetatable({
-            Tween = robloxTween,
+        local NewTween = {
+            Tween = TweenService:Create(Item, Info, Goal),
             Info = Info,
             Goal = Goal,
             Item = Item
-        }, Tween)
+        }
 
-        pcall(function()
-            robloxTween:Play()
-        end)
+        NewTween.Tween:Play()
+
+        setmetatable(NewTween, Tween)
 
         return NewTween
     end
 
     Tween.GetProperty = function(self, Item)
-        Item = Item or (self and self.Item)
-        if not Item then
-            return nil
-        end
+        Item = Item or self.Item 
 
         if Item:IsA("Frame") then
             return { "BackgroundTransparency" }
@@ -257,102 +238,62 @@ local Tween = {} do
             return { "BackgroundTransparency", "ScrollBarImageTransparency" }
         elseif Item:IsA("TextBox") then
             return { "TextTransparency", "BackgroundTransparency" }
-        elseif Item:IsA("UIStroke") then
+        elseif Item:IsA("UIStroke") then 
             return { "Transparency" }
         end
-
-        return nil
     end
 
     Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-        Item = Item or (self and self.Item)
-        if not Item or not Property then
-            return nil
-        end
+        local Item = Item or self.Item 
 
-        local okRead, OldTransparency = pcall(function()
-            return Item[Property]
+        local OldTransparency = Item[Property]
+        Item[Property] = Visibility and 1 or OldTransparency
+
+        local NewTween = Tween:Create(Item, TweenInfo.new(Speed or Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction), {
+            [Property] = Visibility and OldTransparency or 1
+        }, true)
+
+        Library:Connect(NewTween.Tween.Completed, function()
+            if not Visibility then 
+                task.wait()
+                Item[Property] = OldTransparency
+            end
         end)
-        if not okRead then
-            return nil
-        end
-
-        pcall(function()
-            Item[Property] = Visibility and 1 or OldTransparency
-        end)
-
-        local NewTween = Tween:Create(
-            Item,
-            TweenInfo.new(
-                Speed or Library.Tween.Time,
-                Library.Tween.Style,
-                Library.Tween.Direction
-            ),
-            {
-                [Property] = Visibility and OldTransparency or 1
-            },
-            true
-        )
-
-        if NewTween and NewTween.Tween then
-            Library:Connect(NewTween.Tween.Completed, function()
-                if not Visibility and Item and Item.Parent then
-                    task.wait()
-                    pcall(function()
-                        Item[Property] = OldTransparency
-                    end)
-                end
-            end)
-        end
 
         return NewTween
     end
 
     Tween.Get = function(self)
-        if not self or not self.Tween then
-            return nil
+        if not self.Tween then 
+            return
         end
 
         return self.Tween, self.Info, self.Goal
     end
 
     Tween.Pause = function(self)
-        if not self or not self.Tween then
+        if not self.Tween then 
             return
         end
 
-        pcall(function()
-            self.Tween:Pause()
-        end)
+        self.Tween:Pause()
     end
 
     Tween.Play = function(self)
-        if not self or not self.Tween then
+        if not self.Tween then 
             return
         end
 
-        pcall(function()
-            self.Tween:Play()
-        end)
+        self.Tween:Play()
     end
 
     Tween.Clean = function(self)
-        if not self or not self.Tween then
+        if not self.Tween then 
             return
         end
 
-        pcall(function()
-            self.Tween:Pause()
-        end)
-
-        pcall(function()
-            self.Tween:Destroy()
-        end)
-
-        self.Tween = nil
-        self.Info = nil
-        self.Goal = nil
-        self.Item = nil
+        Tween:Pause()
+        self = nil
     end
 end
 
@@ -5907,13 +5848,3 @@ Library.PlayerList = function(self)
 end
 
 return Library
-
-
-
-
-
-
-
-
-
-
