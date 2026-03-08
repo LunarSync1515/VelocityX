@@ -203,99 +203,117 @@ for Index, Value in Library.Folders do
     end
 end
 
--- Tweening
-local Tween = { } do
-    Tween.__index = Tween
+local TweenService = game:GetService("TweenService")
 
-    Tween.Create = function(self, Item, Info, Goal, IsRawItem)
-        Item = IsRawItem and Item or Item.Instance
-        Info = Info or TweenInfo.new(Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction)
+local Tween = {}
+Tween.__index = Tween
 
-        local NewTween = {
-            Tween = TweenService:Create(Item, Info, Goal),
-            Info = Info,
-            Goal = Goal,
-            Item = Item
-        }
+--// Create a new Tween object
+Tween.Create = function(self, Item, Info, Goal, IsRawItem)
+    local Target = IsRawItem and Item or Item.Instance
+    
+    -- Fallback to default values if Library.Tween isn't defined
+    local Time = (Library and Library.Tween and Library.Tween.Time) or 0.3
+    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
+    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
+    
+    Info = Info or TweenInfo.new(Time, Style, Dir)
 
-        NewTween.Tween:Play()
+    local NewTween = {
+        Tween = TweenService:Create(Target, Info, Goal),
+        Info = Info,
+        Goal = Goal,
+        Item = Target
+    }
 
-        setmetatable(NewTween, Tween)
+    NewTween.Tween:Play()
+    setmetatable(NewTween, Tween)
 
-        return NewTween
+    return NewTween
+end
+
+--// Helper to identify transparency properties for various objects
+Tween.GetProperty = function(self, Item)
+    Item = Item or self.Item 
+    if not Item then return {} end
+
+    if Item:IsA("Frame") or Item:IsA("ScrollingFrame") then
+        return { "BackgroundTransparency" }
+    elseif Item:IsA("TextLabel") or Item:IsA("TextButton") or Item:IsA("TextBox") then
+        return { "TextTransparency", "BackgroundTransparency" }
+    elseif Item:IsA("ImageLabel") or Item:IsA("ImageButton") then
+        return { "BackgroundTransparency", "ImageTransparency" }
+    elseif Item:IsA("UIStroke") then 
+        return { "Transparency" }
+    end
+    
+    return {}
+end
+
+--// Fades an item in or out
+Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
+    local Item = Item or self.Item 
+    if not Item then return end
+
+    local OldTransparency = Item[Property]
+    
+    -- If we are fading IN, start from invisible (1)
+    if Visibility then
+        Item[Property] = 1
     end
 
-    Tween.GetProperty = function(self, Item)
-        Item = Item or self.Item 
+    local Time = Speed or (Library and Library.Tween and Library.Tween.Time) or 0.3
+    local Style = (Library and Library.Tween and Library.Tween.Style) or Enum.EasingStyle.Quad
+    local Dir = (Library and Library.Tween and Library.Tween.Direction) or Enum.EasingDirection.Out
 
-        if Item:IsA("Frame") then
-            return { "BackgroundTransparency" }
-        elseif Item:IsA("TextLabel") or Item:IsA("TextButton") then
-            return { "TextTransparency", "BackgroundTransparency" }
-        elseif Item:IsA("ImageLabel") or Item:IsA("ImageButton") then
-            return { "BackgroundTransparency", "ImageTransparency" }
-        elseif Item:IsA("ScrollingFrame") then
-            return { "BackgroundTransparency", "ScrollBarImageTransparency" }
-        elseif Item:IsA("TextBox") then
-            return { "TextTransparency", "BackgroundTransparency" }
-        elseif Item:IsA("UIStroke") then 
-            return { "Transparency" }
-        end
-    end
+    local NewTween = Tween:Create(Item, TweenInfo.new(Time, Style, Dir), {
+        [Property] = Visibility and (OldTransparency > 0 and OldTransparency or 0) or 1
+    }, true)
 
-    Tween.FadeItem = function(self, Item, Property, Visibility, Speed)
-        local Item = Item or self.Item 
-
-        local OldTransparency = Item[Property]
-        Item[Property] = Visibility and 1 or OldTransparency
-
-        local NewTween = Tween:Create(Item, TweenInfo.new(Speed or Library.Tween.Time, Library.Tween.Style, Library.Tween.Direction), {
-            [Property] = Visibility and OldTransparency or 1
-        }, true)
-
+    -- Cleanup connection to handle post-fade logic
+    if Library and Library.Connect then
         Library:Connect(NewTween.Tween.Completed, function()
             if not Visibility then 
                 task.wait()
-                Item[Property] = OldTransparency
+                -- Optional: Reset to old transparency if you want it to reappear later
+                -- Item[Property] = OldTransparency 
             end
         end)
-
-        return NewTween
     end
 
-    Tween.Get = function(self)
-        if not self.Tween then 
-            return
-        end
+    return NewTween
+end
 
-        return self.Tween, self.Info, self.Goal
-    end
+--// Returns tween data
+Tween.Get = function(self)
+    if not self.Tween then return end
+    return self.Tween, self.Info, self.Goal
+end
 
-    Tween.Pause = function(self)
-        if not self.Tween then 
-            return
-        end
-
+--// Standard Controls
+Tween.Pause = function(self)
+    if self.Tween then 
         self.Tween:Pause()
     end
+end
 
-    Tween.Play = function(self)
-        if not self.Tween then 
-            return
-        end
-
+Tween.Play = function(self)
+    if self.Tween then 
         self.Tween:Play()
     end
-
-    Tween.Clean = function(self)
-        if not self.Tween then 
-            return
-        end
-
-        Tween:Pause()
-        self = nil
-    end
 end
+
+--// Proper Cleanup
+Tween.Clean = function(self)
+    if self.Tween then 
+        self.Tween:Cancel() -- Use Cancel to stop it immediately
+        self.Tween = nil
+    end
+    self.Item = nil
+end
+
+-- Assign back to your Library
+Library.Tween = Tween
 
 -- Instances
 Instances = { } do
@@ -723,21 +741,36 @@ Instances:Create("UIPadding", {
     PaddingLeft = UDimNew(0, 15)
 })
 
+--// Library Unload (Fixed to prevent errors)
 Library.Unload = function(self)
-    for Index, Value in self.Connections do 
-        Value.Connection:Disconnect()
+    -- Disconnect connections safely
+    for Index, Value in pairs(self.Connections) do 
+        pcall(function()
+            if Value and Value.Connection then
+                Value.Connection:Disconnect()
+            end
+        end)
     end
 
-    for Index, Value in self.Threads do 
-        coroutine.close(Value)
+    -- Close threads safely
+    for Index, Value in pairs(self.Threads) do 
+        pcall(function()
+            if Value and coroutine.status(Value) ~= "dead" then
+                coroutine.close(Value)
+            end
+        end)
     end
 
+    -- Clean UI safely
     if self.Holder then 
-        self.Holder:Clean()
+        pcall(function()
+            self.Holder:Clean()
+        end)
     end
 
-    Library = nil 
+    -- Cleanup Globals
     getgenv().Library = nil
+    Library = nil 
 end
 
 Library.GetImage = function(self, Image)
@@ -766,12 +799,14 @@ Library.Thread = function(self, Function)
     return NewThread
 end
 
+--// SafeCall (Updated to Warn instead of Kick)
 Library.SafeCall = function(self, Function, ...)
     local Arguements = { ... }
     local Success, Result = pcall(Function, TableUnpack(Arguements))
 
     if not Success then
-        LocalPlayer:Kick("Aether Callback Error: " .. tostring(Result))
+        -- We use warn() so you can see the error in F9 without being kicked
+        warn("Aether Callback Error: " .. tostring(Result))
         return false
     end
 
@@ -797,9 +832,13 @@ Library.Connect = function(self, Event, Callback, Name)
 end
 
 Library.Disconnect = function(self, Name)
-    for _, Connection in self.Connections do 
+    for _, Connection in pairs(self.Connections) do 
         if Connection.Name == Name then
-            Connection.Connection:Disconnect()
+            pcall(function()
+                if Connection.Connection then
+                    Connection.Connection:Disconnect()
+                end
+            end)
             break
         end
     end
@@ -832,7 +871,7 @@ Library.AddToTheme = function(self, Item, Properties)
         Properties = Properties,
     }
 
-    for Property, Value in ThemeData.Properties do
+    for Property, Value in pairs(ThemeData.Properties) do
         if type(Value) == "string" then
             Item[Property] = self.Theme[Value]
         else
@@ -5848,3 +5887,4 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
