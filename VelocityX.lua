@@ -2670,7 +2670,7 @@ Library.KeybindList = function(self)
         local Row = Instances:Create("Frame", {
             Parent = Items["Content"].Instance,
             BackgroundTransparency = 1,
-            Size = UDim2.new(0,0,0,15),
+            Size = UDim2.new(0,0,0,16),
             AutomaticSize = Enum.AutomaticSize.X
         })
 
@@ -2679,7 +2679,7 @@ Library.KeybindList = function(self)
             BackgroundColor3 = Color3.fromRGB(55,60,68),
             BorderSizePixel = 0,
             Size = UDim2.new(0,8,0,8),
-            Position = UDim2.new(0,0,0,3)
+            Position = UDim2.new(0,0,0,4)
         })
 
         local CheckStroke = Instances:Create("UIStroke", {
@@ -2696,6 +2696,7 @@ Library.KeybindList = function(self)
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
             Position = UDim2.new(0,14,0,0),
+            Size = UDim2.new(0,0,0,16),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 13
         })
@@ -2708,6 +2709,7 @@ Library.KeybindList = function(self)
             BackgroundTransparency = 1,
             TextXAlignment = Enum.TextXAlignment.Left,
             Position = UDim2.new(0,14,0,0),
+            Size = UDim2.new(0,0,0,16),
             AutomaticSize = Enum.AutomaticSize.X,
             TextSize = 13
         })
@@ -2961,7 +2963,7 @@ Library.ArmorViewer = function(self)
     local Gap = 8
     local PadL, PadR = 8, 8
     local PadT, PadB = 6, 10
-    local HeaderH = 0
+    local HeaderH = 32
 
     local function Clamp(x, a, b)
         if (x < a) then return a end
@@ -2993,11 +2995,11 @@ Library.ArmorViewer = function(self)
             contentW = PadL + PadR + (n * ItemSize) + ((n - 1) * Gap)
         end
 
-        local outerW = contentW
+        local outerW = contentW + 16
         local w = Clamp(outerW, MinWidth, MaxWidth)
 
         Items["ArmorViewer"].Instance.Size = UDim2New(0, w, 0, BarHeight)
-        Items["Holder"].Instance.Size = UDim2New(1, 0, 1, 0)
+        Items["Holder"].Instance.Size = UDim2New(1, -16, 1, -(HeaderH + 8))
         Items["RealHolder"].Instance.Size = UDim2New(1, 0, 1, 0)
         Items["RealHolder"].Instance.CanvasSize = UDim2New(0, math.max(0, contentW), 0, 0)
     end
@@ -3018,13 +3020,33 @@ Library.ArmorViewer = function(self)
 
         Items["ArmorViewer"]:MakeDraggable()
 
+        Items["Title"] = Instances:Create("TextLabel", {
+            Parent = Items["ArmorViewer"].Instance,
+            Name = "\0",
+            FontFace = Library.Font,
+            TextColor3 = FromRGB(255, 255, 255),
+            BorderColor3 = FromRGB(0, 0, 0),
+            Text = "Armor",
+            Size = UDim2New(1, -16, 0, 15),
+            Position = UDim2New(0, 8, 0, 8),
+            BackgroundTransparency = 1,
+            TextTransparency = 0,
+            Visible = true,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            BorderSizePixel = 0,
+            ZIndex = 8,
+            AutomaticSize = Enum.AutomaticSize.None,
+            TextSize = 14,
+            BackgroundColor3 = FromRGB(255, 255, 255)
+        })  Items["Title"]:AddToTheme({TextColor3 = "Text"})
+
         Items["Holder"] = Instances:Create("Frame", {
             Parent = Items["ArmorViewer"].Instance,
             Name = "\0",
             BackgroundTransparency = 1,
-            Position = UDim2New(0, 0, 0, 0),
+            Position = UDim2New(0, 8, 0, HeaderH),
             BorderColor3 = FromRGB(0, 0, 0),
-            Size = UDim2New(1, 0, 1, 0),
+            Size = UDim2New(1, -16, 1, -(HeaderH + 8)),
             BorderSizePixel = 0,
             ZIndex = 8,
             BackgroundColor3 = FromRGB(255, 255, 255)
@@ -3135,7 +3157,13 @@ Library.ArmorViewer = function(self)
     end
 
     function Viewer:SetTitle(Name)
-        -- hidden in transparent version
+        if Items["Title"] and Items["Title"].Instance then
+            Items["Title"].Instance.Text = tostring(Name or "")
+        end
+    end
+
+    function Viewer:SetText(Name)
+        Viewer:SetTitle(Name)
     end
 
     function Viewer:GetPosition()
@@ -5798,6 +5826,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
