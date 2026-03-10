@@ -344,6 +344,7 @@ do
                 Min = 0,
                 Max = 100,
                 Default = 0,
+                Suffix = "%",
             })
 
             GunModsSection:Slider({
@@ -352,6 +353,7 @@ do
                 Min = 0,
                 Max = 100,
                 Default = 0,
+                Suffix = "%",
             })
 
             GunModsSection:Toggle({
