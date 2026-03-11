@@ -5842,8 +5842,6 @@ Library.TargetHud = function(self)
     local renderConn = nil
 
     local thumbnailCache = {}
-    local lastHideTime = 0
-    local LOST_TARGET_GRACE = 0.3
 
     local Items = {} do
         Items["TargetHud"] = Instances:Create("Frame", {
@@ -5854,7 +5852,7 @@ Library.TargetHud = function(self)
             BorderSizePixel = 0,
             Size = UDim2New(0, 300, 0, 110),
             BackgroundColor3 = FromRGB(16, 16, 18),
-            Visible = false
+            Visible = true
         }) Items["TargetHud"]:AddToTheme({BackgroundColor3 = "Background 2"})
 
         Items["TargetHud"]:MakeDraggable()
@@ -6005,7 +6003,7 @@ Library.TargetHud = function(self)
 
         Items["HealthBar"] = Instances:Create("Frame", {
             Parent = Items["HealthBarBg"].Instance,
-            Size = UDim2New(1, 0, 1, 0),
+            Size = UDim2New(0, 0, 1, 0),
             BackgroundColor3 = FromRGB(55, 220, 95),
             BorderSizePixel = 0
         })
@@ -6098,24 +6096,30 @@ Library.TargetHud = function(self)
         end
     end
 
-    local function hideHUD(force)
-        if not force then
-            if lastHideTime == 0 then
-                lastHideTime = tick()
-            end
+    local function showEmptyState()
+        Items["TargetHud"].Instance.Visible = true
+        Items["Avatar"].Instance.Image = ""
+        Items["NameLabel"].Instance.Text = "Player: none"
+        Items["DistanceLabel"].Instance.Text = "Distance: N/A"
+        Items["VisibleLabel"].Instance.Text = "Visible: false"
+        Items["HealthBar"].Instance.Size = UDim2New(0, 0, 1, 0)
+        Items["HealthValueLabel"].Instance.Text = "0/0"
+    end
 
-            if tick() - lastHideTime < LOST_TARGET_GRACE then
-                return
-            end
-        end
-
+    local function hideHUD()
         currentTargetPlayer = nil
         currentTargetCharacter = nil
         currentHumanoid = nil
         currentRootPart = nil
 
         disconnectTargetConnections()
-        Items["TargetHud"].Instance.Visible = false
+
+        if flags and flags.TargetHudEnabled ~= nil and not flags.TargetHudEnabled then
+            Items["TargetHud"].Instance.Visible = false
+            return
+        end
+
+        showEmptyState()
     end
 
     local function updateHUD()
@@ -6125,17 +6129,16 @@ Library.TargetHud = function(self)
         end
 
         if not currentTargetPlayer or not currentTargetCharacter or not currentHumanoid or not currentRootPart then
-            hideHUD(true)
+            showEmptyState()
             return
         end
 
         if currentHumanoid.Health <= 0 then
-            hideHUD(true)
+            hideHUD()
             return
         end
 
         Items["TargetHud"].Instance.Visible = true
-        lastHideTime = 0
 
         local player = currentTargetPlayer
         if player.DisplayName ~= player.Name then
@@ -6173,7 +6176,7 @@ Library.TargetHud = function(self)
         currentHumanoid, currentRootPart = getCharacterParts(character)
 
         if not currentHumanoid or not currentRootPart then
-            hideHUD(true)
+            hideHUD()
             return
         end
 
@@ -6212,7 +6215,7 @@ Library.TargetHud = function(self)
 
         currentCharacterRemovingConn = player.CharacterRemoving:Connect(function(removingCharacter)
             if currentTargetPlayer == player and currentTargetCharacter == removingCharacter then
-                hideHUD(true)
+                hideHUD()
             end
         end)
     end
@@ -6288,6 +6291,8 @@ Library.TargetHud = function(self)
         end
     end
 
+    showEmptyState()
+
     renderConn = RunService.RenderStepped:Connect(function()
         if flags and flags.TargetHudEnabled ~= nil and not flags.TargetHudEnabled then
             Items["TargetHud"].Instance.Visible = false
@@ -6297,7 +6302,7 @@ Library.TargetHud = function(self)
         local targetPlayer, targetCharacter = getTargetPlayerFromTargeting()
 
         if not targetPlayer or not targetCharacter then
-            hideHUD(false)
+            hideHUD()
             return
         end
 
@@ -6312,4 +6317,5 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
