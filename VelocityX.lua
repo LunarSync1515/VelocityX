@@ -6221,7 +6221,7 @@ Library.TargetHud = function(self)
     end
 
     local function getTargetPlayerFromTargeting()
-        local character = Targeting and Targeting.TargetCharacter
+        local character = Library.Targeting and Library.Targeting.TargetCharacter
         if not character then
             return nil, nil
         end
@@ -6317,5 +6317,6 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
