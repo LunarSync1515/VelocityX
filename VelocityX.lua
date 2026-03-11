@@ -976,6 +976,14 @@ Library.LoadConfig = function(self, Config)
                     Decoded.WidgetPositions.Watermark
                 )
             end
+
+            if Decoded.WidgetPositions.TargetHud
+            and Library.TargetHudInstance
+            and Library.TargetHudInstance.SetPosition then
+                Library.TargetHudInstance:SetPosition(
+                    Decoded.WidgetPositions.TargetHud
+                )
+            end
         end
 
     end)
@@ -6321,6 +6329,7 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
 
