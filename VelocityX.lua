@@ -5897,7 +5897,7 @@ Library.TargetHud = function(self)
             Position = UDim2New(0, 8, 0, 2),
             Size = UDim2New(1, -16, 0, 18),
             FontFace = Library.Font,
-            Text = "target viewer",
+            Text = "Target Viewer",
             TextSize = 12,
             TextColor3 = FromRGB(220, 235, 255),
             TextXAlignment = Enum.TextXAlignment.Left
@@ -6329,6 +6329,7 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
 
