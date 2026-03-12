@@ -5472,7 +5472,6 @@ Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, Mode
                 end
             end
         })
-    end
         
         SettingsSection:Label("Menu Keybind"):Keybind({
             Name = "Menu Keybind",
@@ -5850,5 +5849,6 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
