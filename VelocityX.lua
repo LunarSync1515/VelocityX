@@ -5893,7 +5893,7 @@ Library.TargetHud = function(self)
         Name = "__TargetHud",
         AnchorPoint = Vector2New(0.5, 0.5),
         Position = UDim2New(0.5, 0, 0.75, 0),
-        Size = UDim2New(0, 360, 0, 125),
+        Size = UDim2New(0, 360, 0, 145),
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(18, 18, 22),
         Visible = true
@@ -6004,9 +6004,23 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["VisibleLabel"], {TextColor3 = "Text"})
     local VisibleLabel = getInstance(Items["VisibleLabel"])
 
+    Items["AccountAgeLabel"] = Instances:Create("TextLabel", {
+        Parent = Inner,
+        BackgroundTransparency = 1,
+        Position = UDim2New(0, 90, 0, 64),
+        Size = UDim2New(1, -100, 0, 16),
+        FontFace = Library.Font,
+        Text = "Account Age: N/A",
+        TextSize = 12,
+        TextColor3 = FromRGB(180, 180, 180),
+        TextXAlignment = Enum.TextXAlignment.Left
+    })
+    safeAddToTheme(Items["AccountAgeLabel"], {TextColor3 = "Text"})
+    local AccountAgeLabel = getInstance(Items["AccountAgeLabel"])
+
     Items["HealthBarBg"] = Instances:Create("Frame", {
         Parent = Inner,
-        Position = UDim2New(0, 90, 0, 70),
+        Position = UDim2New(0, 90, 0, 88),
         Size = UDim2New(1, -140, 0, 10),
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(30, 30, 35)
@@ -6034,7 +6048,7 @@ Library.TargetHud = function(self)
     Items["HealthValue"] = Instances:Create("TextLabel", {
         Parent = Inner,
         BackgroundTransparency = 1,
-        Position = UDim2New(1, -45, 0, 66),
+        Position = UDim2New(1, -45, 0, 84),
         Size = UDim2New(0, 40, 0, 18),
         FontFace = Library.Font,
         Text = "0/0",
@@ -6113,6 +6127,7 @@ Library.TargetHud = function(self)
         NameLabel.Text = "No target"
         DistanceLabel.Text = "Distance: N/A"
         VisibleLabel.Text = "Visible: false"
+        AccountAgeLabel.Text = "Account Age: N/A"
         HealthBar.Size = UDim2New(0, 0, 1, 0)
         HealthValue.Text = "0/0"
     end
@@ -6227,91 +6242,107 @@ Library.TargetHud = function(self)
         end
     end
 
-if flags and flags.TargetHudEnabled == nil then
-    flags.TargetHudEnabled = true
-end
-
-setEmpty()
-
-local debounceTime = 0.15
-local gracePeriod = 0.45
-local lastUpdateTime = 0
-local lastSeenTime = 0
-
-renderConn = RunService.RenderStepped:Connect(function()
-
-    if not isEnabled() then
-        Frame.Visible = false
-        return
+    if flags and flags.TargetHudEnabled == nil then
+        flags.TargetHudEnabled = true
     end
 
-    local now = tick()
-    if now - lastUpdateTime < debounceTime then
-        return
-    end
-    lastUpdateTime = now
+    setEmpty()
 
-    local ok, player, humanoid, rootPart = pcall(getTarget)
+    local debounceTime = 0.15
+    local gracePeriod = 0.45
+    local lastUpdateTime = 0
+    local lastSeenTime = 0
 
-    if not ok or not player or not humanoid or not rootPart then
-        lastSeenTime = lastSeenTime == 0 and now or lastSeenTime
-
-        if now - lastSeenTime >= gracePeriod then
-            setEmpty()
+    renderConn = RunService.RenderStepped:Connect(function()
+        if not isEnabled() then
+            Frame.Visible = false
+            return
         end
-        return
-    end
 
-    lastSeenTime = 0
-    Frame.Visible = true
+        local now = tick()
+        if now - lastUpdateTime < debounceTime then
+            return
+        end
+        lastUpdateTime = now
 
-    setAvatarForPlayer(player)
+        local ok, player, humanoid, rootPart = pcall(getTarget)
 
-    if player.DisplayName ~= player.Name then
-        NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
-    else
-        NameLabel.Text = player.Name
-    end
+        if not ok or not player or not humanoid or not rootPart then
+            lastSeenTime = lastSeenTime == 0 and now or lastSeenTime
 
-    local localCharacter = LocalPlayer.Character
-    local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
+            if now - lastSeenTime >= gracePeriod then
+                setEmpty()
+            end
+            return
+        end
 
-    if localRoot and localRoot.Parent and rootPart and rootPart.Parent then
-        local okDistance, distance = pcall(function()
-            return (localRoot.Position - rootPart.Position).Magnitude
-        end)
+        lastSeenTime = 0
+        Frame.Visible = true
 
-        if okDistance and distance then
-            DistanceLabel.Text = string.format("Distance: %.0f", distance)
+        setAvatarForPlayer(player)
+
+        if player.DisplayName ~= player.Name then
+            NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
+        else
+            NameLabel.Text = player.Name
+        end
+
+        local localCharacter = LocalPlayer.Character
+        local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
+
+        if localRoot and localRoot.Parent and rootPart and rootPart.Parent then
+            local okDistance, distance = pcall(function()
+                return (localRoot.Position - rootPart.Position).Magnitude
+            end)
+
+            if okDistance and distance then
+                DistanceLabel.Text = string.format("Distance: %.0f", distance)
+            else
+                DistanceLabel.Text = "Distance: N/A"
+            end
         else
             DistanceLabel.Text = "Distance: N/A"
         end
-    else
-        DistanceLabel.Text = "Distance: N/A"
-    end
 
-    VisibleLabel.Text = "Visible: true"
+        VisibleLabel.Text = "Visible: true"
 
-    local health = humanoid and humanoid.Health
-    local maxHealth = humanoid and humanoid.MaxHealth
+        if player and player.AccountAge then
+            local totalDays = player.AccountAge
+            local years = math.floor(totalDays / 365)
+            local remainingDays = totalDays % 365
+            local months = math.floor(remainingDays / 30)
+            local days = remainingDays % 30
 
-    if type(health) == "number" and type(maxHealth) == "number" and maxHealth > 0 then
-        local percent = math.clamp(health / maxHealth, 0, 1)
-        HealthBar.Size = UDim2New(percent, 0, 1, 0)
-        HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
-        setHealthColor(percent)
-    else
-        HealthBar.Size = UDim2New(0, 0, 1, 0)
-        HealthValue.Text = "0/0"
-    end
+            AccountAgeLabel.Text = string.format(
+                "Account Age: %dy %dm %dd",
+                years,
+                months,
+                days
+            )
+        else
+            AccountAgeLabel.Text = "Account Age: N/A"
+        end
 
-end)
+        local health = humanoid and humanoid.Health
+        local maxHealth = humanoid and humanoid.MaxHealth
 
-Library.TargetHudInstance = TargetHud
-return TargetHud
+        if type(health) == "number" and type(maxHealth) == "number" and maxHealth > 0 then
+            local percent = math.clamp(health / maxHealth, 0, 1)
+            HealthBar.Size = UDim2New(percent, 0, 1, 0)
+            HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
+            setHealthColor(percent)
+        else
+            HealthBar.Size = UDim2New(0, 0, 1, 0)
+            HealthValue.Text = "0/0"
+        end
+    end)
+
+    Library.TargetHudInstance = TargetHud
+    return TargetHud
 end
 
 return Library
+
 
 
 
