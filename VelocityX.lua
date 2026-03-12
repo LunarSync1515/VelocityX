@@ -5412,7 +5412,7 @@ end
         return Textbox
     end
 
-Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, ModeratorList, PlayerList)
+Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, ModeratorList, PlayerList, TargetHud)
     local SettingsPage = Window:Page({Name = "Settings", Columns = 2})
     local SettingsSection = SettingsPage:Section({Name = "Settings", Side = 1}) do
         SettingsSection:Button({
@@ -5461,6 +5461,18 @@ Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, Mode
                 end
             end
         })
+
+        SettingsSection:Toggle({
+            Name = "Target HUD",
+            Flag = "TargetHudEnabled",
+            Default = true,
+            Callback = function(Value)
+                if TargetHud then
+                    TargetHud:SetVisibility(Value)
+                end
+            end
+        })
+    end
         
         SettingsSection:Label("Menu Keybind"):Keybind({
             Name = "Menu Keybind",
@@ -5838,4 +5850,5 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
