@@ -5465,7 +5465,7 @@ Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, Mode
         SettingsSection:Toggle({
             Name = "Target HUD",
             Flag = "Target HUD",
-            Default = true,
+            Default = false,
             Callback = function(Value)
                 if TargetHud then
                     TargetHud:SetVisibility(Value)
@@ -6340,6 +6340,7 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
 
