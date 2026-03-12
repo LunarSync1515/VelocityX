@@ -6227,80 +6227,92 @@ Library.TargetHud = function(self)
         end
     end
 
-    if flags and flags.TargetHudEnabled == nil then
-        flags.TargetHudEnabled = true
+if flags and flags.TargetHudEnabled == nil then
+    flags.TargetHudEnabled = true
+end
+
+setEmpty()
+
+local debounceTime = 0.15
+local gracePeriod = 0.45
+local lastUpdateTime = 0
+local lastSeenTime = 0
+
+renderConn = RunService.RenderStepped:Connect(function()
+
+    if not isEnabled() then
+        Frame.Visible = false
+        return
     end
 
-    setEmpty()
+    local now = tick()
+    if now - lastUpdateTime < debounceTime then
+        return
+    end
+    lastUpdateTime = now
 
-    local UPDATE_DELAY = 0.15
-    local lastUpdate = 0
+    local ok, player, humanoid, rootPart = pcall(getTarget)
 
-    renderConn = RunService.RenderStepped:Connect(function()
-        if not isEnabled() then
-            Frame.Visible = false
-            return
-        end
+    if not ok or not player or not humanoid or not rootPart then
+        lastSeenTime = lastSeenTime == 0 and now or lastSeenTime
 
-        local now = tick()
-        if now - lastUpdate < UPDATE_DELAY then
-            return
-        end
-        lastUpdate = now
-
-        local ok, player, humanoid, rootPart = pcall(getTarget)
-        if not ok or not player or not humanoid or not rootPart then
+        if now - lastSeenTime >= gracePeriod then
             setEmpty()
-            return
         end
+        return
+    end
 
-        Frame.Visible = true
-        setAvatarForPlayer(player)
+    lastSeenTime = 0
+    Frame.Visible = true
 
-        if player.DisplayName ~= player.Name then
-            NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
-        else
-            NameLabel.Text = player.Name
-        end
+    setAvatarForPlayer(player)
 
-        local localCharacter = LocalPlayer.Character
-        local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
+    if player.DisplayName ~= player.Name then
+        NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
+    else
+        NameLabel.Text = player.Name
+    end
 
-        if localRoot and localRoot.Parent and rootPart and rootPart.Parent then
-            local okDistance, distance = pcall(function()
-                return (localRoot.Position - rootPart.Position).Magnitude
-            end)
+    local localCharacter = LocalPlayer.Character
+    local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
 
-            if okDistance and distance then
-                DistanceLabel.Text = string.format("Distance: %.0f", distance)
-            else
-                DistanceLabel.Text = "Distance: N/A"
-            end
+    if localRoot and localRoot.Parent and rootPart and rootPart.Parent then
+        local okDistance, distance = pcall(function()
+            return (localRoot.Position - rootPart.Position).Magnitude
+        end)
+
+        if okDistance and distance then
+            DistanceLabel.Text = string.format("Distance: %.0f", distance)
         else
             DistanceLabel.Text = "Distance: N/A"
         end
+    else
+        DistanceLabel.Text = "Distance: N/A"
+    end
 
-        VisibleLabel.Text = "Visible: true"
+    VisibleLabel.Text = "Visible: true"
 
-        local health = humanoid and humanoid.Health
-        local maxHealth = humanoid and humanoid.MaxHealth
+    local health = humanoid and humanoid.Health
+    local maxHealth = humanoid and humanoid.MaxHealth
 
-        if type(health) == "number" and type(maxHealth) == "number" and maxHealth > 0 then
-            local percent = math.clamp(health / maxHealth, 0, 1)
-            HealthBar.Size = UDim2New(percent, 0, 1, 0)
-            HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
-            setHealthColor(percent)
-        else
-            HealthBar.Size = UDim2New(0, 0, 1, 0)
-            HealthValue.Text = "0/0"
-        end
-    end)
+    if type(health) == "number" and type(maxHealth) == "number" and maxHealth > 0 then
+        local percent = math.clamp(health / maxHealth, 0, 1)
+        HealthBar.Size = UDim2New(percent, 0, 1, 0)
+        HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
+        setHealthColor(percent)
+    else
+        HealthBar.Size = UDim2New(0, 0, 1, 0)
+        HealthValue.Text = "0/0"
+    end
 
-    Library.TargetHudInstance = TargetHud
-    return TargetHud
+end)
+
+Library.TargetHudInstance = TargetHud
+return TargetHud
 end
 
 return Library
+
 
 
 
