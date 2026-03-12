@@ -6224,7 +6224,11 @@ Library.TargetHud = function(self)
 
     setEmpty()
 
+local UPDATE_DELAY = 0.15
+local lastUpdate = 0
+
 renderConn = RunService.RenderStepped:Connect(function()
+
     if not isEnabled() then
         Frame.Visible = false
         return
@@ -6237,12 +6241,14 @@ renderConn = RunService.RenderStepped:Connect(function()
     lastUpdate = now
 
     local player, humanoid, rootPart = getTarget()
+
     if not player or not humanoid or not rootPart then
         setEmpty()
         return
     end
 
     Frame.Visible = true
+
     setAvatarForPlayer(player)
 
     if player.DisplayName ~= player.Name then
@@ -6251,8 +6257,10 @@ renderConn = RunService.RenderStepped:Connect(function()
         NameLabel.Text = player.Name
     end
 
-    local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if localRoot then
+    local localCharacter = LocalPlayer.Character
+    local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
+
+    if localRoot and rootPart then
         local distance = (localRoot.Position - rootPart.Position).Magnitude
         DistanceLabel.Text = string.format("Distance: %.0f", distance)
     else
@@ -6263,11 +6271,16 @@ renderConn = RunService.RenderStepped:Connect(function()
 
     local health = humanoid.Health
     local maxHealth = math.max(humanoid.MaxHealth, 1)
-    local percent = math.clamp(health / maxHealth, 0, 1)
 
-    HealthBar.Size = UDim2New(percent, 0, 1, 0)
-    HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
-    setHealthColor(percent)
+    if health and maxHealth then
+        local percent = math.clamp(health / maxHealth, 0, 1)
+
+        HealthBar.Size = UDim2New(percent, 0, 1, 0)
+        HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
+
+        setHealthColor(percent)
+    end
+
 end)
 
     Library.TargetHudInstance = TargetHud
@@ -6275,6 +6288,7 @@ end)
 end
 
 return Library
+
 
 
 
