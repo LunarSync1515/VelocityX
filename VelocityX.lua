@@ -5412,7 +5412,7 @@ end
         return Textbox
     end
 
-Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, ModeratorList, PlayerList)
+Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, ModeratorList, PlayerList, TargetHud)
     local SettingsPage = Window:Page({Name = "Settings", Columns = 2})
     local SettingsSection = SettingsPage:Section({Name = "Settings", Side = 1}) do
         SettingsSection:Button({
@@ -5458,6 +5458,17 @@ Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, Mode
             Callback = function(Value)
                 if PlayerList then
                     PlayerList:SetVisibility(Value)
+                end
+            end
+        })
+
+        SettingsSection:Toggle({
+            Name = "Target HUD",
+            Flag = "Target HUD",
+            Default = true,
+            Callback = function(Value)
+                if TargetHud then
+                    TargetHud:SetVisibility(Value)
                 end
             end
         })
@@ -6329,6 +6340,7 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
 
