@@ -964,13 +964,15 @@ end
       return "None"
   end
   
-  local Targeting = {
-      TargetPart = nil,
-      TargetCharacter = nil,
-      ManipulatedPosition = nil,
-      ManipPos = nil,
-      Targets = {},
-  }
+local Targeting = {
+    TargetPart = nil,
+    TargetCharacter = nil,
+    ManipulatedPosition = nil,
+    ManipPos = nil,
+    Targets = {},
+}
+
+Library.Targeting = Targeting
   
   --// Gun Mods
   do
