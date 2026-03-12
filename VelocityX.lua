@@ -897,6 +897,10 @@ Library.GetConfig = function(self)
             Config.WidgetPositions.Watermark = Library.WatermarkInstance:GetPosition()
         end
 
+        if Library.TargetHudInstance and Library.TargetHudInstance.GetPosition then
+            Config.WidgetPositions.TargetHud = Library.TargetHudInstance:GetPosition()
+        end
+
     end)
 
     return HttpService:JSONEncode(Config)
@@ -970,6 +974,14 @@ Library.LoadConfig = function(self, Config)
             and Library.WatermarkInstance.SetPosition then
                 Library.WatermarkInstance:SetPosition(
                     Decoded.WidgetPositions.Watermark
+                )
+            end
+
+            if Decoded.WidgetPositions.TargetHud
+            and Library.TargetHudInstance
+            and Library.TargetHudInstance.SetPosition then
+                Library.TargetHudInstance:SetPosition(
+                    Decoded.WidgetPositions.TargetHud
                 )
             end
         end
@@ -5826,3 +5838,4 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
