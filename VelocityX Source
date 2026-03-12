@@ -76,7 +76,7 @@ Library.WatermarkInstance = Watermark
 Library.TargetHudInstance = MyTargetHud
 
 MyModList:SetVisibility(false)
-MyTargetHud:SetVisibility(true)
+MyTargetHud:SetVisibility(false)
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
