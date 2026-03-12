@@ -5874,7 +5874,7 @@ Library.TargetHud = function(self)
             AnchorPoint = Vector2New(0.5, 0.5),
             Position = UDim2New(0.5, 0, 0.75, 0),
             BorderSizePixel = 0,
-            Size = UDim2New(0, 340, 0, 130),
+            Size = UDim2New(0, 300, 0, 110),
             BackgroundColor3 = FromRGB(16, 16, 18),
             Visible = true
         }) Items["TargetHud"]:AddToTheme({BackgroundColor3 = "Background 2"})
@@ -6365,6 +6365,7 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
 
