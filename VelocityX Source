@@ -147,6 +147,10 @@ local SPECIAL_IDS = {
     [30934698] = "Trial Mod (3verIast)",
     [813030262] = "Trial Mod (Prye4)",
     [1406181681] = "Trial Mod (roblox_23193)",
+    [839333692] = "Trial Mod (Matheus06532)",
+    [419652748] = "Trial Mod (baconman11538)",
+    [353983652] = "Trial Mod (Puhgee)",
+    [2639766722] = "Trial Mod (javicool51)",
 }
 
 local function addModerator(player, tag)
