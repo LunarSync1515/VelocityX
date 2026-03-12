@@ -1169,6 +1169,10 @@ Library.Targeting = Targeting
   
               local distText = newText()
               distText.Parent = holder
+
+              local hpText = newText()
+              hpText.Text = "HP: 0"
+              hpText.Parent = holder
   
               local weaponText = newText()
               weaponText.Text = '[None]'
@@ -1198,6 +1202,7 @@ Library.Targeting = Targeting
                   HealthGradient = healthGradient,
                   Distance = distText,
                   Weapon = weaponText,
+                  HP = hpText,
                   Class = classname,
                   Cham = cham
               }
@@ -1304,7 +1309,13 @@ Library.Targeting = Targeting
                   e.HealthFillHolder.Size = UDim2.fromScale(1,1)
   
                   local hp = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
+
+                  e.HP.Text = "HP: "..math.floor(hum.Health)
+
                   e.HealthFill.Size = UDim2.fromScale(1, hp)
+
+                  -- position HP text beside health bar
+                  e.HP.Position = UDim2.fromOffset(reservedLeft - barW - gap - 24, size.Y + 2)
   
                   e.HealthGradient.Color = ColorSequence.new({
                       ColorSequenceKeypoint.new(0, flags[class .. 'HealthColor1'].Color),
@@ -1325,6 +1336,7 @@ Library.Targeting = Targeting
                   end
   
                   e.Distance.Position = UDim2.fromOffset(reservedLeft, size.Y + 6)
+                  e.HP.Visible = flags[class .. 'Health']
                   e.Distance.Size = UDim2.fromOffset(size.X, 14)
                   e.Distance.Visible = flags[class .. 'Distance']
                   e.Distance.Text = math.floor(distance) .. ' studs'
