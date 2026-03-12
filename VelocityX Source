@@ -1310,7 +1310,8 @@ Library.Targeting = Targeting
   
                   local hp = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
 
-                  e.HP.Text = "HP: "..math.floor(hum.Health)
+                  e.HP.Text = math.floor(hum.Health)
+                  e.HP.TextColor3 = Color3.fromRGB(0,255,0)
 
                   e.HealthFill.Size = UDim2.fromScale(1, hp)
 
