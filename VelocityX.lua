@@ -5465,7 +5465,7 @@ Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, Mode
         SettingsSection:Toggle({
             Name = "Target HUD",
             Flag = "Target HUD",
-            Default = false,
+            Default = true,
             Callback = function(Value)
                 if TargetHud then
                     TargetHud:SetVisibility(Value)
@@ -5854,6 +5854,7 @@ Library.TargetHud = function(self)
     local RunService = game:GetService("RunService")
 
     local LocalPlayer = Players.LocalPlayer
+    local flags = Library.Flags
 
     local currentTargetPlayer = nil
     local currentTargetCharacter = nil
@@ -6119,7 +6120,19 @@ Library.TargetHud = function(self)
         end
     end
 
+    local function isEnabled()
+        if flags and flags.TargetHudEnabled ~= nil then
+            return flags.TargetHudEnabled
+        end
+        return true
+    end
+
     local function showEmptyState()
+        if not isEnabled() then
+            Items["TargetHud"].Instance.Visible = false
+            return
+        end
+
         Items["TargetHud"].Instance.Visible = true
         Items["Avatar"].Instance.Image = ""
         Items["NameLabel"].Instance.Text = "Player: none"
@@ -6136,17 +6149,11 @@ Library.TargetHud = function(self)
         currentRootPart = nil
 
         disconnectTargetConnections()
-
-        if flags and flags.TargetHudEnabled ~= nil and not flags.TargetHudEnabled then
-            Items["TargetHud"].Instance.Visible = false
-            return
-        end
-
         showEmptyState()
     end
 
     local function updateHUD()
-        if flags and flags.TargetHudEnabled ~= nil and not flags.TargetHudEnabled then
+        if not isEnabled() then
             Items["TargetHud"].Instance.Visible = false
             return
         end
@@ -6275,7 +6282,16 @@ Library.TargetHud = function(self)
     end
 
     function TargetHud:SetVisibility(Bool)
-        Items["TargetHud"].Instance.Visible = Bool
+        Bool = Bool and true or false
+        if flags then
+            flags.TargetHudEnabled = Bool
+        end
+
+        if Bool then
+            showEmptyState()
+        else
+            Items["TargetHud"].Instance.Visible = false
+        end
     end
 
     function TargetHud:GetPosition()
@@ -6314,10 +6330,18 @@ Library.TargetHud = function(self)
         end
     end
 
-    showEmptyState()
+    if flags and flags.TargetHudEnabled == nil then
+        flags.TargetHudEnabled = true
+    end
+
+    if isEnabled() then
+        showEmptyState()
+    else
+        Items["TargetHud"].Instance.Visible = false
+    end
 
     renderConn = RunService.RenderStepped:Connect(function()
-        if flags and flags.TargetHudEnabled ~= nil and not flags.TargetHudEnabled then
+        if not isEnabled() then
             Items["TargetHud"].Instance.Visible = false
             return
         end
@@ -6336,10 +6360,12 @@ Library.TargetHud = function(self)
         end
     end)
 
+    Library.TargetHudInstance = TargetHud
     return TargetHud
 end
 
 return Library
+
 
 
 
