@@ -142,8 +142,10 @@ local MODERATOR_RANK = 15 -- Game Moderator rank
 -- manually tracked people by UserId
 local SPECIAL_IDS = {
     [2229169589] = "Trial Mod (fearedbyvamp)",
-    [1] = "Trial Mod (Owner)",
-    [2] = "Trial Mod (DevName)",
+    [4243907215] = "Trial Mod (AaronElagant)",
+    [3020799797] = "Trial Mod (hello_myfriends45)",
+    [30934698] = "Trial Mod (3verIast)",
+    [813030262] = "Trial Mod (Prye4)",
 }
 
 local function addModerator(player, tag)
