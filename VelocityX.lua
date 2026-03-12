@@ -5858,16 +5858,12 @@ Library.TargetHud = function(self)
     local LocalPlayer = Players.LocalPlayer
     local flags = Library.Flags
 
-    local currentTargetPlayer = nil
-    local currentTargetCharacter = nil
-    local currentHumanoid = nil
-    local currentRootPart = nil
-    local currentHealthConn = nil
-    local currentCharacterAddedConn = nil
-    local currentCharacterRemovingConn = nil
+    local thumbnailCache = {}
     local renderConn = nil
 
-    local thumbnailCache = {}
+    local function getInstance(Object)
+        return Object and (Object.Instance or Object)
+    end
 
     local function safeAddToTheme(Object, ThemeTable)
         if Object and Object.AddToTheme then
@@ -5883,8 +5879,11 @@ Library.TargetHud = function(self)
         end
     end
 
-    local function getInstance(Object)
-        return Object and (Object.Instance or Object)
+    local function isEnabled()
+        if flags and flags.TargetHudEnabled ~= nil then
+            return flags.TargetHudEnabled
+        end
+        return true
     end
 
     local Items = {}
@@ -5894,197 +5893,157 @@ Library.TargetHud = function(self)
         Name = "__TargetHud",
         AnchorPoint = Vector2New(0.5, 0.5),
         Position = UDim2New(0.5, 0, 0.75, 0),
+        Size = UDim2New(0, 360, 0, 125),
         BorderSizePixel = 0,
-        Size = UDim2New(0, 300, 0, 110),
-        BackgroundColor3 = FromRGB(16, 16, 18),
+        BackgroundColor3 = FromRGB(18, 18, 22),
         Visible = true
     })
     safeAddToTheme(Items["TargetHud"], {BackgroundColor3 = "Background 2"})
 
-    local FrameInstance = getInstance(Items["TargetHud"])
+    local Frame = getInstance(Items["TargetHud"])
 
     Instances:Create("UICorner", {
-        Parent = FrameInstance,
+        Parent = Frame,
         CornerRadius = UDim.new(0, 4)
     })
 
     Instances:Create("UIStroke", {
-        Parent = FrameInstance,
+        Parent = Frame,
         Color = FromRGB(125, 190, 255),
-        Thickness = 1.5,
-        Transparency = 0.35,
-        LineJoinMode = Enum.LineJoinMode.Miter,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    })
-
-    Instances:Create("UIStroke", {
-        Parent = FrameInstance,
-        Color = FromRGB(125, 190, 255),
-        Thickness = 3,
-        Transparency = 0.82,
+        Thickness = 1.2,
+        Transparency = 0.25,
         ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     })
 
     Items["Title"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
+        Parent = Frame,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 8, 0, 2),
-        Size = UDim2New(1, -16, 0, 18),
+        Position = UDim2New(0, 10, 0, 4),
+        Size = UDim2New(1, -20, 0, 20),
         FontFace = Library.Font,
-        Text = "Target Viewer",
-        TextSize = 12,
-        TextColor3 = FromRGB(220, 235, 255),
+        Text = "Target Hud",
+        TextSize = 14,
+        TextColor3 = FromRGB(240, 240, 240),
         TextXAlignment = Enum.TextXAlignment.Left
     })
     safeAddToTheme(Items["Title"], {TextColor3 = "Text"})
 
-    Items["TopBar"] = Instances:Create("Frame", {
-        Parent = FrameInstance,
-        Position = UDim2New(0, 10, 0, 22),
-        Size = UDim2New(1, -20, 0, 2),
+    Items["TopLine"] = Instances:Create("Frame", {
+        Parent = Frame,
+        Position = UDim2New(0, 8, 0, 28),
+        Size = UDim2New(1, -16, 0, 1),
         BorderSizePixel = 0,
         BackgroundColor3 = FromRGB(125, 190, 255)
     })
 
-    Items["SectionLabel"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
-        BackgroundTransparency = 1,
-        Position = UDim2New(0, 14, 0, 26),
-        Size = UDim2New(0, 80, 0, 16),
-        FontFace = Library.Font,
-        Text = "info",
-        TextSize = 12,
-        TextColor3 = FromRGB(205, 220, 245),
-        TextXAlignment = Enum.TextXAlignment.Left
+    Items["Inner"] = Instances:Create("Frame", {
+        Parent = Frame,
+        Position = UDim2New(0, 8, 0, 34),
+        Size = UDim2New(1, -16, 1, -42),
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(10, 10, 14)
     })
-    safeAddToTheme(Items["SectionLabel"], {TextColor3 = "Text"})
+    local Inner = getInstance(Items["Inner"])
+
+    Instances:Create("UIStroke", {
+        Parent = Inner,
+        Color = FromRGB(70, 80, 100),
+        Thickness = 1,
+        Transparency = 0.45
+    })
 
     Items["Avatar"] = Instances:Create("ImageLabel", {
-        Parent = FrameInstance,
-        BackgroundTransparency = 0,
-        BackgroundColor3 = FromRGB(28, 28, 32),
-        Position = UDim2New(0, 14, 0, 42),
-        Size = UDim2New(0, 52, 0, 52),
+        Parent = Inner,
+        Position = UDim2New(0, 12, 0, 10),
+        Size = UDim2New(0, 70, 0, 70),
+        BackgroundColor3 = FromRGB(230, 230, 230),
         BorderSizePixel = 0,
         Image = ""
     })
-
-    local AvatarInstance = getInstance(Items["Avatar"])
-
-    Instances:Create("UICorner", {
-        Parent = AvatarInstance,
-        CornerRadius = UDim.new(0, 4)
-    })
-
-    Instances:Create("UIStroke", {
-        Parent = AvatarInstance,
-        Color = FromRGB(55, 70, 95),
-        Thickness = 1,
-        Transparency = 0.35
-    })
+    local Avatar = getInstance(Items["Avatar"])
 
     Items["NameLabel"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
+        Parent = Inner,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 78, 0, 40),
-        Size = UDim2New(1, -88, 0, 16),
+        Position = UDim2New(0, 90, 0, 10),
+        Size = UDim2New(1, -100, 0, 20),
         FontFace = Library.Font,
-        Text = "",
-        TextSize = 13,
-        TextColor3 = FromRGB(225, 235, 255),
+        Text = "No target",
+        TextSize = 14,
+        TextColor3 = FromRGB(255, 255, 255),
         TextXAlignment = Enum.TextXAlignment.Left
     })
     safeAddToTheme(Items["NameLabel"], {TextColor3 = "Text"})
+    local NameLabel = getInstance(Items["NameLabel"])
 
     Items["DistanceLabel"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
+        Parent = Inner,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 78, 0, 55),
-        Size = UDim2New(1, -88, 0, 14),
+        Position = UDim2New(0, 90, 0, 32),
+        Size = UDim2New(1, -100, 0, 16),
         FontFace = Library.Font,
-        Text = "",
+        Text = "Distance: N/A",
         TextSize = 12,
-        TextColor3 = FromRGB(200, 210, 225),
+        TextColor3 = FromRGB(200, 200, 200),
         TextXAlignment = Enum.TextXAlignment.Left
     })
     safeAddToTheme(Items["DistanceLabel"], {TextColor3 = "Text"})
+    local DistanceLabel = getInstance(Items["DistanceLabel"])
 
     Items["VisibleLabel"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
+        Parent = Inner,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 78, 0, 68),
-        Size = UDim2New(1, -88, 0, 14),
+        Position = UDim2New(0, 90, 0, 48),
+        Size = UDim2New(1, -100, 0, 16),
         FontFace = Library.Font,
-        Text = "",
+        Text = "Visible: false",
         TextSize = 12,
-        TextColor3 = FromRGB(200, 210, 225),
+        TextColor3 = FromRGB(180, 180, 180),
         TextXAlignment = Enum.TextXAlignment.Left
     })
     safeAddToTheme(Items["VisibleLabel"], {TextColor3 = "Text"})
-
-    Items["HealthText"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
-        BackgroundTransparency = 1,
-        Position = UDim2New(0, 78, 0, 81),
-        Size = UDim2New(1, -88, 0, 14),
-        FontFace = Library.Font,
-        Text = "Health",
-        TextSize = 12,
-        TextColor3 = FromRGB(215, 225, 240),
-        TextXAlignment = Enum.TextXAlignment.Left
-    })
-    safeAddToTheme(Items["HealthText"], {TextColor3 = "Text"})
+    local VisibleLabel = getInstance(Items["VisibleLabel"])
 
     Items["HealthBarBg"] = Instances:Create("Frame", {
-        Parent = FrameInstance,
-        Position = UDim2New(0, 78, 0, 95),
-        Size = UDim2New(0, 190, 0, 8),
-        BackgroundColor3 = FromRGB(24, 24, 26),
-        BorderSizePixel = 0
+        Parent = Inner,
+        Position = UDim2New(0, 90, 0, 70),
+        Size = UDim2New(1, -140, 0, 10),
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(30, 30, 35)
     })
-    safeAddToTheme(Items["HealthBarBg"], {BackgroundColor3 = "Background 1"})
-
-    local HealthBarBgInstance = getInstance(Items["HealthBarBg"])
+    local HealthBarBg = getInstance(Items["HealthBarBg"])
 
     Instances:Create("UICorner", {
-        Parent = HealthBarBgInstance,
+        Parent = HealthBarBg,
         CornerRadius = UDim.new(0, 2)
     })
-
-    local HealthBarBgStroke = Instances:Create("UIStroke", {
-        Parent = HealthBarBgInstance,
-        Color = FromRGB(50, 55, 60),
-        Thickness = 1,
-        Transparency = 0.5
-    })
-    safeAddToTheme(HealthBarBgStroke, {Color = "Border"})
 
     Items["HealthBar"] = Instances:Create("Frame", {
-        Parent = HealthBarBgInstance,
+        Parent = HealthBarBg,
         Size = UDim2New(0, 0, 1, 0),
-        BackgroundColor3 = FromRGB(55, 220, 95),
-        BorderSizePixel = 0
+        BorderSizePixel = 0,
+        BackgroundColor3 = FromRGB(55, 220, 95)
     })
-
-    local HealthBarInstance = getInstance(Items["HealthBar"])
+    local HealthBar = getInstance(Items["HealthBar"])
 
     Instances:Create("UICorner", {
-        Parent = HealthBarInstance,
+        Parent = HealthBar,
         CornerRadius = UDim.new(0, 2)
     })
 
-    Items["HealthValueLabel"] = Instances:Create("TextLabel", {
-        Parent = FrameInstance,
+    Items["HealthValue"] = Instances:Create("TextLabel", {
+        Parent = Inner,
         BackgroundTransparency = 1,
-        Position = UDim2New(0, 272, 0, 89),
-        Size = UDim2New(0, 22, 0, 14),
+        Position = UDim2New(1, -45, 0, 66),
+        Size = UDim2New(0, 40, 0, 18),
         FontFace = Library.Font,
-        Text = "",
+        Text = "0/0",
         TextSize = 11,
-        TextColor3 = FromRGB(210, 225, 240),
+        TextColor3 = FromRGB(230, 230, 230),
         TextXAlignment = Enum.TextXAlignment.Right
     })
-    safeAddToTheme(Items["HealthValueLabel"], {TextColor3 = "Text"})
+    safeAddToTheme(Items["HealthValue"], {TextColor3 = "Text"})
+    local HealthValue = getInstance(Items["HealthValue"])
 
     local dragging = false
     local dragInput = nil
@@ -6092,12 +6051,8 @@ Library.TargetHud = function(self)
     local startPos = nil
 
     local function updateDrag(input)
-        if not FrameInstance or not dragStart or not startPos then
-            return
-        end
-
         local delta = input.Position - dragStart
-        FrameInstance.Position = UDim2.new(
+        Frame.Position = UDim2.new(
             startPos.X.Scale,
             startPos.X.Offset + delta.X,
             startPos.Y.Scale,
@@ -6105,12 +6060,12 @@ Library.TargetHud = function(self)
         )
     end
 
-    FrameInstance.InputBegan:Connect(function(input)
+    Frame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1
             or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
-            startPos = FrameInstance.Position
+            startPos = Frame.Position
 
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -6120,7 +6075,7 @@ Library.TargetHud = function(self)
         end
     end)
 
-    FrameInstance.InputChanged:Connect(function(input)
+    Frame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement
             or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
@@ -6133,61 +6088,70 @@ Library.TargetHud = function(self)
         end
     end)
 
-    local function isEnabled()
-        if flags and flags.TargetHudEnabled ~= nil then
-            return flags.TargetHudEnabled
-        end
-        return true
-    end
-
-    local function disconnectTargetConnections()
-        if currentHealthConn then
-            currentHealthConn:Disconnect()
-            currentHealthConn = nil
-        end
-
-        if currentCharacterAddedConn then
-            currentCharacterAddedConn:Disconnect()
-            currentCharacterAddedConn = nil
-        end
-
-        if currentCharacterRemovingConn then
-            currentCharacterRemovingConn:Disconnect()
-            currentCharacterRemovingConn = nil
+    local function setHealthColor(percent)
+        if percent > 0.6 then
+            HealthBar.BackgroundColor3 = FromRGB(55, 220, 95)
+        elseif percent > 0.3 then
+            HealthBar.BackgroundColor3 = FromRGB(255, 200, 90)
+        else
+            HealthBar.BackgroundColor3 = FromRGB(255, 90, 90)
         end
     end
 
-    local function clearTargetState()
-        currentTargetPlayer = nil
-        currentTargetCharacter = nil
-        currentHumanoid = nil
-        currentRootPart = nil
+    local function setEmpty()
+        if not isEnabled() then
+            Frame.Visible = false
+            return
+        end
+
+        Frame.Visible = true
+        Avatar.Image = ""
+        NameLabel.Text = "No target"
+        DistanceLabel.Text = "Distance: N/A"
+        VisibleLabel.Text = "Visible: false"
+        HealthBar.Size = UDim2New(0, 0, 1, 0)
+        HealthValue.Text = "0/0"
     end
 
-    local function getCharacterParts(character)
+    local function getTarget()
+        local targeting = Library.Targeting
+        local character = targeting and targeting.TargetCharacter
+
         if not character then
-            return nil, nil
+            return nil, nil, nil
+        end
+
+        if typeof(character) ~= "Instance" or not character:IsA("Model") then
+            return nil, nil, nil
+        end
+
+        if character == LocalPlayer.Character then
+            return nil, nil, nil
         end
 
         local humanoid = character:FindFirstChildOfClass("Humanoid")
         local rootPart = character:FindFirstChild("HumanoidRootPart")
-
-        if not humanoid or not rootPart then
-            return nil, nil
+        if not humanoid or not rootPart or humanoid.Health <= 0 then
+            return nil, nil, nil
         end
 
-        return humanoid, rootPart
+        local player = Players:GetPlayerFromCharacter(character)
+        if not player then
+            return nil, nil, nil
+        end
+
+        return player, humanoid, rootPart
     end
 
-    local function setAvatar(player)
+    local function setAvatarForPlayer(player)
         if not player then
-            AvatarInstance.Image = ""
+            Avatar.Image = ""
             return
         end
 
         local cached = thumbnailCache[player.UserId]
         if cached then
-            AvatarInstance.Image = cached
+            Avatar.Image = cached
             return
         end
 
@@ -6201,194 +6165,27 @@ Library.TargetHud = function(self)
 
         if ok and image then
             thumbnailCache[player.UserId] = image
-            AvatarInstance.Image = image
+            Avatar.Image = image
         else
-            AvatarInstance.Image = ""
+            Avatar.Image = ""
         end
-    end
-
-    local function setHealthBarColor(percent)
-        if percent > 0.6 then
-            HealthBarInstance.BackgroundColor3 = FromRGB(55, 220, 95)
-        elseif percent > 0.3 then
-            HealthBarInstance.BackgroundColor3 = FromRGB(255, 200, 90)
-        else
-            HealthBarInstance.BackgroundColor3 = FromRGB(255, 90, 90)
-        end
-    end
-
-    local function showEmptyState()
-        if not isEnabled() then
-            FrameInstance.Visible = false
-            return
-        end
-
-        FrameInstance.Visible = true
-        AvatarInstance.Image = ""
-        getInstance(Items["NameLabel"]).Text = "Player: none"
-        getInstance(Items["DistanceLabel"]).Text = "Distance: N/A"
-        getInstance(Items["VisibleLabel"]).Text = "Visible: false"
-        HealthBarInstance.Size = UDim2New(0, 0, 1, 0)
-        getInstance(Items["HealthValueLabel"]).Text = "0/0"
-    end
-
-    local function hideHUD()
-        disconnectTargetConnections()
-        clearTargetState()
-        showEmptyState()
-    end
-
-    local function updateHUD()
-        if not isEnabled() then
-            FrameInstance.Visible = false
-            return
-        end
-
-        if not currentTargetPlayer or not currentTargetCharacter or not currentHumanoid or not currentRootPart then
-            showEmptyState()
-            return
-        end
-
-        if currentHumanoid.Health <= 0 then
-            hideHUD()
-            return
-        end
-
-        FrameInstance.Visible = true
-
-        local player = currentTargetPlayer
-        if player.DisplayName ~= player.Name then
-            getInstance(Items["NameLabel"]).Text = string.format("Player: %s (@%s)", player.DisplayName, player.Name)
-        else
-            getInstance(Items["NameLabel"]).Text = string.format("Player: %s", player.Name)
-        end
-
-        local health = currentHumanoid.Health
-        local maxHealth = math.max(currentHumanoid.MaxHealth, 1)
-        local percent = math.clamp(health / maxHealth, 0, 1)
-
-        HealthBarInstance.Size = UDim2New(percent, 0, 1, 0)
-        getInstance(Items["HealthValueLabel"]).Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
-        setHealthBarColor(percent)
-
-        local localCharacter = LocalPlayer.Character
-        local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
-
-        if localRoot then
-            local distance = (localRoot.Position - currentRootPart.Position).Magnitude
-            getInstance(Items["DistanceLabel"]).Text = string.format("Distance: %.0f", distance)
-        else
-            getInstance(Items["DistanceLabel"]).Text = "Distance: N/A"
-        end
-
-        getInstance(Items["VisibleLabel"]).Text = "Visible: true"
-    end
-
-    local function bindHealthConnection(player, character, humanoid)
-        if currentHealthConn then
-            currentHealthConn:Disconnect()
-            currentHealthConn = nil
-        end
-
-        if not humanoid then
-            return
-        end
-
-        currentHealthConn = humanoid.HealthChanged:Connect(function()
-            if currentTargetPlayer == player and currentTargetCharacter == character and currentHumanoid == humanoid then
-                updateHUD()
-            end
-        end)
-    end
-
-    local function bindTarget(player, character)
-        disconnectTargetConnections()
-
-        currentTargetPlayer = player
-        currentTargetCharacter = character
-        currentHumanoid, currentRootPart = getCharacterParts(character)
-
-        if not currentHumanoid or not currentRootPart then
-            showEmptyState()
-            return
-        end
-
-        setAvatar(player)
-        bindHealthConnection(player, character, currentHumanoid)
-        updateHUD()
-
-        currentCharacterAddedConn = player.CharacterAdded:Connect(function(newCharacter)
-            if currentTargetPlayer ~= player then
-                return
-            end
-
-            currentTargetCharacter = newCharacter
-            currentHumanoid, currentRootPart = getCharacterParts(newCharacter)
-
-            if currentHumanoid and currentRootPart then
-                bindHealthConnection(player, newCharacter, currentHumanoid)
-                updateHUD()
-            else
-                showEmptyState()
-            end
-        end)
-
-        currentCharacterRemovingConn = player.CharacterRemoving:Connect(function(removingCharacter)
-            if currentTargetPlayer == player and currentTargetCharacter == removingCharacter then
-                hideHUD()
-            end
-        end)
-    end
-
-    local function getTargetPlayerFromTargeting()
-        local targeting = Library.Targeting
-        local character = targeting and targeting.TargetCharacter
-
-        if not character then
-            return nil, nil
-        end
-
-        if typeof(character) ~= "Instance" or not character:IsA("Model") then
-            return nil, nil
-        end
-
-        if character == LocalPlayer.Character then
-            return nil, nil
-        end
-
-        if character.Name:lower():find("soldier") then
-            return nil, nil
-        end
-
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if not humanoid or humanoid.Health <= 0 then
-            return nil, nil
-        end
-
-        local player = Players:GetPlayerFromCharacter(character)
-        if not player then
-            return nil, nil
-        end
-
-        return player, character
     end
 
     function TargetHud:SetVisibility(Bool)
         Bool = Bool and true or false
-
         if flags then
             flags.TargetHudEnabled = Bool
         end
 
         if Bool then
-            showEmptyState()
+            setEmpty()
         else
-            FrameInstance.Visible = false
+            Frame.Visible = false
         end
     end
 
     function TargetHud:GetPosition()
-        local p = FrameInstance.Position
+        local p = Frame.Position
         return {
             XScale = p.X.Scale,
             XOffset = p.X.Offset,
@@ -6402,7 +6199,7 @@ Library.TargetHud = function(self)
             return
         end
 
-        FrameInstance.Position = UDim2.new(
+        Frame.Position = UDim2.new(
             Pos.XScale or 0,
             Pos.XOffset or 0,
             Pos.YScale or 0,
@@ -6416,8 +6213,6 @@ Library.TargetHud = function(self)
             renderConn = nil
         end
 
-        disconnectTargetConnections()
-
         if Items["TargetHud"] then
             safeClean(Items["TargetHud"])
         end
@@ -6427,37 +6222,46 @@ Library.TargetHud = function(self)
         flags.TargetHudEnabled = true
     end
 
-    if isEnabled() then
-        showEmptyState()
-    else
-        FrameInstance.Visible = false
-    end
+    setEmpty()
 
     renderConn = RunService.RenderStepped:Connect(function()
-        local ok, err = pcall(function()
-            if not isEnabled() then
-                FrameInstance.Visible = false
-                return
-            end
-
-            local targetPlayer, targetCharacter = getTargetPlayerFromTargeting()
-
-            if not targetPlayer or not targetCharacter then
-                hideHUD()
-                return
-            end
-
-            if targetPlayer ~= currentTargetPlayer or targetCharacter ~= currentTargetCharacter then
-                bindTarget(targetPlayer, targetCharacter)
-            else
-                updateHUD()
-            end
-        end)
-
-        if not ok then
-            warn("TargetHud error:", err)
-            FrameInstance.Visible = false
+        if not isEnabled() then
+            Frame.Visible = false
+            return
         end
+
+        local player, humanoid, rootPart = getTarget()
+        if not player or not humanoid or not rootPart then
+            setEmpty()
+            return
+        end
+
+        Frame.Visible = true
+        setAvatarForPlayer(player)
+
+        if player.DisplayName ~= player.Name then
+            NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
+        else
+            NameLabel.Text = player.Name
+        end
+
+        local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if localRoot then
+            local distance = (localRoot.Position - rootPart.Position).Magnitude
+            DistanceLabel.Text = string.format("Distance: %.0f", distance)
+        else
+            DistanceLabel.Text = "Distance: N/A"
+        end
+
+        VisibleLabel.Text = "Visible: true"
+
+        local health = humanoid.Health
+        local maxHealth = math.max(humanoid.MaxHealth, 1)
+        local percent = math.clamp(health / maxHealth, 0, 1)
+
+        HealthBar.Size = UDim2New(percent, 0, 1, 0)
+        HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
+        setHealthColor(percent)
     end)
 
     Library.TargetHudInstance = TargetHud
@@ -6465,6 +6269,7 @@ Library.TargetHud = function(self)
 end
 
 return Library
+
 
 
 
