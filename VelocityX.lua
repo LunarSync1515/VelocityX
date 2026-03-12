@@ -3334,7 +3334,7 @@ Library.TargetHud = function(self)
             AnchorPoint = Vector2New(0.5, 0.5),
             Position = UDim2New(0.5, 0, 0.75, 0),
             BorderSizePixel = 0,
-            Size = UDim2New(0, 340, 0, 130),
+            Size = UDim2New(0, 300, 0, 110),
             BackgroundColor3 = FromRGB(16, 16, 18),
             Visible = true
         }) Items["TargetHud"]:AddToTheme({BackgroundColor3 = "Background 2"})
@@ -3510,13 +3510,6 @@ Library.TargetHud = function(self)
         }) Items["HealthValueLabel"]:AddToTheme({TextColor3 = "Text"})
     end
 
-    local function isEnabled()
-        if flags and flags.TargetHudEnabled ~= nil then
-            return flags.TargetHudEnabled
-        end
-        return true
-    end
-
     local function disconnectTargetConnections()
         if currentHealthConn then
             currentHealthConn:Disconnect()
@@ -3532,13 +3525,6 @@ Library.TargetHud = function(self)
             currentCharacterRemovingConn:Disconnect()
             currentCharacterRemovingConn = nil
         end
-    end
-
-    local function clearTargetState()
-        currentTargetPlayer = nil
-        currentTargetCharacter = nil
-        currentHumanoid = nil
-        currentRootPart = nil
     end
 
     local function getCharacterParts(character)
@@ -3594,6 +3580,13 @@ Library.TargetHud = function(self)
         end
     end
 
+    local function isEnabled()
+        if flags and flags.TargetHudEnabled ~= nil then
+            return flags.TargetHudEnabled
+        end
+        return true
+    end
+
     local function showEmptyState()
         if not isEnabled() then
             Items["TargetHud"].Instance.Visible = false
@@ -3610,8 +3603,12 @@ Library.TargetHud = function(self)
     end
 
     local function hideHUD()
+        currentTargetPlayer = nil
+        currentTargetCharacter = nil
+        currentHumanoid = nil
+        currentRootPart = nil
+
         disconnectTargetConnections()
-        clearTargetState()
         showEmptyState()
     end
 
@@ -3661,23 +3658,6 @@ Library.TargetHud = function(self)
         Items["VisibleLabel"].Instance.Text = "Visible: true"
     end
 
-    local function bindHealthConnection(player, character, humanoid)
-        if currentHealthConn then
-            currentHealthConn:Disconnect()
-            currentHealthConn = nil
-        end
-
-        if not humanoid then
-            return
-        end
-
-        currentHealthConn = humanoid.HealthChanged:Connect(function()
-            if currentTargetPlayer == player and currentTargetCharacter == character and currentHumanoid == humanoid then
-                updateHUD()
-            end
-        end)
-    end
-
     local function bindTarget(player, character)
         disconnectTargetConnections()
 
@@ -3686,13 +3666,18 @@ Library.TargetHud = function(self)
         currentHumanoid, currentRootPart = getCharacterParts(character)
 
         if not currentHumanoid or not currentRootPart then
-            showEmptyState()
+            hideHUD()
             return
         end
 
         setAvatar(player)
-        bindHealthConnection(player, character, currentHumanoid)
         updateHUD()
+
+        currentHealthConn = currentHumanoid.HealthChanged:Connect(function()
+            if currentTargetPlayer == player and currentTargetCharacter == character then
+                updateHUD()
+            end
+        end)
 
         currentCharacterAddedConn = player.CharacterAdded:Connect(function(newCharacter)
             if currentTargetPlayer ~= player then
@@ -3702,12 +3687,20 @@ Library.TargetHud = function(self)
             currentTargetCharacter = newCharacter
             currentHumanoid, currentRootPart = getCharacterParts(newCharacter)
 
-            if currentHumanoid and currentRootPart then
-                bindHealthConnection(player, newCharacter, currentHumanoid)
-                updateHUD()
-            else
-                showEmptyState()
+            if currentHealthConn then
+                currentHealthConn:Disconnect()
+                currentHealthConn = nil
             end
+
+            if currentHumanoid then
+                currentHealthConn = currentHumanoid.HealthChanged:Connect(function()
+                    if currentTargetPlayer == player and currentTargetCharacter == newCharacter then
+                        updateHUD()
+                    end
+                end)
+            end
+
+            updateHUD()
         end)
 
         currentCharacterRemovingConn = player.CharacterRemoving:Connect(function(removingCharacter)
@@ -3750,7 +3743,6 @@ Library.TargetHud = function(self)
 
     function TargetHud:SetVisibility(Bool)
         Bool = Bool and true or false
-
         if flags then
             flags.TargetHudEnabled = Bool
         end
@@ -3833,6 +3825,7 @@ Library.TargetHud = function(self)
 end
 									
 return Library
+
 
 
 
