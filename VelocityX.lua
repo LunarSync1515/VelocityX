@@ -3312,6 +3312,7 @@ Library.TargetHud = function(self)
     local TargetHud = {}
     local Players = game:GetService("Players")
     local RunService = game:GetService("RunService")
+    local UserInputService = game:GetService("UserInputService")
 
     local LocalPlayer = Players.LocalPlayer
     local flags = Library.Flags
@@ -3327,18 +3328,22 @@ Library.TargetHud = function(self)
 
     local thumbnailCache = {}
 
-    local function safeAddToTheme(object, themeTable)
-        if object and object.AddToTheme then
-            object:AddToTheme(themeTable)
+    local function safeAddToTheme(Object, ThemeTable)
+        if Object and Object.AddToTheme then
+            Object:AddToTheme(ThemeTable)
         end
     end
 
-    local function safeClean(object)
-        if object and object.Clean then
-            object:Clean()
-        elseif object and object.Instance then
-            object.Instance:Destroy()
+    local function safeClean(Object)
+        if Object and Object.Clean then
+            Object:Clean()
+        elseif Object and Object.Instance then
+            Object.Instance:Destroy()
         end
+    end
+
+    local function getInstance(Object)
+        return Object and (Object.Instance or Object)
     end
 
     local Items = {}
@@ -3355,17 +3360,15 @@ Library.TargetHud = function(self)
     })
     safeAddToTheme(Items["TargetHud"], {BackgroundColor3 = "Background 2"})
 
-    if Items["TargetHud"] and Items["TargetHud"].MakeDraggable then
-        Items["TargetHud"]:MakeDraggable()
-    end
+    local FrameInstance = getInstance(Items["TargetHud"])
 
     Instances:Create("UICorner", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         CornerRadius = UDim.new(0, 4)
     })
 
     Instances:Create("UIStroke", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         Color = FromRGB(125, 190, 255),
         Thickness = 1.5,
         Transparency = 0.35,
@@ -3374,7 +3377,7 @@ Library.TargetHud = function(self)
     })
 
     Instances:Create("UIStroke", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         Color = FromRGB(125, 190, 255),
         Thickness = 3,
         Transparency = 0.82,
@@ -3382,7 +3385,7 @@ Library.TargetHud = function(self)
     })
 
     Items["Title"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 8, 0, 2),
         Size = UDim2New(1, -16, 0, 18),
@@ -3395,7 +3398,7 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["Title"], {TextColor3 = "Text"})
 
     Items["TopBar"] = Instances:Create("Frame", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         Position = UDim2New(0, 10, 0, 22),
         Size = UDim2New(1, -20, 0, 2),
         BorderSizePixel = 0,
@@ -3403,7 +3406,7 @@ Library.TargetHud = function(self)
     })
 
     Items["SectionLabel"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 14, 0, 26),
         Size = UDim2New(0, 80, 0, 16),
@@ -3416,7 +3419,7 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["SectionLabel"], {TextColor3 = "Text"})
 
     Items["Avatar"] = Instances:Create("ImageLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 0,
         BackgroundColor3 = FromRGB(28, 28, 32),
         Position = UDim2New(0, 14, 0, 42),
@@ -3425,20 +3428,22 @@ Library.TargetHud = function(self)
         Image = ""
     })
 
+    local AvatarInstance = getInstance(Items["Avatar"])
+
     Instances:Create("UICorner", {
-        Parent = Items["Avatar"].Instance,
+        Parent = AvatarInstance,
         CornerRadius = UDim.new(0, 4)
     })
 
     Instances:Create("UIStroke", {
-        Parent = Items["Avatar"].Instance,
+        Parent = AvatarInstance,
         Color = FromRGB(55, 70, 95),
         Thickness = 1,
         Transparency = 0.35
     })
 
     Items["NameLabel"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 78, 0, 40),
         Size = UDim2New(1, -88, 0, 16),
@@ -3451,7 +3456,7 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["NameLabel"], {TextColor3 = "Text"})
 
     Items["DistanceLabel"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 78, 0, 55),
         Size = UDim2New(1, -88, 0, 14),
@@ -3464,7 +3469,7 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["DistanceLabel"], {TextColor3 = "Text"})
 
     Items["VisibleLabel"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 78, 0, 68),
         Size = UDim2New(1, -88, 0, 14),
@@ -3477,7 +3482,7 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["VisibleLabel"], {TextColor3 = "Text"})
 
     Items["HealthText"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 78, 0, 81),
         Size = UDim2New(1, -88, 0, 14),
@@ -3490,7 +3495,7 @@ Library.TargetHud = function(self)
     safeAddToTheme(Items["HealthText"], {TextColor3 = "Text"})
 
     Items["HealthBarBg"] = Instances:Create("Frame", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         Position = UDim2New(0, 78, 0, 95),
         Size = UDim2New(0, 190, 0, 8),
         BackgroundColor3 = FromRGB(24, 24, 26),
@@ -3498,13 +3503,15 @@ Library.TargetHud = function(self)
     })
     safeAddToTheme(Items["HealthBarBg"], {BackgroundColor3 = "Background 1"})
 
+    local HealthBarBgInstance = getInstance(Items["HealthBarBg"])
+
     Instances:Create("UICorner", {
-        Parent = Items["HealthBarBg"].Instance,
+        Parent = HealthBarBgInstance,
         CornerRadius = UDim.new(0, 2)
     })
 
     local HealthBarBgStroke = Instances:Create("UIStroke", {
-        Parent = Items["HealthBarBg"].Instance,
+        Parent = HealthBarBgInstance,
         Color = FromRGB(50, 55, 60),
         Thickness = 1,
         Transparency = 0.5
@@ -3512,19 +3519,21 @@ Library.TargetHud = function(self)
     safeAddToTheme(HealthBarBgStroke, {Color = "Border"})
 
     Items["HealthBar"] = Instances:Create("Frame", {
-        Parent = Items["HealthBarBg"].Instance,
+        Parent = HealthBarBgInstance,
         Size = UDim2New(0, 0, 1, 0),
         BackgroundColor3 = FromRGB(55, 220, 95),
         BorderSizePixel = 0
     })
 
+    local HealthBarInstance = getInstance(Items["HealthBar"])
+
     Instances:Create("UICorner", {
-        Parent = Items["HealthBar"].Instance,
+        Parent = HealthBarInstance,
         CornerRadius = UDim.new(0, 2)
     })
 
     Items["HealthValueLabel"] = Instances:Create("TextLabel", {
-        Parent = Items["TargetHud"].Instance,
+        Parent = FrameInstance,
         BackgroundTransparency = 1,
         Position = UDim2New(0, 272, 0, 89),
         Size = UDim2New(0, 22, 0, 14),
@@ -3535,6 +3544,53 @@ Library.TargetHud = function(self)
         TextXAlignment = Enum.TextXAlignment.Right
     })
     safeAddToTheme(Items["HealthValueLabel"], {TextColor3 = "Text"})
+
+    local dragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
+
+    local function updateDrag(input)
+        if not FrameInstance or not dragStart or not startPos then
+            return
+        end
+
+        local delta = input.Position - dragStart
+        FrameInstance.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    FrameInstance.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = FrameInstance.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    FrameInstance.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input == dragInput then
+            updateDrag(input)
+        end
+    end)
 
     local function isEnabled()
         if flags and flags.TargetHudEnabled ~= nil then
@@ -3584,13 +3640,13 @@ Library.TargetHud = function(self)
 
     local function setAvatar(player)
         if not player then
-            Items["Avatar"].Instance.Image = ""
+            AvatarInstance.Image = ""
             return
         end
 
         local cached = thumbnailCache[player.UserId]
         if cached then
-            Items["Avatar"].Instance.Image = cached
+            AvatarInstance.Image = cached
             return
         end
 
@@ -3604,35 +3660,35 @@ Library.TargetHud = function(self)
 
         if ok and image then
             thumbnailCache[player.UserId] = image
-            Items["Avatar"].Instance.Image = image
+            AvatarInstance.Image = image
         else
-            Items["Avatar"].Instance.Image = ""
+            AvatarInstance.Image = ""
         end
     end
 
     local function setHealthBarColor(percent)
         if percent > 0.6 then
-            Items["HealthBar"].Instance.BackgroundColor3 = FromRGB(55, 220, 95)
+            HealthBarInstance.BackgroundColor3 = FromRGB(55, 220, 95)
         elseif percent > 0.3 then
-            Items["HealthBar"].Instance.BackgroundColor3 = FromRGB(255, 200, 90)
+            HealthBarInstance.BackgroundColor3 = FromRGB(255, 200, 90)
         else
-            Items["HealthBar"].Instance.BackgroundColor3 = FromRGB(255, 90, 90)
+            HealthBarInstance.BackgroundColor3 = FromRGB(255, 90, 90)
         end
     end
 
     local function showEmptyState()
         if not isEnabled() then
-            Items["TargetHud"].Instance.Visible = false
+            FrameInstance.Visible = false
             return
         end
 
-        Items["TargetHud"].Instance.Visible = true
-        Items["Avatar"].Instance.Image = ""
-        Items["NameLabel"].Instance.Text = "Player: none"
-        Items["DistanceLabel"].Instance.Text = "Distance: N/A"
-        Items["VisibleLabel"].Instance.Text = "Visible: false"
-        Items["HealthBar"].Instance.Size = UDim2New(0, 0, 1, 0)
-        Items["HealthValueLabel"].Instance.Text = "0/0"
+        FrameInstance.Visible = true
+        AvatarInstance.Image = ""
+        getInstance(Items["NameLabel"]).Text = "Player: none"
+        getInstance(Items["DistanceLabel"]).Text = "Distance: N/A"
+        getInstance(Items["VisibleLabel"]).Text = "Visible: false"
+        HealthBarInstance.Size = UDim2New(0, 0, 1, 0)
+        getInstance(Items["HealthValueLabel"]).Text = "0/0"
     end
 
     local function hideHUD()
@@ -3643,7 +3699,7 @@ Library.TargetHud = function(self)
 
     local function updateHUD()
         if not isEnabled() then
-            Items["TargetHud"].Instance.Visible = false
+            FrameInstance.Visible = false
             return
         end
 
@@ -3657,21 +3713,21 @@ Library.TargetHud = function(self)
             return
         end
 
-        Items["TargetHud"].Instance.Visible = true
+        FrameInstance.Visible = true
 
         local player = currentTargetPlayer
         if player.DisplayName ~= player.Name then
-            Items["NameLabel"].Instance.Text = string.format("Player: %s (@%s)", player.DisplayName, player.Name)
+            getInstance(Items["NameLabel"]).Text = string.format("Player: %s (@%s)", player.DisplayName, player.Name)
         else
-            Items["NameLabel"].Instance.Text = string.format("Player: %s", player.Name)
+            getInstance(Items["NameLabel"]).Text = string.format("Player: %s", player.Name)
         end
 
         local health = currentHumanoid.Health
         local maxHealth = math.max(currentHumanoid.MaxHealth, 1)
         local percent = math.clamp(health / maxHealth, 0, 1)
 
-        Items["HealthBar"].Instance.Size = UDim2New(percent, 0, 1, 0)
-        Items["HealthValueLabel"].Instance.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
+        HealthBarInstance.Size = UDim2New(percent, 0, 1, 0)
+        getInstance(Items["HealthValueLabel"]).Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
         setHealthBarColor(percent)
 
         local localCharacter = LocalPlayer.Character
@@ -3679,12 +3735,12 @@ Library.TargetHud = function(self)
 
         if localRoot then
             local distance = (localRoot.Position - currentRootPart.Position).Magnitude
-            Items["DistanceLabel"].Instance.Text = string.format("Distance: %.0f", distance)
+            getInstance(Items["DistanceLabel"]).Text = string.format("Distance: %.0f", distance)
         else
-            Items["DistanceLabel"].Instance.Text = "Distance: N/A"
+            getInstance(Items["DistanceLabel"]).Text = "Distance: N/A"
         end
 
-        Items["VisibleLabel"].Instance.Text = "Visible: true"
+        getInstance(Items["VisibleLabel"]).Text = "Visible: true"
     end
 
     local function bindHealthConnection(player, character, humanoid)
@@ -3786,12 +3842,12 @@ Library.TargetHud = function(self)
         if Bool then
             showEmptyState()
         else
-            Items["TargetHud"].Instance.Visible = false
+            FrameInstance.Visible = false
         end
     end
 
     function TargetHud:GetPosition()
-        local p = Items["TargetHud"].Instance.Position
+        local p = FrameInstance.Position
         return {
             XScale = p.X.Scale,
             XOffset = p.X.Offset,
@@ -3805,7 +3861,7 @@ Library.TargetHud = function(self)
             return
         end
 
-        Items["TargetHud"].Instance.Position = UDim2.new(
+        FrameInstance.Position = UDim2.new(
             Pos.XScale or 0,
             Pos.XOffset or 0,
             Pos.YScale or 0,
@@ -3833,26 +3889,33 @@ Library.TargetHud = function(self)
     if isEnabled() then
         showEmptyState()
     else
-        Items["TargetHud"].Instance.Visible = false
+        FrameInstance.Visible = false
     end
 
     renderConn = RunService.RenderStepped:Connect(function()
-        if not isEnabled() then
-            Items["TargetHud"].Instance.Visible = false
-            return
-        end
+        local ok, err = pcall(function()
+            if not isEnabled() then
+                FrameInstance.Visible = false
+                return
+            end
 
-        local targetPlayer, targetCharacter = getTargetPlayerFromTargeting()
+            local targetPlayer, targetCharacter = getTargetPlayerFromTargeting()
 
-        if not targetPlayer or not targetCharacter then
-            hideHUD()
-            return
-        end
+            if not targetPlayer or not targetCharacter then
+                hideHUD()
+                return
+            end
 
-        if targetPlayer ~= currentTargetPlayer or targetCharacter ~= currentTargetCharacter then
-            bindTarget(targetPlayer, targetCharacter)
-        else
-            updateHUD()
+            if targetPlayer ~= currentTargetPlayer or targetCharacter ~= currentTargetCharacter then
+                bindTarget(targetPlayer, targetCharacter)
+            else
+                updateHUD()
+            end
+        end)
+
+        if not ok then
+            warn("TargetHud error:", err)
+            FrameInstance.Visible = false
         end
     end)
 
@@ -3861,6 +3924,7 @@ Library.TargetHud = function(self)
 end
 									
 return Library
+
 
 
 
