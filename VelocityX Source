@@ -104,7 +104,7 @@ local function CenterAlert(text, duration)
 
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, 300, 0, 55)
-    Frame.Position = UDim2.new(0.5, -150, 0.18, 0) -- higher up
+    Frame.Position = UDim2.new(0.5, -150, 0.18, 0)
     Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     Frame.BorderSizePixel = 0
     Frame.Parent = ScreenGui
@@ -139,6 +139,13 @@ end
 local GROUP_ID = 1154360
 local MODERATOR_RANK = 15 -- Game Moderator rank
 
+-- manually tracked people by UserId
+local SPECIAL_IDS = {
+    [2229169589] = "Trial Mod (fearedbyvamp)",
+    [1] = "Trial Mod (Owner)",
+    [2] = "Trial Mod (DevName)",
+}
+
 local function addModerator(player, tag)
     if trackedMods[player.UserId] then
         return
@@ -147,8 +154,8 @@ local function addModerator(player, tag)
     trackedMods[player.UserId] = true
     MyModList:add_mod(player.UserId, player.Name, tag)
 
-    warn(("⚠️ GROUP MODERATOR: %s detected!"):format(player.Name))
-    CenterAlert("⚠ MODERATOR DETECTED ⚠\n" .. player.Name, 3)
+    warn(("⚠️ STAFF DETECTED: %s [%s]"):format(player.Name, tag))
+    CenterAlert("⚠ STAFF DETECTED ⚠\n" .. player.Name .. " [" .. tag .. "]", 3)
 end
 
 local function removeModerator(player)
@@ -159,6 +166,14 @@ local function removeModerator(player)
 end
 
 local function checkPlayer(player)
+    -- first: check manual UserId list
+    local manualTag = SPECIAL_IDS[player.UserId]
+    if manualTag then
+        addModerator(player, manualTag)
+        return
+    end
+
+    -- second: check group membership/rank
     if not player:IsInGroup(GROUP_ID) then
         removeModerator(player)
         return
