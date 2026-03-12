@@ -6224,51 +6224,58 @@ Library.TargetHud = function(self)
 
     setEmpty()
 
-    renderConn = RunService.RenderStepped:Connect(function()
-        if not isEnabled() then
-            Frame.Visible = false
-            return
-        end
+renderConn = RunService.RenderStepped:Connect(function()
+    if not isEnabled() then
+        Frame.Visible = false
+        return
+    end
 
-        local player, humanoid, rootPart = getTarget()
-        if not player or not humanoid or not rootPart then
-            setEmpty()
-            return
-        end
+    local now = tick()
+    if now - lastUpdate < UPDATE_DELAY then
+        return
+    end
+    lastUpdate = now
 
-        Frame.Visible = true
-        setAvatarForPlayer(player)
+    local player, humanoid, rootPart = getTarget()
+    if not player or not humanoid or not rootPart then
+        setEmpty()
+        return
+    end
 
-        if player.DisplayName ~= player.Name then
-            NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
-        else
-            NameLabel.Text = player.Name
-        end
+    Frame.Visible = true
+    setAvatarForPlayer(player)
 
-        local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if localRoot then
-            local distance = (localRoot.Position - rootPart.Position).Magnitude
-            DistanceLabel.Text = string.format("Distance: %.0f", distance)
-        else
-            DistanceLabel.Text = "Distance: N/A"
-        end
+    if player.DisplayName ~= player.Name then
+        NameLabel.Text = string.format("%s (@%s)", player.DisplayName, player.Name)
+    else
+        NameLabel.Text = player.Name
+    end
 
-        VisibleLabel.Text = "Visible: true"
+    local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if localRoot then
+        local distance = (localRoot.Position - rootPart.Position).Magnitude
+        DistanceLabel.Text = string.format("Distance: %.0f", distance)
+    else
+        DistanceLabel.Text = "Distance: N/A"
+    end
 
-        local health = humanoid.Health
-        local maxHealth = math.max(humanoid.MaxHealth, 1)
-        local percent = math.clamp(health / maxHealth, 0, 1)
+    VisibleLabel.Text = "Visible: true"
 
-        HealthBar.Size = UDim2New(percent, 0, 1, 0)
-        HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
-        setHealthColor(percent)
-    end)
+    local health = humanoid.Health
+    local maxHealth = math.max(humanoid.MaxHealth, 1)
+    local percent = math.clamp(health / maxHealth, 0, 1)
+
+    HealthBar.Size = UDim2New(percent, 0, 1, 0)
+    HealthValue.Text = string.format("%d/%d", math.floor(health), math.floor(maxHealth))
+    setHealthColor(percent)
+end)
 
     Library.TargetHudInstance = TargetHud
     return TargetHud
 end
 
 return Library
+
 
 
 
