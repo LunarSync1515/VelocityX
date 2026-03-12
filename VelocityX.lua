@@ -5462,16 +5462,16 @@ Library.CreateSettingsPage = function(self, Window, KeybindList, Watermark, Mode
             end
         })
 
-        SettingsSection:Toggle({
-            Name = "Target HUD",
-            Flag = "TargetHudEnabled",
-            Default = true,
-            Callback = function(Value)
-                if TargetHud then
-                    TargetHud:SetVisibility(Value)
-                end
-            end
-        })
+SettingsSection:Toggle({
+    Name = "Target HUD",
+    Flag = "TargetHudEnabled",
+    Default = true,
+    Callback = function(Value)
+        if Library.TargetHudInstance and Library.TargetHudInstance.SetVisibility then
+            Library.TargetHudInstance:SetVisibility(Value)
+        end
+    end
+})
         
         SettingsSection:Label("Menu Keybind"):Keybind({
             Name = "Menu Keybind",
@@ -5849,6 +5849,7 @@ Library.PlayerList = function(self)
 end
 
 return Library
+
 
 
 
