@@ -151,6 +151,7 @@ local SPECIAL_IDS = {
     [419652748] = "Trial Mod (baconman11538)",
     [353983652] = "Trial Mod (Puhgee)",
     [2639766722] = "Trial Mod (javicool51)",
+    [8838291970] = "Trial Mod (SoL4R_dEmON)",
 }
 
 local function addModerator(player, tag)
