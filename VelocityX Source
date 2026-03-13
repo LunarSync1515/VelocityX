@@ -141,17 +141,17 @@ local MODERATOR_RANK = 15 -- Game Moderator rank
 
 -- manually tracked people by UserId
 local SPECIAL_IDS = {
-    [2229169589] = "Trial Mod (fearedbyvamp)",
-    [4243907215] = "Trial Mod (AaronElagant)",
-    [3020799797] = "Trial Mod (hello_myfriends45)",
-    [30934698] = "Trial Mod (3verIast)",
-    [813030262] = "Trial Mod (Prye4)",
-    [1406181681] = "Trial Mod (roblox_23193)",
-    [839333692] = "Trial Mod (Matheus06532)",
-    [419652748] = "Trial Mod (baconman11538)",
-    [353983652] = "Trial Mod (Puhgee)",
-    [2639766722] = "Trial Mod (javicool51)",
-    [8838291970] = "Trial Mod (SoL4R_dEmON)",
+    [2229169589] = "Trial Mod", -- fearedbyvamp
+    [4243907215] = "Trial Mod", -- AaronElagant
+    [3020799797] = "Trial Mod", -- hello_myfriends45
+    [30934698] = "Trial Mod", -- 3verIast
+    [813030262] = "Trial Mod", -- Prye4
+    [1406181681] = "Trial Mod", -- roblox_23193
+    [839333692] = "Trial Mod", -- Matheus06532
+    [419652748] = "Trial Mod", -- baconman11538
+    [353983652] = "Trial Mod", -- Puhgee
+    [2639766722] = "Trial Mod", -- javicool51
+    [8838291970] = "Trial Mod", -- SoL4R_dEmON
 }
 
 local function addModerator(player, tag)
