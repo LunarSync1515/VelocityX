@@ -152,6 +152,7 @@ local SPECIAL_IDS = {
     [353983652] = "Trial Mod", -- Puhgee
     [2639766722] = "Trial Mod", -- javicool51
     [8838291970] = "Trial Mod", -- SoL4R_dEmON
+    [3004094651] = "Trial Mod", -- harrib_allsack54321
 }
 
 local function addModerator(player, tag)
