@@ -2277,6 +2277,10 @@ do
 
             local InputBegan
             InputBegan = UserInputService.InputBegan:Connect(function(Input)
+                if UserInputService:GetFocusedTextBox() then
+                    return
+                end
+
                 if Input.UserInputType == Enum.UserInputType.Keyboard then 
                     Keybind:Set(Input.KeyCode)
                 else
@@ -2293,6 +2297,10 @@ do
         end)
 
         Library:Connect(UserInputService.InputBegan, function(Input)
+            if UserInputService:GetFocusedTextBox() then
+                return
+            end
+
             if Keybind.Value == "None" then return end
 
             if tostring(Input.KeyCode) == Keybind.Key then
@@ -2327,6 +2335,10 @@ do
         end)
 
         Library:Connect(UserInputService.InputEnded, function(Input)
+            if UserInputService:GetFocusedTextBox() then
+                return
+            end
+
             if Keybind.Value == "None" then return end
 
             if tostring(Input.KeyCode) == Keybind.Key then
