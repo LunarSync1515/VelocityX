@@ -2626,8 +2626,8 @@ end
                           local NonePos = Vector3.new(0, 0, 0)
   
                           local BaseCFrame = Root.CFrame
-                          local IsUpPressed = UserInputService:IsKeyDown(Enum.KeyCode.E)
-                          local IsDownPressed = UserInputService:IsKeyDown(Enum.KeyCode.Q)
+                          local IsUpPressed = UserInputService:IsKeyDown(Enum.KeyCode.Space)
+                          local IsDownPressed = UserInputService:IsKeyDown(Enum.KeyCode.Z)
                           local IsForwardPressed = UserInputService:IsKeyDown(119) -- W
                           local IsBackwardPressed = UserInputService:IsKeyDown(115) -- S
   
